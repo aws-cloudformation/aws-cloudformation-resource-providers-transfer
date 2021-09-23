@@ -1,6 +1,5 @@
 package software.amazon.transfer.workflow;
 
-import software.amazon.awssdk.services.transfer.TransferAsyncClient;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;

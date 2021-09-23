@@ -23,7 +23,7 @@ public class ListHandler extends BaseHandler<CallbackContext> {
         final List<ResourceModel> models = new ArrayList<>();
 
         // STEP 1 [TODO: construct a body of a request]
-        final AwsRequest awsRequest = Translator.translateToListRequest(request.getNextToken());
+        // final AwsRequest awsRequest = Translator.translateToListRequest(request.getNextToken());
 
         // STEP 2 [TODO: make an api call]
         AwsResponse awsResponse = null; // proxy.injectCredentialsAndInvokeV2(awsRequest, ClientBuilder.getClient()::describeLogGroups);
