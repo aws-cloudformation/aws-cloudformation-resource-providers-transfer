@@ -246,6 +246,12 @@
     "/properties/WorkflowId",
     "/properties/Arn"
   ],
+  "createOnlyProperties": [
+    "/properties/Steps",
+    "/properties/OnExceptionSteps",
+    "/properties/Tags",
+    "/properties/Description"
+  ],
   "primaryIdentifier": [
     "/properties/WorkflowId"
   ],
