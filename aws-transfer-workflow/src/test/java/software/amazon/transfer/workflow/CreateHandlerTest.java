@@ -74,7 +74,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        CreateHandler handler = new CreateHandler();
+        CreateHandler handler = new CreateHandler(client);
 
         doThrow(InvalidRequestException.class)
                 .when(proxy)
@@ -93,7 +93,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        CreateHandler handler = new CreateHandler();
+        CreateHandler handler = new CreateHandler(client);
 
         doThrow(InternalServiceErrorException.class)
                 .when(proxy)
@@ -112,7 +112,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_ResourceExistsExceptionFailed() {
-        CreateHandler handler = new CreateHandler();
+        CreateHandler handler = new CreateHandler(client);
 
         doThrow(ResourceExistsException.class)
                 .when(proxy)
@@ -133,7 +133,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_ThrottlingExceptionFailed() {
-        CreateHandler handler = new CreateHandler();
+        CreateHandler handler = new CreateHandler(client);
 
         doThrow(ThrottlingException.class)
                 .when(proxy)
@@ -152,7 +152,7 @@ public class CreateHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        CreateHandler handler = new CreateHandler();
+        CreateHandler handler = new CreateHandler(client);
 
         doThrow(TransferException.class)
                 .when(proxy)

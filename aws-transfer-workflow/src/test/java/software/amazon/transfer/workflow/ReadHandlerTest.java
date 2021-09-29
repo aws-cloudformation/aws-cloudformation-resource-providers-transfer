@@ -75,7 +75,7 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        ReadHandler handler = new ReadHandler();
+        ReadHandler handler = new ReadHandler(client);
 
         doThrow(InvalidRequestException.class)
                 .when(proxy)
@@ -94,7 +94,7 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        ReadHandler handler = new ReadHandler();
+        ReadHandler handler = new ReadHandler(client);
 
         doThrow(InternalServiceErrorException.class)
                 .when(proxy)
@@ -113,7 +113,7 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_ResourceNotFoundExceptionFailed() {
-        ReadHandler handler = new ReadHandler();
+        ReadHandler handler = new ReadHandler(client);
 
         doThrow(ResourceNotFoundException.class)
                 .when(proxy)
@@ -134,7 +134,7 @@ public class ReadHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        ReadHandler handler = new ReadHandler();
+        ReadHandler handler = new ReadHandler(client);
 
         doThrow(TransferException.class)
                 .when(proxy)
