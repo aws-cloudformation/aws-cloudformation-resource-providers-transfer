@@ -1,7 +1,15 @@
 package software.amazon.transfer.workflow;
 
-import software.amazon.awssdk.awscore.AwsRequest;
-import software.amazon.awssdk.awscore.AwsResponse;
+import lombok.NoArgsConstructor;
+import software.amazon.awssdk.services.transfer.TransferClient;
+import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
+import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
+import software.amazon.awssdk.services.transfer.model.ListWorkflowsRequest;
+import software.amazon.awssdk.services.transfer.model.ListWorkflowsResponse;
+import software.amazon.awssdk.services.transfer.model.TransferException;
+import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
+import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
+import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
@@ -11,7 +19,13 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
 public class ListHandler extends BaseHandler<CallbackContext> {
+    private TransferClient client;
+
+    public ListHandler(TransferClient client) {
+        this.client = client;
+    }
 
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
@@ -20,24 +34,41 @@ public class ListHandler extends BaseHandler<CallbackContext> {
         final CallbackContext callbackContext,
         final Logger logger) {
 
+        if (this.client == null){
+            this.client = ClientBuilder.getClient();
+        }
+
         final List<ResourceModel> models = new ArrayList<>();
 
-        // STEP 1 [TODO: construct a body of a request]
-        // final AwsRequest awsRequest = Translator.translateToListRequest(request.getNextToken());
+        ListWorkflowsRequest listWorkflowsRequest = ListWorkflowsRequest.builder()
+                .maxResults(10)
+                .nextToken(request.getNextToken())
+                .build();
 
-        // STEP 2 [TODO: make an api call]
-        AwsResponse awsResponse = null; // proxy.injectCredentialsAndInvokeV2(awsRequest, ClientBuilder.getClient()::describeLogGroups);
+        try {
+            ListWorkflowsResponse response =
+                    proxy.injectCredentialsAndInvokeV2(listWorkflowsRequest, client::listWorkflows);
 
-        // STEP 3 [TODO: get a token for the next page]
-        String nextToken = null;
+            response.workflows().forEach(listedWorkflow -> {
+                ResourceModel model = ResourceModel.builder()
+                        .arn(listedWorkflow.arn())
+                        .description(listedWorkflow.description())
+                        .workflowId(listedWorkflow.workflowId())
+                        .build();
+                models.add(model);
+            });
 
-        // STEP 4 [TODO: construct resource models]
-        // e.g. https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-logs/blob/master/aws-logs-loggroup/src/main/java/software/amazon/logs/loggroup/ListHandler.java#L19-L21
-
-        return ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .resourceModels(models)
-            .nextToken(nextToken)
-            .status(OperationStatus.SUCCESS)
-            .build();
+            return ProgressEvent.<ResourceModel, CallbackContext>builder()
+                    .resourceModels(models)
+                    .nextToken(response.nextToken())
+                    .status(OperationStatus.SUCCESS)
+                    .build();
+        } catch (InvalidRequestException e) {
+            throw new CfnInvalidRequestException(listWorkflowsRequest.toString(), e.getCause());
+        } catch (InternalServiceErrorException e) {
+            throw new CfnServiceInternalErrorException("listWorkflow", e.getCause());
+        } catch (TransferException e) {
+            throw new CfnGeneralServiceException(e.getMessage(), e.getCause());
+        }
     }
 }

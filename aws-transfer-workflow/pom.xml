@@ -169,10 +169,13 @@
                 <version>0.8.4</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/BaseConfiguration*</exclude>
+                        <exclude>**/*Configuration*</exclude>
                         <exclude>**/BaseHandler*</exclude>
                         <exclude>**/HandlerWrapper*</exclude>
                         <exclude>**/ResourceModel*</exclude>
+                        <exclude>**/ClientBuilder*</exclude>
+                        <exclude>**/CallbackContext*</exclude>
+                        <exclude>**/Converter*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
