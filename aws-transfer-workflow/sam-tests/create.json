@@ -1,0 +1,24 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "CREATE",
+  "request": {
+    "clientRequestToken": "b82eac8e-4706-477c-97ee-0fd9270cc005",
+    "desiredResourceState": {
+      "Description": "SamLocalTest",
+      "Steps": [
+        {
+          "Type": "DELETE",
+          "DeleteStepDetails": {
+            "Name": "deleteallfiles"
+          }
+        }
+      ]
+    },
+    "logicalResourceIdentifier": "Workflow"
+  },
+  "callbackContext": null
+}

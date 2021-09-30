@@ -2,6 +2,7 @@ package software.amazon.transfer.workflow;
 
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateWorkflowRequest;
+import software.amazon.awssdk.services.transfer.model.CreateWorkflowResponse;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
 import software.amazon.awssdk.services.transfer.model.ResourceExistsException;
@@ -25,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 
@@ -54,6 +56,9 @@ public class CreateHandlerTest extends AbstractTestBase {
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
                 .build();
+
+        CreateWorkflowResponse createWorkflowResponse = CreateWorkflowResponse.builder().workflowId("id").build();
+        doReturn(createWorkflowResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         ProgressEvent<ResourceModel, CallbackContext> response
                 = handler.handleRequest(proxy, request, null, logger);

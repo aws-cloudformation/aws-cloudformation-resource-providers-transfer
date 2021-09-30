@@ -1,0 +1,16 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "READ",
+  "request": {
+    "clientRequestToken": "b1bc6fb0-21e7-4b2a-8e02-999cece8de9e",
+    "desiredResourceState": {
+      "WorkflowId": "w-333b37fe1f90e7eeb"
+    },
+    "logicalResourceIdentifier": "Workflow"
+  },
+  "callbackContext": null
+}

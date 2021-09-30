@@ -1,0 +1,16 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "DELETE",
+  "request": {
+    "clientRequestToken": "6c7f6486-a2c8-4e5f-b7ba-0a7e7da1ca8f",
+    "desiredResourceState": {
+      "WorkflowId": "w-54c0b3c9ef4d1a37c"
+    },
+    "logicalResourceIdentifier": "Workflow"
+  },
+  "callbackContext": null
+}

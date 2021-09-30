@@ -15,9 +15,10 @@ out/
 
 # auto-generated files
 target/
+.hypothesis/
 
 # our logs
 rpdk.log*
 
-# contains credentials
-sam-tests/
+# Temporary build artifact
+aws-transfer-workflow.zip
