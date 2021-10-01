@@ -89,7 +89,7 @@ public class ListHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        ListHandler handler = new ListHandler();
+        ListHandler handler = new ListHandler(client);
 
         doThrow(InvalidRequestException.class)
                 .when(proxy)
@@ -108,7 +108,7 @@ public class ListHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        ListHandler handler = new ListHandler();
+        ListHandler handler = new ListHandler(client);
 
         doThrow(InternalServiceErrorException.class)
                 .when(proxy)
@@ -127,7 +127,7 @@ public class ListHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        ListHandler handler = new ListHandler();
+        ListHandler handler = new ListHandler(client);
 
         doThrow(TransferException.class)
                 .when(proxy)

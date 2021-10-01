@@ -79,14 +79,14 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         }  catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(describeWorkflowRequest.toString(), e.getCause());
+            throw new CfnInvalidRequestException(describeWorkflowRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
-            throw new CfnServiceInternalErrorException("describeWorkflow", e.getCause());
+            throw new CfnServiceInternalErrorException("describeWorkflow", e);
         } catch (ResourceNotFoundException e) {
             throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
                     model.getPrimaryIdentifier().toString());
         } catch (TransferException e) {
-            throw new CfnGeneralServiceException(e.getMessage(), e.getCause());
+            throw new CfnGeneralServiceException(e.getMessage(), e);
         }
     }
 }

@@ -65,7 +65,7 @@ public class DeleteHandlerTest {
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        DeleteHandler handler = new DeleteHandler();
+        DeleteHandler handler = new DeleteHandler(client);
 
         doThrow(InvalidRequestException.class)
                 .when(proxy)
@@ -84,7 +84,7 @@ public class DeleteHandlerTest {
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        DeleteHandler handler = new DeleteHandler();
+        DeleteHandler handler = new DeleteHandler(client);
 
         doThrow(InternalServiceErrorException.class)
                 .when(proxy)
@@ -103,7 +103,7 @@ public class DeleteHandlerTest {
 
     @Test
     public void handleRequest_ResourceNotFoundExceptionFailed() {
-        DeleteHandler handler = new DeleteHandler();
+        DeleteHandler handler = new DeleteHandler(client);
 
         doThrow(ResourceNotFoundException.class)
                 .when(proxy)
@@ -124,7 +124,7 @@ public class DeleteHandlerTest {
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        DeleteHandler handler = new DeleteHandler();
+        DeleteHandler handler = new DeleteHandler(client);
 
         doThrow(TransferException.class)
                 .when(proxy)

@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import lombok.NoArgsConstructor;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateWorkflowRequest;
+import software.amazon.awssdk.services.transfer.model.CreateWorkflowResponse;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
 import software.amazon.awssdk.services.transfer.model.ResourceExistsException;
@@ -62,19 +63,21 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
                         .collect(Collectors.toList()))
                 .build();
         try {
-            proxy.injectCredentialsAndInvokeV2(createWorkflowRequest, client::createWorkflow);
+            CreateWorkflowResponse response =
+                    proxy.injectCredentialsAndInvokeV2(createWorkflowRequest, client::createWorkflow);
+            model.setWorkflowId(response.workflowId());
             logger.log(String.format("%s created successfully", ResourceModel.TYPE_NAME));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(createWorkflowRequest.toString(), e.getCause());
+            throw new CfnInvalidRequestException(createWorkflowRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
-            throw new CfnServiceInternalErrorException("createWorkflow", e.getCause());
+            throw new CfnServiceInternalErrorException("createWorkflow", e);
         } catch (ResourceExistsException e) {
             throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME,
                     model.getPrimaryIdentifier().toString());
         } catch (ThrottlingException e) {
-            throw new CfnThrottlingException("createWorkflow", e.getCause());
+            throw new CfnThrottlingException("createWorkflow", e);
         } catch (TransferException e) {
-            throw new CfnGeneralServiceException(e.getMessage(), e.getCause());
+            throw new CfnGeneralServiceException(e.getMessage(), e);
         }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()

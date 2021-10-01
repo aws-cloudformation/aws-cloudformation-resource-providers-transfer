@@ -45,14 +45,14 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
             proxy.injectCredentialsAndInvokeV2(deleteWorkflowRequest, client::deleteWorkflow);
             logger.log(String.format("%s %s deleted successfully", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier()));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(deleteWorkflowRequest.toString(), e.getCause());
+            throw new CfnInvalidRequestException(deleteWorkflowRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
-            throw new CfnServiceInternalErrorException("deleteWorkflow", e.getCause());
+            throw new CfnServiceInternalErrorException("deleteWorkflow", e);
         } catch (ResourceNotFoundException e) {
             throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
                     model.getPrimaryIdentifier().toString());
         } catch (TransferException e) {
-            throw new CfnGeneralServiceException(e.getMessage(), e.getCause());
+            throw new CfnGeneralServiceException(e.getMessage(), e);
         }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()

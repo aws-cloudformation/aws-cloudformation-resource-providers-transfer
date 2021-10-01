@@ -218,7 +218,7 @@
     "Description": {
       "description": "A textual description for the workflow.",
       "type": "string",
-      "pattern": "^[\\w-]*$",
+      "pattern": "^[\\w- ]*$",
       "minLength": 0,
       "maxLength": 256
     },
