@@ -27,6 +27,7 @@ Resources:
                 - "transfer:DeleteWorkflow"
                 - "transfer:DescribeWorkflow"
                 - "transfer:ListWorkflows"
+                - "transfer:TagResource"
                 Resource: "*"
 Outputs:
   ExecutionRoleArn:

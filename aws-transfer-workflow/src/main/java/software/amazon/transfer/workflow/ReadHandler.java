@@ -59,17 +59,17 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .onExceptionSteps((CollectionUtils.isNullOrEmpty(describedWorkflow.onExceptionSteps())) ?
                             null : describedWorkflow.onExceptionSteps()
                             .stream()
-                            .map(Converter.WorkflowStepConverter::toModel)
+                            .map(Converter.WorkflowStepConverter::fromSdk)
                             .collect(Collectors.toList()))
                     .steps((CollectionUtils.isNullOrEmpty(describedWorkflow.steps())) ?
                             null : describedWorkflow.steps()
                             .stream()
-                            .map(Converter.WorkflowStepConverter::toModel)
+                            .map(Converter.WorkflowStepConverter::fromSdk)
                             .collect(Collectors.toList()))
                     .tags((CollectionUtils.isNullOrEmpty(describedWorkflow.tags())) ?
                             null : describedWorkflow.tags()
                             .stream()
-                            .map(Converter.TagConverter::toModel)
+                            .map(Converter.TagConverter::fromSdk)
                             .collect(Collectors.toSet()))
                     .workflowId(model.getWorkflowId())
                     .build();

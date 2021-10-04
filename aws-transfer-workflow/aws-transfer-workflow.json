@@ -258,7 +258,8 @@
   "handlers": {
     "create": {
       "permissions": [
-        "transfer:CreateWorkflow"
+        "transfer:CreateWorkflow",
+        "transfer:TagResource"
       ]
     },
     "read": {
