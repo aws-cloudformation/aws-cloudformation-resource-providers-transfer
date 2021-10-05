@@ -7,7 +7,7 @@ import software.amazon.awssdk.services.transfer.model.OverwriteExisting;
 import software.amazon.awssdk.services.transfer.model.WorkflowStepType;
 
 public class AbstractTestBase {
-  static String TEST_DESCRIPTION = "uluru unit test";
+  static String TEST_DESCRIPTION = "unit test";
 
   public List<WorkflowStep> getModelCopyWorkflowSteps() {
     WorkflowStep step = WorkflowStep.builder()

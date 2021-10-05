@@ -26,7 +26,7 @@ public class Converter {
                     .build();
         }
 
-        static software.amazon.transfer.workflow.Tag toModel(Tag tag) {
+        static software.amazon.transfer.workflow.Tag fromSdk(Tag tag) {
             if (tag == null) {
                 return null;
             }
@@ -91,7 +91,7 @@ public class Converter {
             return sdkWorkflowStep.build();
         }
 
-        static software.amazon.transfer.workflow.WorkflowStep toModel(WorkflowStep workflowStep) {
+        static software.amazon.transfer.workflow.WorkflowStep fromSdk(WorkflowStep workflowStep) {
             if (workflowStep == null) {
                 return null;
             }
@@ -142,7 +142,7 @@ public class Converter {
                         .name(workflowStep.tagStepDetails().name())
                         .tags(workflowStep.tagStepDetails().tags()
                                 .stream()
-                                .map(S3TagConverter::toModel)
+                                .map(S3TagConverter::fromSdk)
                                 .collect(Collectors.toSet()))
                         .build());
             }
@@ -162,7 +162,7 @@ public class Converter {
                     .build();
         }
 
-        static software.amazon.transfer.workflow.S3Tag toModel(S3Tag s3tag) {
+        static software.amazon.transfer.workflow.S3Tag fromSdk(S3Tag s3tag) {
             if (s3tag == null) {
                 return null;
             }
