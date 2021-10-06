@@ -1,0 +1,34 @@
+{
+  "Description": "Cfn Local Test",
+  "Steps": [
+    {
+      "Type": "DELETE",
+      "DeleteStepDetails": {
+        "Name": "deleteallfiles"
+      }
+    },
+    {
+      "Type": "COPY",
+      "CopyStepDetails": {
+        "Name": "copytofolder",
+        "DestinationFileLocation": {
+          "S3FileLocation": {
+            "Bucket": "test",
+            "Key": "test/"
+          }
+        },
+        "OverwriteExisting": "FALSE"
+      }
+    }
+  ],
+  "Tags": [
+    {
+      "Key": "apple",
+      "Value": "red"
+    },
+    {
+      "Key": "peach",
+      "Value": "pink"
+    }
+  ]
+}
