@@ -41,7 +41,9 @@
         "Key": {
           "description": "The name assigned to the file when it was created in S3. You use the object key to retrieve the object.",
           "type": "string",
-          "pattern": "[\\P{M}\\p{M}]*"
+          "pattern": "[\\P{M}\\p{M}]*",
+          "minLength": 0,
+          "maxLength": 1024
         }
       },
       "additionalProperties": false
