@@ -78,7 +78,7 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .resourceModel(resourceModel)
                     .status(OperationStatus.SUCCESS)
                     .build();
-        }  catch (InvalidRequestException e) {
+        } catch (InvalidRequestException e) {
             throw new CfnInvalidRequestException(describeWorkflowRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("describeWorkflow", e);

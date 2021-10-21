@@ -251,7 +251,6 @@
   "createOnlyProperties": [
     "/properties/Steps",
     "/properties/OnExceptionSteps",
-    "/properties/Tags",
     "/properties/Description"
   ],
   "primaryIdentifier": [
@@ -277,6 +276,12 @@
     "list": {
       "permissions": [
         "transfer:ListWorkflows"
+      ]
+    },
+    "update": {
+      "permissions": [
+        "transfer:UnTagResource",
+        "transfer:TagResource"
       ]
     }
   }

@@ -44,6 +44,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         ResourceModel model = request.getDesiredResourceState();
+        model.setTags(Converter.TagConverter.translateTagfromMap(request.getDesiredResourceTags()));
         CreateWorkflowRequest createWorkflowRequest = CreateWorkflowRequest.builder()
                 .description(model.getDescription())
                 .onExceptionSteps((CollectionUtils.isNullOrEmpty(model.getOnExceptionSteps())) ?

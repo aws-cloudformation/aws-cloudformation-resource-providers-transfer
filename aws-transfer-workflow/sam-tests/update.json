@@ -1,0 +1,58 @@
+{
+  "credentials": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
+  },
+  "action": "UPDATE",
+  "request": {
+    "awsAccountId": "",
+    "awsPartition": "aws",
+    "region": "us-east-1",
+    "clientRequestToken": "e646a1aa-35ea-11ec-8d3d-0242ac130003",
+    "desiredResourceState": {
+      "WorkflowId": "w-d68fd252f3c7c55a6",
+      "Description": "SamLocalTest",
+      "Steps": [
+        {
+          "Type": "DELETE",
+          "DeleteStepDetails": {
+            "Name": "deleteallfiles"
+          }
+        }
+      ],
+      "Tags": [
+        {
+          "Key": "violets",
+          "Value": "blue"
+        }
+      ]
+    },
+    "desiredResourceTags": {
+      "roses": "red"
+    },
+    "previousResourceState": {
+      "WorkflowId": "w-d68fd252f3c7c55a6",
+      "Description": "SamLocalTest",
+      "Steps": [
+        {
+          "Type": "DELETE",
+          "DeleteStepDetails": {
+            "Name": "deleteallfiles"
+          }
+        }
+      ],
+      "Tags": [
+        {
+          "Key": "roses",
+          "Value": "red"
+        }
+      ]
+    },
+    "previousResourceTags": {
+      "violets": "blue"
+    },
+    "logicalResourceIdentifier": "Workflow"
+  },
+  "callbackContext": null
+}
