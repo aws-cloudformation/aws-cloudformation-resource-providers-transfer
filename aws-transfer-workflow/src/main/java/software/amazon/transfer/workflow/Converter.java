@@ -1,5 +1,8 @@
 package software.amazon.transfer.workflow;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import software.amazon.awssdk.services.transfer.model.CopyStepDetails;
@@ -24,6 +27,20 @@ public class Converter {
                     .key(tag.getKey())
                     .value(tag.getValue())
                     .build();
+        }
+
+        static Set<software.amazon.transfer.workflow.Tag> translateTagfromMap(Map<String, String> tags) {
+            if (tags == null) {
+                return Collections.emptySet();
+            }
+
+            return tags.entrySet()
+                    .stream()
+                    .map(tag -> software.amazon.transfer.workflow.Tag.builder()
+                            .key(tag.getKey())
+                            .value(tag.getValue())
+                            .build())
+                    .collect(Collectors.toSet());
         }
 
         static software.amazon.transfer.workflow.Tag fromSdk(Tag tag) {
