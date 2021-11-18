@@ -194,6 +194,7 @@
       "type": "array",
       "maxItems": 8,
       "uniqueItems": true,
+      "insertionOrder": true,
       "items": {
         "$ref": "#/definitions/WorkflowStep"
       }
@@ -203,6 +204,7 @@
       "type": "array",
       "maxItems": 8,
       "uniqueItems": true,
+      "insertionOrder": true,
       "items": {
         "$ref": "#/definitions/WorkflowStep"
       }
