@@ -9,14 +9,12 @@
         "Key": {
           "description": "The name assigned to the tag that you create.",
           "type": "string",
-          "pattern": "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$",
           "minLength": 1,
           "maxLength": 128
         },
         "Value": {
           "description": "The value that corresponds to the key.",
           "type": "string",
-          "pattern": "^([\\p{L}\\p{Z}\\p{N}_.:/=+\\-@]*)$",
           "minLength": 0,
           "maxLength": 256
         }
@@ -41,7 +39,7 @@
         "Key": {
           "description": "The name assigned to the file when it was created in S3. You use the object key to retrieve the object.",
           "type": "string",
-          "pattern": "[\\P{M}\\p{M}]*",
+          "pattern": ".*",
           "minLength": 0,
           "maxLength": 1024
         }
@@ -222,7 +220,7 @@
     "Description": {
       "description": "A textual description for the workflow.",
       "type": "string",
-      "pattern": "^[\\w- ]*$",
+      "pattern": "^[\\w\\- ]*$",
       "minLength": 0,
       "maxLength": 256
     },
