@@ -81,6 +81,7 @@ public class Converter {
                                                 .build())
                                         .build())
                         .overwriteExisting(workflowStep.getCopyStepDetails().getOverwriteExisting())
+                        .sourceFileLocation(workflowStep.getCopyStepDetails().getSourceFileLocation())
                         .build());
             }
             if (WorkflowStepType.CUSTOM.toString().equals(type) && workflowStep.getCustomStepDetails() !=null) {
@@ -88,11 +89,13 @@ public class Converter {
                         .name(workflowStep.getCustomStepDetails().getName())
                         .target(workflowStep.getCustomStepDetails().getTarget())
                         .timeoutSeconds(workflowStep.getCustomStepDetails().getTimeoutSeconds())
+                        .sourceFileLocation(workflowStep.getCustomStepDetails().getSourceFileLocation())
                         .build());
             }
             if (WorkflowStepType.DELETE.toString().equals(type) && workflowStep.getDeleteStepDetails() != null) {
                 sdkWorkflowStep.deleteStepDetails(DeleteStepDetails.builder()
                         .name(workflowStep.getDeleteStepDetails().getName())
+                        .sourceFileLocation(workflowStep.getDeleteStepDetails().getSourceFileLocation())
                         .build());
             }
             if (WorkflowStepType.TAG.toString().equals(type) && workflowStep.getTagStepDetails() != null) {
@@ -103,6 +106,7 @@ public class Converter {
                                 .stream()
                                 .map(S3TagConverter::toSdk)
                                 .collect(Collectors.toList()))
+                        .sourceFileLocation(workflowStep.getTagStepDetails().getSourceFileLocation())
                         .build());
             }
             return sdkWorkflowStep.build();
@@ -125,6 +129,7 @@ public class Converter {
                         software.amazon.transfer.workflow.CopyStepDetails.builder()
                                 .name(workflowStep.copyStepDetails().name())
                                 .overwriteExisting(workflowStep.copyStepDetails().overwriteExisting().toString())
+                                .sourceFileLocation(workflowStep.copyStepDetails().sourceFileLocation())
                                 .build();
                 if (workflowStep.copyStepDetails().destinationFileLocation() != null) {
                     software.amazon.transfer.workflow.InputFileLocation inputFileLocation =
@@ -147,11 +152,13 @@ public class Converter {
                         .name(workflowStep.customStepDetails().name())
                         .target(workflowStep.customStepDetails().target())
                         .timeoutSeconds(workflowStep.customStepDetails().timeoutSeconds())
+                        .sourceFileLocation(workflowStep.customStepDetails().sourceFileLocation())
                         .build());
             }
             if (workflowStep.deleteStepDetails() != null) {
                 modelWorkflowStep.setDeleteStepDetails(software.amazon.transfer.workflow.DeleteStepDetails.builder()
                         .name(workflowStep.deleteStepDetails().name())
+                        .sourceFileLocation(workflowStep.deleteStepDetails().sourceFileLocation())
                         .build());
             }
             if (workflowStep.tagStepDetails() != null) {
@@ -161,6 +168,7 @@ public class Converter {
                                 .stream()
                                 .map(S3TagConverter::fromSdk)
                                 .collect(Collectors.toSet()))
+                        .sourceFileLocation(workflowStep.tagStepDetails().sourceFileLocation())
                         .build());
             }
             return modelWorkflowStep;
