@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class Converter {
-    
+
     static class TagConverter {
         static Tag toSdk(
                 Tag tag) {

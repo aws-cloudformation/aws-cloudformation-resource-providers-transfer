@@ -76,7 +76,7 @@ _Type_: String
 
 _Maximum_: <code>256</code>
 
-_Pattern_: <code>^[\w- ]*$</code>
+_Pattern_: <code>^[\w\- ]*$</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
