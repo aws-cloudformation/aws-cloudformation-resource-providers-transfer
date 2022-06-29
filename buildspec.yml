@@ -5,9 +5,9 @@ phases:
         java: openjdk11
         python: 3.7
     commands:
-      -  pip install --upgrade 'pyyaml < 6.0'
       -  pip install --upgrade 'six==1.15.0'
-      -  pip install --upgrade pre-commit cloudformation-cli==0.2.14 cloudformation-cli-java-plugin==2.0.11
+      -  pip install pre-commit
+      -  pip install cloudformation-cli-java-plugin
   build:
     commands:
       - pre-commit run --all-files
@@ -32,3 +32,4 @@ phases:
         fi
     finally:
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-workflow/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-agreement/rpdk.log"
