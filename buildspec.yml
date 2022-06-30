@@ -5,9 +5,10 @@ phases:
         java: openjdk11
         python: 3.7
     commands:
-      - cd "$CODEBUILD_SRC_DIR_JAVA_PLUGIN"
-      - pip install --upgrade pip setuptools wheel awscli -r "$CODEBUILD_SRC_DIR_RPDK/requirements.txt"
-      - mkdir "$CODEBUILD_SRC_DIR_JAVA_PLUGIN/artifacts"
+      -  pip install --upgrade 'PyYAML<6.0,>=5.1'
+      -  pip install --upgrade 'six==1.15.0'
+      -  pip install pre-commit
+      -  pip install cloudformation-cli-java-plugin
   build:
     commands:
       - pre-commit run --all-files
