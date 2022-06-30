@@ -12,13 +12,13 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: software.amazon.transfer.agreement.HandlerWrapper::handleRequest
-      Runtime: java8
+      Runtime: java11
       CodeUri: ./target/aws-transfer-agreement-handler-1.0-SNAPSHOT.jar
 
   TestEntrypoint:
     Type: AWS::Serverless::Function
     Properties:
       Handler: software.amazon.transfer.agreement.HandlerWrapper::testEntrypoint
-      Runtime: java8
+      Runtime: java11
       CodeUri: ./target/aws-transfer-agreement-handler-1.0-SNAPSHOT.jar
 
