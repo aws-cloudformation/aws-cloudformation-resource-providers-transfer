@@ -1,17 +1,16 @@
 {
-    "credentials": {
-        "AccessKeyId": "",
-        "SecretAccessKey": "",
-        "SessionToken": ""
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "DELETE",
+  "request": {
+    "clientRequestToken": "6c7f6486-a2c8-4e5f-b7ba-0a7e7da1ca8f",
+    "desiredResourceState": {
+      "CertificateId": "cert-778f68ec4a3048ceb"
     },
-    "action": "DELETE",
-    "request": {
-      "clientRequestToken": "6c7f6486-a2c8-4e5f-b7ba-0a7e7da1ca8f",
-      "desiredResourceState": {
-        "CertificateId": "cert-778f68ec4a3048ceb"
-      },
-      "logicalResourceIdentifier": "Certificate"
-    },
-    "callbackContext": null
-  }
-  
+    "logicalResourceIdentifier": "Certificate"
+  },
+  "callbackContext": null
+}

@@ -57,7 +57,7 @@ public class ListHandlerTest {
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
             .desiredResourceState(model)
             .build();
-        
+
         ListCertificatesResponse listCertificatesResponse = ListCertificatesResponse.builder()
                 .certificates(listedCertificate)
                 .build();

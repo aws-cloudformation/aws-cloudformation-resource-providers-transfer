@@ -1,5 +1,5 @@
 package software.amazon.transfer.certificate;
- 
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.cloudformation.LambdaWrapper;
 

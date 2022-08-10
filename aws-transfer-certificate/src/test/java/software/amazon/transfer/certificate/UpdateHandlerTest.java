@@ -91,18 +91,18 @@ public class UpdateHandlerTest {
                         tag -> Tag.builder().key(tag.getKey()).value(tag.getValue()).build()
                 )
                 .collect(Collectors.toSet());
- 
+
         ResourceModel model = ResourceModel.builder().build();
- 
+
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
                 .desiredResourceTags(TEST_TAG_MAP)
                 .build();
- 
+
         ProgressEvent<ResourceModel, CallbackContext> response
                 = handler.handleRequest(proxy, request, null, logger);
- 
- 
+
+
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
@@ -115,21 +115,21 @@ public class UpdateHandlerTest {
         verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(TagResourceRequest.class), any());
         verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(UpdateCertificateRequest.class), any());
     }
- 
+
     @Test
     public void handleRequest_RemoveTagInvoked() {
         UpdateHandler handler = new UpdateHandler(client);
- 
+
         ResourceModel model = ResourceModel.builder().build();
- 
+
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
                 .previousResourceTags(TEST_TAG_MAP)
                 .build();
- 
+
         ProgressEvent<ResourceModel, CallbackContext> response
                 = handler.handleRequest(proxy, request, null, logger);
- 
+
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
@@ -142,82 +142,82 @@ public class UpdateHandlerTest {
         verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(UntagResourceRequest.class), any());
         verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(UpdateCertificateRequest.class), any());
     }
- 
+
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
         UpdateHandler handler = new UpdateHandler(client);
- 
+
         doThrow(InvalidRequestException.class)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(), any());
- 
+
         ResourceModel model = ResourceModel.builder().build();
- 
+
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
                 .desiredResourceTags(TEST_TAG_MAP)
                 .build();
- 
+
         assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
         } );
     }
- 
+
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
         UpdateHandler handler = new UpdateHandler(client);
- 
+
         doThrow(InternalServiceErrorException.class)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(TransferRequest.class), any());
- 
+
         ResourceModel model = ResourceModel.builder().build();
- 
+
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
                 .desiredResourceTags(TEST_TAG_MAP)
                 .build();
- 
+
         assertThrows(CfnServiceInternalErrorException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
         } );
     }
- 
+
     @Test
     public void handleRequest_ResourceNotFoundExceptionFailed() {
         UpdateHandler handler = new UpdateHandler(client);
- 
+
         doThrow(ResourceNotFoundException.class)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(TransferRequest.class), any());
- 
+
         ResourceModel model = ResourceModel.builder().build();
- 
+
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
                 .desiredResourceTags(TEST_TAG_MAP)
                 .build();
- 
+
         assertThrows(CfnNotFoundException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
         } );
     }
- 
+
     @Test
     public void handleRequest_TransferExceptionFailed() {
         UpdateHandler handler = new UpdateHandler(client);
- 
+
         doThrow(TransferException.class)
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(TransferRequest.class), any());
- 
+
         ResourceModel model = ResourceModel.builder().build();
- 
+
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
                 .desiredResourceTags(TEST_TAG_MAP)
                 .build();
- 
+
         assertThrows(CfnGeneralServiceException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
         } );

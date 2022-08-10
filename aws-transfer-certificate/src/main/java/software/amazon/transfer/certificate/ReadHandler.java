@@ -63,10 +63,10 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .status(describedCertificate.statusAsString())
                     .certificate(describedCertificate.certificate())
                     .certificateChain(describedCertificate.certificateChain())
-                    .activeDate(describedCertificate.activeDate() != null 
+                    .activeDate(describedCertificate.activeDate() != null
                             ? describedCertificate.activeDate().toString()
                             : null)
-                    .inactiveDate(describedCertificate.inactiveDate() != null 
+                    .inactiveDate(describedCertificate.inactiveDate() != null
                             ? describedCertificate.inactiveDate().toString()
                             : null)
                     .type(describedCertificate.typeAsString())
@@ -77,10 +77,10 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                             .collect(Collectors.toSet()))
                     .certificateId(model.getCertificateId())
                     .serial(describedCertificate.serial())
-                    .notBeforeDate(describedCertificate.notBeforeDate() != null 
+                    .notBeforeDate(describedCertificate.notBeforeDate() != null
                             ? describedCertificate.notBeforeDate().toString()
                             : null)
-                    .notAfterDate(describedCertificate.notAfterDate() != null 
+                    .notAfterDate(describedCertificate.notAfterDate() != null
                             ? describedCertificate.notAfterDate().toString()
                             : null)
                     .build();
