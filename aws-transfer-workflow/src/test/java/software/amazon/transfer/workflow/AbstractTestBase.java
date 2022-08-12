@@ -4,12 +4,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+
 import software.amazon.awssdk.services.transfer.model.OverwriteExisting;
 import software.amazon.awssdk.services.transfer.model.WorkflowStepType;
 
 public class AbstractTestBase {
   static String TEST_DESCRIPTION = "unit test";
-  static Map<String, String> TEST_TAG_MAP = Collections.singletonMap("key", "value");
+  static Map<String, String> RESOURCE_TAG_MAP = Collections.singletonMap("key", "value");
+  static Map<String, String> SYSTEM_TAG_MAP = Collections.singletonMap(
+          "aws:cloudformation:stack-name", "StackName");
+  static Map<String, String> TEST_TAG_MAP = ImmutableMap.of("key", "value", "aws:cloudformation:stack-name", "StackName");
 
   public List<WorkflowStep> getModelCopyWorkflowSteps() {
     WorkflowStep step = WorkflowStep.builder()

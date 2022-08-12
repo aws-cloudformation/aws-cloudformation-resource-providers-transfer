@@ -70,7 +70,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     @Test
     public void handleRequest_AddTagInvoked() {
         UpdateHandler handler = new UpdateHandler(client);
-        Set<Tag> desiredTags = TEST_TAG_MAP.entrySet()
+        Set<Tag> allTags = TEST_TAG_MAP.entrySet()
                 .stream()
                 .map(
                         tag -> Tag.builder().key(tag.getKey()).value(tag.getValue()).build()
@@ -81,7 +81,8 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         ProgressEvent<ResourceModel, CallbackContext> response
@@ -96,19 +97,26 @@ public class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
-        assertThat(response.getResourceModel().getTags()).isEqualTo(desiredTags);
+        assertThat(response.getResourceModel().getTags()).isEqualTo(allTags);
         verify(proxy).injectCredentialsAndInvokeV2(any(), any());
     }
 
     @Test
     public void handleRequest_RemoveTagInvoked() {
         UpdateHandler handler = new UpdateHandler(client);
+        Set<Tag> systemTags = SYSTEM_TAG_MAP.entrySet()
+                .stream()
+                .map(
+                        tag -> Tag.builder().key(tag.getKey()).value(tag.getValue()).build()
+                )
+                .collect(Collectors.toSet());
 
         ResourceModel model = ResourceModel.builder().build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .previousResourceTags(TEST_TAG_MAP)
+                .previousResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         ProgressEvent<ResourceModel, CallbackContext> response
@@ -122,8 +130,8 @@ public class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
-        assertThat(response.getResourceModel().getTags()).isEmpty();
-        verify(proxy).injectCredentialsAndInvokeV2(any(), any());
+        assertThat(response.getResourceModel().getTags()).isEqualTo(systemTags);
+        verify(proxy, times(2)).injectCredentialsAndInvokeV2(any(), any());
     }
 
     @Test
@@ -138,7 +146,8 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         assertThrows(CfnInvalidRequestException.class, () -> {
@@ -158,7 +167,8 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         assertThrows(CfnServiceInternalErrorException.class, () -> {
@@ -178,7 +188,8 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         assertThrows(CfnNotFoundException.class, () -> {
@@ -198,7 +209,8 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         assertThrows(CfnGeneralServiceException.class, () -> {
