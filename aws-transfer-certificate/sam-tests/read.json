@@ -1,0 +1,16 @@
+{
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "READ",
+  "request": {
+    "clientRequestToken": "b1bc6fb0-21e7-4b2a-8e02-999cece8de9e",
+    "desiredResourceState": {
+      "CertificateId": "cert-b3f3a1ed789d4f9f9"
+    },
+    "logicalResourceIdentifier": "Certificate"
+  },
+  "callbackContext": null
+}

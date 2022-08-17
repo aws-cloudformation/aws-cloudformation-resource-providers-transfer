@@ -34,3 +34,4 @@ phases:
         fi
     finally:
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-workflow/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-certificate/rpdk.log"
