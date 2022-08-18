@@ -29,7 +29,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
+import org.mockito.ArgumentCaptor;
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
     private AmazonWebServicesClientProxy proxy;
@@ -51,10 +53,13 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .description(TEST_DESCRIPTION)
                 .onExceptionSteps(getModelCopyWorkflowSteps())
                 .steps(getModelCopyWorkflowSteps())
+                .tags(MODEL_TAGS)
                 .build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         CreateWorkflowResponse createWorkflowResponse = CreateWorkflowResponse.builder().workflowId("id").build();
@@ -75,6 +80,11 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(testModel).hasFieldOrPropertyWithValue("description", TEST_DESCRIPTION);
         assertThat(testModel).hasFieldOrPropertyWithValue("steps", getModelCopyWorkflowSteps());
         assertThat(testModel).hasFieldOrPropertyWithValue("onExceptionSteps", getModelCopyWorkflowSteps());
+
+        ArgumentCaptor<CreateWorkflowRequest> requestCaptor = ArgumentCaptor.forClass(CreateWorkflowRequest.class);
+        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        CreateWorkflowRequest actualRequest = requestCaptor.getValue();
+        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
     }
 
     @Test

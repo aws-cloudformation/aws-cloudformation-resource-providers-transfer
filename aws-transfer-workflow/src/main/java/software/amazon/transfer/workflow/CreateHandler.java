@@ -1,6 +1,8 @@
 package software.amazon.transfer.workflow;
 
 import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.NoArgsConstructor;
 import software.amazon.awssdk.services.transfer.TransferClient;
@@ -44,7 +46,17 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         ResourceModel model = request.getDesiredResourceState();
-        model.setTags(Converter.TagConverter.translateTagfromMap(request.getDesiredResourceTags()));
+
+        Map<String, String> allTags = new HashMap<>();
+
+        if (request.getDesiredResourceTags() != null) {
+            allTags.putAll(request.getDesiredResourceTags());
+        }
+        if (request.getSystemTags() != null) {
+            allTags.putAll(request.getSystemTags());
+        }
+
+        model.setTags(Converter.TagConverter.translateTagfromMap(allTags));
         CreateWorkflowRequest createWorkflowRequest = CreateWorkflowRequest.builder()
                 .description(model.getDescription())
                 .onExceptionSteps((CollectionUtils.isNullOrEmpty(model.getOnExceptionSteps())) ?
