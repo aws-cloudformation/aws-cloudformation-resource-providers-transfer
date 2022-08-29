@@ -27,7 +27,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone:
-        !If [ isBJS, "cn-north-1a", !Ref "AWS::NoValue" ]
+        !Ref "AWS::NoValue"
       CidrBlock: 10.0.0.0/16
       VpcId:
         Ref: Vpc
