@@ -77,7 +77,7 @@ public class ListHandlerTest {
         assertThat(response.getCallbackContext()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
         assertThat(response.getResourceModel()).isNull();
-        
+
         ResourceModel testListedModel = testModels.get(0);
 
         assertThat(testListedModel).hasFieldOrPropertyWithValue("arn", TEST_ARN);
