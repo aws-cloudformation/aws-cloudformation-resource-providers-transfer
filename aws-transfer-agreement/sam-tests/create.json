@@ -1,0 +1,25 @@
+{
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "CREATE",
+  "request": {
+    "clientRequestToken": "b82eac8e-4706-477c-97ee-0fd9270cc005",
+    "desiredResourceState": {
+      "AccessRole": "arn:aws:iam::${PERSONAL_AWS}:role/Admin",
+      "BaseDirectory": "/base",
+      "Description": "OpenAs2Description",
+      "LocalProfileId": "p-02dbd12fb18b4e94b",
+      "PartnerProfileId": "p-020e2542685f494fb",
+      "ServerId": "s-c4fa7897de0a4c01b",
+      "Status": "ACTIVE"
+    },
+    "desiredResourceTags": {
+      "roses": "red"
+    },
+    "logicalResourceIdentifier": "Agreement"
+  },
+  "callbackContext": null
+}

@@ -1,0 +1,61 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'AWS Transfer Workflow Sample Template'
+Resources:
+  Workflow:
+    Type: AWS::Transfer::Workflow
+    Properties:
+      Description: canary test
+      Tags:
+        - Key: resourceKey
+          Value: resourceValue
+        - Key: updated
+          Value: tags
+      OnExceptionSteps:
+        - Type: CUSTOM
+          CustomStepDetails:
+            Name: customit
+            Target: !ImportValue WorkflowsCustomStepLambda
+            TimeoutSeconds: 10
+        - Type: DELETE
+          DeleteStepDetails:
+            Name: deleteit
+        - Type: TAG
+          TagStepDetails:
+            Name: tagit
+            Tags:
+              - Key: s3key1
+                Value: s3value1
+              - Key: R2
+                Value: D2
+        - Type: COPY
+          CopyStepDetails:
+            Name: copyit
+            DestinationFileLocation:
+              S3FileLocation:
+                Bucket: canary-test
+                Key: test/
+      Steps:
+        - Type: CUSTOM
+          CustomStepDetails:
+            Name: customit
+            Target: !ImportValue WorkflowsCustomStepLambda
+            TimeoutSeconds: 10
+        - Type: DELETE
+          DeleteStepDetails:
+            Name: deleteit
+        - Type: TAG
+          TagStepDetails:
+            Name: tagit
+            Tags:
+              - Key: s3key1
+                Value: s3value1
+              - Key: R2
+                Value: D2
+        - Type: COPY
+          CopyStepDetails:
+            Name: copyit
+            DestinationFileLocation:
+              S3FileLocation:
+                Bucket: canary-test
+                Key: test/

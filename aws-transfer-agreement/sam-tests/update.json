@@ -1,0 +1,42 @@
+{
+  "credentials": {
+    "AccessKeyId": "ASIA4DDS62FIJMYBM2MK",
+    "SecretAccessKey": "NRBssvRoDwYH7H5h72/eP3WXwpSMKP4zk6TsIFt4",
+    "SessionToken": "IQoJb3JpZ2luX2VjEJT//////////wEaCXVzLWVhc3QtMSJIMEYCIQDxas0tqQmfw0eKaIBVlLCUEfs3PRSw+Mu11hWWz4xujAIhANuyZrYRGdrp3qR5yhUbvPd2BQRswzQTNRnpPYa6c66dKvQBCNz//////////wEQARoMODMxMzE3MjY2NzY4IgxxxabhXHmNgWQAgwUqyAHirrDtKl03wcv1Ifa2EJWbcB5QhGBNxc1S4w+91kSkm1kIAaImGTN8i5vwbzu3LxU2LzuxH8TC+18E39Ui5c9CbGKD5ftdevU6+l+IUfo8v+HEvaN0NINqXkh9ZfXMbhQWld85w7C1PdxEwzR2r0qru3hR7xvQu4FiAImiGcmc7AMhfJv2OtqYu4eQS3fflTAUct2HSJLUneg3x7GyX3iWXE2liyHzELVLjfg1NrtdWLX10ifcEUqVPT3lIsms6P0bCvU101+J8TDln4aXBjqXAYX5RJ0OkvQkeErw6A/d9RlpJtI3QKpUWmBquXWcN0wOD3TvCgKIJSpV0dIpS4m/O37f+6ne7cYOQgGhSeEB5ET5Nmo52nltKg8otVuJgSksYM7MxgkFhDYGvk+GbYZpnLVx1+wDEUSCJsFomSAAwtdQtWv659w+JE8Ds8NU1Dtu16P0WkW3QxVF4/Nr/Yv+ski6ehn7Mxw="
+  },
+  "action": "UPDATE",
+  "request": {
+    "awsAccountId": "${PERSONAL_AWS}",
+    "awsPartition": "aws",
+    "region": "us-east-1",
+    "clientRequestToken": "e646a1aa-35ea-11ec-8d3d-0242ac130003",
+    "desiredResourceState": {
+      "AccessRole": "arn:aws:iam::${PERSONAL_AWS}:role/Admin",
+      "AgreementId": "a-467b8400cbe749aeb",
+      "BaseDirectory": "/base",
+      "Description": "DifferentDescription",
+      "LocalProfileId": "p-02dbd12fb18b4e94b",
+      "PartnerProfileId": "p-209b4c7113c94feaa",
+      "ServerId": "s-c4fa7897de0a4c01b",
+      "Status": "ACTIVE"
+    },
+    "desiredResourceTags": {
+      "violets": "blue"
+    },
+    "previousResourceState": {
+      "AccessRole": "arn:aws:iam::${PERSONAL_AWS}:role/Admin",
+      "AgreementId": "a-467b8400cbe749aeb",
+      "BaseDirectory": "/base",
+      "Description": "OpenAs2Description",
+      "LocalProfileId": "p-02dbd12fb18b4e94b",
+      "PartnerProfileId": "p-020e2542685f494fb",
+      "ServerId": "s-c4fa7897de0a4c01b",
+      "Status": "ACTIVE"
+    },
+    "previousResourceTags": {
+      "roses": "red"
+    },
+    "logicalResourceIdentifier": "Agreement"
+  },
+  "callbackContext": null
+}
