@@ -6,6 +6,7 @@ phases:
         python: 3.7
     commands:
       -  pip install --upgrade 'six==1.16.0'
+      -  pip install requests --upgrade
       -  pip install pyyaml --upgrade
       -  pip install boto3 --upgrade
       -  pip install pre-commit
@@ -35,3 +36,4 @@ phases:
     finally:
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-workflow/rpdk.log"
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-certificate/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-agreement/rpdk.log"

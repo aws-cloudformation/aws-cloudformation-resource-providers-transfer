@@ -1,0 +1,78 @@
+Conditions:
+  isBJS:
+    Fn::Equals:
+      - Ref: AWS::Region
+      - cn-north-1
+Resources:
+  AgreementsCustomAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaRole
+  Vpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+
+  Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      VpcId:
+        Ref: Vpc
+
+  AgreementsCustomServer:
+    Type: AWS::Transfer::Server
+    Properties:
+      Protocols:
+        - AS2
+      ProtocolDetails:
+        As2Transports:
+          - HTTP
+      EndpointType: VPC
+      EndpointDetails:
+        SubnetIds:
+          - Ref: Subnet
+        VpcId:
+          Ref: Vpc
+
+  AgreementsCustomLocalProfile:
+    Type: AWS::Transfer::Profile
+    Properties:
+      As2id: LocalProfileId
+      ProfileType: LOCAL
+  AgreementsCustomPartnerProfile:
+    Type: AWS::Transfer::Profile
+    Properties:
+      As2id: PartnerProfileId
+      ProfileType: PARTNER
+Outputs:
+  AgreementsCustomAccessRole:
+    Value:
+      Fn::GetAtt: AgreementsCustomAccessRole.Arn
+    Export:
+      Name: awstransferagreementcto1
+  AgreementsCustomServer:
+    Value:
+      Fn::GetAtt: AgreementsCustomServer.ServerId
+    Export:
+      Name: awstransferagreementcto2
+  AgreementsCustomLocalProfile:
+    Value:
+      Ref: AgreementsCustomLocalProfile
+    Export:
+      Name: awstransferagreementcto3
+  AgreementsCustomPartnerProfile:
+    Value:
+      Ref: AgreementsCustomPartnerProfile
+    Export:
+      Name: awstransferagreementcto4

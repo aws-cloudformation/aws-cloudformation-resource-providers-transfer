@@ -1,0 +1,17 @@
+{
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "READ",
+  "request": {
+    "clientRequestToken": "b1bc6fb0-21e7-4b2a-8e02-999cece8de9e",
+    "desiredResourceState": {
+      "AgreementId": "a-467b8400cbe749aeb",
+      "ServerId": "s-c4fa7897de0a4c01b"
+    },
+    "logicalResourceIdentifier": "Agreement"
+  },
+  "callbackContext": null
+}

@@ -1,0 +1,16 @@
+{
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "LIST",
+  "request": {
+    "clientRequestToken": "796134b0-da78-11eb-8d19-0242ac130003",
+    "desiredResourceState": {
+      "ServerId": "s-c4fa7897de0a4c01b"
+    },
+    "logicalResourceIdentifier": "Agreement"
+  },
+  "callbackContext": null
+}
