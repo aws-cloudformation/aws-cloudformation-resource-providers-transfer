@@ -132,6 +132,7 @@ public class CreateHandlerTest {
 
         ResourceModel model = ResourceModel.builder()
                 .agreementId(TEST_AGREEMENT_ID)
+                .serverId(TEST_SERVER_ID)
                 .build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()

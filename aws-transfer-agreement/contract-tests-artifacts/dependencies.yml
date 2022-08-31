@@ -1,8 +1,3 @@
-Conditions:
-  isBJS:
-    Fn::Equals:
-      - Ref: AWS::Region
-      - cn-north-1
 Resources:
   AgreementsCustomAccessRole:
     Type: AWS::IAM::Role
@@ -48,12 +43,12 @@ Resources:
   AgreementsCustomLocalProfile:
     Type: AWS::Transfer::Profile
     Properties:
-      As2id: LocalProfileId
+      As2Id: LocalProfileId
       ProfileType: LOCAL
   AgreementsCustomPartnerProfile:
     Type: AWS::Transfer::Profile
     Properties:
-      As2id: PartnerProfileId
+      As2Id: PartnerProfileId
       ProfileType: PARTNER
 Outputs:
   AgreementsCustomAccessRole:

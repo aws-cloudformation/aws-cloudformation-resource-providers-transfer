@@ -45,10 +45,11 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         }
 
         final ResourceModel model = request.getDesiredResourceState();
-        String arn = String.format("arn:%s:transfer:%s:%s:agreement/%s",
+        String arn = String.format("arn:%s:transfer:%s:%s:agreement/%s/%s",
                 request.getAwsPartition(),
                 request.getRegion(),
                 request.getAwsAccountId(),
+                model.getServerId(),
                 model.getAgreementId());
 
         UpdateAgreementRequest updateAgreementRequest = UpdateAgreementRequest.builder()

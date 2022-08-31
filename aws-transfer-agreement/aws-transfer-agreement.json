@@ -114,8 +114,12 @@
     "/properties/AgreementId",
     "/properties/Arn"
   ],
+  "createOnlyProperties": [
+    "/properties/ServerId"
+  ],
   "primaryIdentifier": [
-    "/properties/AgreementId"
+    "/properties/AgreementId",
+    "/properties/ServerId"
   ],
   "handlers": {
     "create": {
