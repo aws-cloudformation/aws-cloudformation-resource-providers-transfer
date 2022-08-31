@@ -1,0 +1,17 @@
+{
+    "credentials": {
+      "AccessKeyId": "",
+        "SecretAccessKey": "",
+        "SessionToken": ""
+    },
+    "action": "DELETE",
+    "request": {
+      "clientRequestToken": "6c7f6486-a2c8-4e5f-b7ba-0a7e7da1ca8f",
+      "desiredResourceState": {
+        "ConnectorId": "c-7f681fa189994065b"
+      },
+      "logicalResourceIdentifier": "Connector"
+    },
+    "callbackContext": null
+  }
+  

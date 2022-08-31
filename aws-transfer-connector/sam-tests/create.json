@@ -1,0 +1,31 @@
+{
+    "credentials": {
+      "AccessKeyId": "",
+        "SecretAccessKey": "",
+        "SessionToken": ""
+    },
+    "action": "CREATE",
+    "request": {
+      "clientRequestToken": "b82eac8e-4706-477c-97ee-0fd9270cc005",
+      "desiredResourceState": {
+        "AccessRole": "arn:aws:iam::${PERSONAL_AWS}:role/Admin",
+        "As2Config": {
+          "LocalProfileId": "p-02dbd12fb18b4e94b",
+          "PartnerProfileId": "p-020e2542685f494fb",
+          "MessageSubject": "This is the subject my mate",
+          "Compression": "ZLIB",
+          "EncryptionAlgorithm": "AES128_CBC",
+          "SigningAlgorithm": "SHA256",
+          "MdnSigningAlgorithm": "SHA256",
+          "MdnResponse": "SYNC"
+        },
+        "Url": "http://www.google.com/"
+      },
+      "desiredResourceTags": {
+        "yorkshire": "terrier"
+      },
+      "logicalResourceIdentifier": "Connector"
+    },
+    "callbackContext": null
+  }
+  
