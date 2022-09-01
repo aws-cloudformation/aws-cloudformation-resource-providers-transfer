@@ -164,7 +164,8 @@
     "create": {
       "permissions": [
         "transfer:CreateConnector",
-        "transfer:TagResource"
+        "transfer:TagResource",
+        "iam:PassRole"
       ]
     },
     "read": {
@@ -176,7 +177,8 @@
       "permissions": [
         "transfer:UpdateConnector",
         "transfer:UnTagResource",
-        "transfer:TagResource"
+        "transfer:TagResource",
+        "iam:PassRole"
       ]
     },
     "delete": {
