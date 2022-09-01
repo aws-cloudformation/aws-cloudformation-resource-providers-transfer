@@ -125,7 +125,8 @@
     "create": {
       "permissions": [
         "transfer:CreateAgreement",
-        "transfer:TagResource"
+        "transfer:TagResource",
+        "iam:PassRole"
       ]
     },
     "read": {
@@ -137,7 +138,8 @@
       "permissions": [
         "transfer:UpdateAgreement",
         "transfer:UnTagResource",
-        "transfer:TagResource"
+        "transfer:TagResource",
+        "iam:PassRole"
       ]
     },
     "delete": {

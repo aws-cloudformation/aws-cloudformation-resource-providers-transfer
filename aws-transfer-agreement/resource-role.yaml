@@ -23,6 +23,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                - "iam:PassRole"
                 - "transfer:CreateAgreement"
                 - "transfer:DeleteAgreement"
                 - "transfer:DescribeAgreement"
