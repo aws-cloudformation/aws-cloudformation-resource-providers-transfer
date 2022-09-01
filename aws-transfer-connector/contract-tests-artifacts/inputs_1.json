@@ -1,49 +1,48 @@
 {
-    "CreateInputs": {
-      "Url": "http://www.example.com/transfer",
-      "As2Config": {
-        "LocalProfileId": "{{awstransferconnectorcto1}}",
-        "PartnerProfileId": "{{awstransferconnectorcto2}}",
-        "MessageSubject": "A message subject",
-        "Compression": "ZLIB",
-        "EncryptionAlgorithm": "AES128_CBC",
-        "SigningAlgorithm": "SHA256",
-        "MdnSigningAlgorithm": "SHA256",
-        "MdnResponse": "SYNC"
-      },
-      "AccessRole": "{{awstransferconnectorcto3}}",
-      "LoggingRole": "{{awstransferconnectorcto4}}",
-      "Tags": [
-        {
-          "Key": "apple",
-          "Value": "red"
-        },
-        {
-          "Key": "peach",
-          "Value": "pink"
-        }
-      ]
+  "CreateInputs": {
+    "Url": "http://www.example.com/transfer",
+    "As2Config": {
+      "LocalProfileId": "{{awstransferconnectorcto1}}",
+      "PartnerProfileId": "{{awstransferconnectorcto2}}",
+      "MessageSubject": "A message subject",
+      "Compression": "ZLIB",
+      "EncryptionAlgorithm": "AES128_CBC",
+      "SigningAlgorithm": "SHA256",
+      "MdnSigningAlgorithm": "SHA256",
+      "MdnResponse": "SYNC"
     },
-    "PatchInputs": [
+    "AccessRole": "{{awstransferconnectorcto3}}",
+    "LoggingRole": "{{awstransferconnectorcto4}}",
+    "Tags": [
       {
-        "op": "replace",
-        "path": "/Url",
-        "value": "http://www.example.com/transferAs2"
+        "Key": "apple",
+        "Value": "red"
       },
       {
-        "op": "replace",
-        "path": "/Tags/0/Key",
-        "value": "xfer"
-      },
-      {
-        "op": "replace",
-        "path": "/Tags/0/Value",
-        "value": "yay"
-      },
-      {
-        "op": "remove",
-        "path": "/Tags/1"
+        "Key": "peach",
+        "Value": "pink"
       }
     ]
-  }
-  
+  },
+  "PatchInputs": [
+    {
+      "op": "replace",
+      "path": "/Url",
+      "value": "http://www.example.com/transferAs2"
+    },
+    {
+      "op": "replace",
+      "path": "/Tags/0/Key",
+      "value": "xfer"
+    },
+    {
+      "op": "replace",
+      "path": "/Tags/0/Value",
+      "value": "yay"
+    },
+    {
+      "op": "remove",
+      "path": "/Tags/1"
+    }
+  ]
+}

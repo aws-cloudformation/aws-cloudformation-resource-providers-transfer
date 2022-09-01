@@ -1,10 +1,10 @@
 # macOS
  .DS_Store
  ._*
- 
+
  # Maven outputs
  .classpath
- 
+
  # IntelliJ
  *.iml
  .idea
@@ -12,14 +12,14 @@
  out/
  .settings
  .project
- 
+
  # auto-generated files
  target/
  .hypothesis/
  build/
- 
+
  # our logs
  rpdk.log*
- 
+
  # Temporary build artifact
  aws-transfer-connector.zip
