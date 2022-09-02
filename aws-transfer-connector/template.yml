@@ -21,4 +21,3 @@ Resources:
       Handler: software.amazon.transfer.connector.HandlerWrapper::testEntrypoint
       Runtime: java11
       CodeUri: ./target/aws-transfer-connector-handler-1.0-SNAPSHOT.jar
-
