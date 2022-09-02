@@ -72,7 +72,7 @@ _Maximum_: <code>19</code>
 
 _Pattern_: <code>^s-([0-9a-f]{17})$</code>
 
-_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+_Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
 #### LocalProfileId
 
@@ -159,10 +159,6 @@ _Type_: List of <a href="tag.md">Tag</a>
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 ## Return Values
-
-### Ref
-
-When you pass the logical ID of this resource to the intrinsic `Ref` function, Ref returns the AgreementId.
 
 ### Fn::GetAtt
 
