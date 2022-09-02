@@ -1,0 +1,16 @@
+{
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "DELETE",
+  "request": {
+    "clientRequestToken": "6c7f6486-a2c8-4e5f-b7ba-0a7e7da1ca9f",
+    "desiredResourceState": {
+      "ProfileId": "p-6762b2f82d1142039"
+    },
+    "logicalResourceIdentifier": "Profile"
+  },
+  "callbackContext": null
+}

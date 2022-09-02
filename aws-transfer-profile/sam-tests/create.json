@@ -1,0 +1,21 @@
+{
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "CREATE",
+  "request": {
+    "clientRequestToken": "4bbcd219-5f34-449a-8e99-8de91dbe95ed",
+    "desiredResourceState": {
+      "As2Id": "testid",
+      "CertificateIds": [
+        "cert-778f68ec4a3048ceb"
+      ],
+      "ProfileType": "PARTNER"
+    },
+    "previousResourceState": {},
+    "logicalResourceIdentifier": "Profile"
+  },
+  "callbackContext": null
+}
