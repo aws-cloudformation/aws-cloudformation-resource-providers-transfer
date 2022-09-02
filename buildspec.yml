@@ -37,3 +37,4 @@ phases:
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-workflow/rpdk.log"
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-certificate/rpdk.log"
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-agreement/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-profile/rpdk.log"

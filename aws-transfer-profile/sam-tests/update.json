@@ -1,0 +1,32 @@
+{
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "UPDATE",
+  "request": {
+    "awsAccountId": "",
+    "awsPartition": "aws",
+    "region": "us-east-1",
+    "clientRequestToken": "e646a1aa-35ea-11ec-8d3d-0242ac140003",
+    "desiredResourceState": {
+      "ProfileId": "p-209b4c7113c94feaa",
+      "As2Id": "testid",
+      "CertificateIds": [
+        "cert-a5feb415ebf34870b"
+      ],
+      "ProfileType": "PARTNER"
+    },
+    "previousResourceState": {
+      "ProfileId": "p-209b4c7113c94feaa",
+      "As2Id": "testid",
+      "CertificateIds": [
+        "cert-778f68ec4a3048ceb"
+      ],
+      "ProfileType": "PARTNER"
+    },
+    "logicalResourceIdentifier": "Profile"
+  },
+  "callbackContext": null
+}
