@@ -1,0 +1,54 @@
+{
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "UPDATE",
+  "request": {
+    "awsAccountId": "${PERSONAL_AWS}",
+    "awsPartition": "aws",
+    "region": "us-east-1",
+    "clientRequestToken": "e646a1aa-35ea-11ec-8d3d-0242ac130003",
+    "desiredResourceState": {
+      "ConnectorId": "c-b19e4d54098e42bcb",
+      "AccessRole": "arn:aws:iam::${PERSONAL_AWS}:role/Admin",
+      "As2Config": {
+        "LocalProfileId": "p-992166e362af47649",
+        "PartnerProfileId": "p-209b4c7113c94feaa",
+        "MessageSubject": "This is the new subject my mate",
+        "Compression": "DISABLED",
+        "EncryptionAlgorithm": "AES256_CBC",
+        "SigningAlgorithm": "NONE",
+        "MdnSigningAlgorithm": "DEFAULT",
+        "MdnResponse": "NONE"
+      },
+      "Arn": "arn:aws:transfer:us-east-1:${PERSONAL_AWS}:connector/c-b19e4d54098e42bcb",
+      "Url": "http://www.google.com/"
+    },
+    "desiredResourceTags": {
+      "record": "player"
+    },
+    "previousResourceState": {
+      "ConnectorId": "c-b19e4d54098e42bcb",
+      "AccessRole": "arn:aws:iam::${PERSONAL_AWS}:role/Admin",
+      "As2Config": {
+        "LocalProfileId": "p-02dbd12fb18b4e94b",
+        "PartnerProfileId": "p-020e2542685f494fb",
+        "MessageSubject": "This is the subject my mate",
+        "Compression": "ZLIB",
+        "EncryptionAlgorithm": "AES128_CBC",
+        "SigningAlgorithm": "SHA256",
+        "MdnSigningAlgorithm": "SYNC",
+        "MdnResponse": "SYNC"
+      },
+      "previousResourceTags": {
+        "yorkshire": "terrier"
+      },
+      "Arn": "arn:aws:transfer:us-east-1:${PERSONAL_AWS}:connector/c-b19e4d54098e42bcb",
+      "Url": "http://www.amazon.com/"
+    },
+    "logicalResourceIdentifier": "Connector"
+  },
+  "callbackContext": null
+}

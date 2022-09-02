@@ -1,0 +1,60 @@
+Resources:
+  ConnectorsCustomLocalProfile:
+    Type: AWS::Transfer::Profile
+    Properties:
+      As2Id: LocalProfileId
+      ProfileType: LOCAL
+  ConnectorsCustomPartnerProfile:
+    Type: AWS::Transfer::Profile
+    Properties:
+      As2Id: PartnerProfileId
+      ProfileType: PARTNER
+  ConnectorsCustomAccessRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaRole
+  ConnectorsCustomLoggingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaRole
+Outputs:
+  ConnectorsCustomLocalProfile:
+    Value:
+      Ref: ConnectorsCustomLocalProfile
+    Export:
+      Name: awstransferconnectorcto1
+  ConnectorsCustomPartnerProfile:
+    Value:
+      Ref: ConnectorsCustomPartnerProfile
+    Export:
+      Name: awstransferconnectorcto2
+  ConnectorsCustomAccessRole:
+    Value:
+      Fn::GetAtt: ConnectorsCustomAccessRole.Arn
+    Export:
+      Name: awstransferconnectorcto3
+  ConnectorsCustomLoggingRole:
+    Value:
+      Fn::GetAtt: ConnectorsCustomLoggingRole.Arn
+    Export:
+      Name: awstransferconnectorcto4

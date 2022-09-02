@@ -1,0 +1,16 @@
+{
+  "credentials": {
+    "AccessKeyId": "",
+    "SecretAccessKey": "",
+    "SessionToken": ""
+  },
+  "action": "READ",
+  "request": {
+    "clientRequestToken": "b1bc6fb0-21e7-4b2a-8e02-999cece8de9e",
+    "desiredResourceState": {
+      "ConnectorId": "c-7f681fa189994065b"
+    },
+    "logicalResourceIdentifier": "Connector"
+  },
+  "callbackContext": null
+}
