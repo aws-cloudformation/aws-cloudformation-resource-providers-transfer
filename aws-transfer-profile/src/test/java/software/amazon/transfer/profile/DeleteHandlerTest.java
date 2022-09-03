@@ -42,7 +42,7 @@ public class DeleteHandlerTest {
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final DeleteHandler handler = new DeleteHandler();
+        final DeleteHandler handler = new DeleteHandler(client);
 
         final ResourceModel model = ResourceModel.builder()
                 .profileId("testid")
