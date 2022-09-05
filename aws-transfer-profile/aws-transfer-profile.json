@@ -35,13 +35,13 @@
   },
   "properties": {
     "As2Id": {
-      "description": "A unique identifier for the As2 account.",
+      "description": "AS2 identifier agreed with a trading partner.",
       "type": "string",
       "minLength": 1,
       "maxLength": 128
     },
     "ProfileType": {
-      "description": "Enum for type of profile.",
+      "description": "Enum specifying whether the profile is local or associated with a trading partner.",
       "type": "string",
       "enum": [
         "LOCAL",
@@ -59,7 +59,7 @@
       }
     },
     "CertificateIds": {
-      "description": "An array of certificate id to apply to this resource.",
+      "description": "List of the certificate IDs associated with this profile to be used for encryption and signing of AS2 messages.",
       "type": "array",
       "insertionOrder": false,
       "items": {
