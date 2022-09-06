@@ -15,34 +15,26 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteHandlerTest {
 
-    private AmazonWebServicesClientProxy proxy;
-    private Logger logger;
-    private TransferClient client;
-
-    @BeforeEach
-    public void setup() {
-        proxy = mock(AmazonWebServicesClientProxy.class);
-        logger = mock(Logger.class);
-        client = mock(TransferClient.class);
-    }
+    @Mock private AmazonWebServicesClientProxy proxy;
+    @Mock private Logger logger;
+    @Mock private TransferClient client;
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final DeleteHandler handler = new DeleteHandler();
+        final DeleteHandler handler = new DeleteHandler(client);
 
         final ResourceModel model = ResourceModel.builder()
                 .profileId("testid")

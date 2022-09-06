@@ -37,7 +37,7 @@ Properties:
 
 #### As2Id
 
-A unique identifier for the As2 account.
+AS2 identifier agreed with a trading partner.
 
 _Required_: Yes
 
@@ -51,7 +51,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### ProfileType
 
-Enum for type of profile.
+Enum specifying whether the profile is local or associated with a trading partner.
 
 _Required_: Yes
 
@@ -73,7 +73,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### CertificateIds
 
-An array of certificate id to apply to this resource.
+List of the certificate IDs associated with this profile to be used for encryption and signing of AS2 messages.
 
 _Required_: No
 
