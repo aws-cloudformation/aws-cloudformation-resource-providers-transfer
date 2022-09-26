@@ -82,7 +82,6 @@
     }
   },
   "additionalProperties": false,
-  "taggable": true,
   "required": [
     "As2Id",
     "ProfileType"
@@ -97,6 +96,13 @@
   "createOnlyProperties": [
     "/properties/ProfileType"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "handlers": {
     "create": {
       "permissions": [

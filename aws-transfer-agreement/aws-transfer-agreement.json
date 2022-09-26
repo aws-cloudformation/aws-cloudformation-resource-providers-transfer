@@ -102,7 +102,6 @@
     }
   },
   "additionalProperties": false,
-  "taggable": true,
   "required": [
     "ServerId",
     "LocalProfileId",
@@ -121,6 +120,13 @@
     "/properties/AgreementId",
     "/properties/ServerId"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "handlers": {
     "create": {
       "permissions": [
