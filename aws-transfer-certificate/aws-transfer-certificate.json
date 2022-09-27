@@ -129,7 +129,6 @@
     }
   },
   "additionalProperties": false,
-  "taggable": true,
   "required": [
     "Certificate",
     "Usage"
@@ -154,6 +153,13 @@
   "primaryIdentifier": [
     "/properties/CertificateId"
   ],
+  "tagging": {
+    "taggable": true,
+    "tagOnCreate": true,
+    "tagUpdatable": true,
+    "cloudFormationSystemTags": true,
+    "tagProperty": "/properties/Tags"
+  },
   "handlers": {
     "create": {
       "permissions": [

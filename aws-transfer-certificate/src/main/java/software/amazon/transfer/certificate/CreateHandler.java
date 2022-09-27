@@ -1,6 +1,8 @@
 package software.amazon.transfer.certificate;
 
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.amazonaws.util.CollectionUtils;
@@ -45,7 +47,16 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         ResourceModel model = request.getDesiredResourceState();
-        model.setTags(Converter.TagConverter.translateTagfromMap(request.getDesiredResourceTags()));
+
+        Map<String, String> allTags = new HashMap<>();
+        if (request.getDesiredResourceTags() != null) {
+            allTags.putAll(request.getDesiredResourceTags());
+        }
+        if (request.getSystemTags() != null) {
+            allTags.putAll(request.getSystemTags());
+        }
+        model.setTags(Converter.TagConverter.translateTagfromMap(allTags));
+
         ImportCertificateRequest importCertificateRequest = ImportCertificateRequest.builder()
                 .certificate(model.getCertificate())
                 .certificateChain(model.getCertificateChain())

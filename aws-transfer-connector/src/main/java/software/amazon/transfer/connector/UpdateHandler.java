@@ -1,6 +1,8 @@
 package software.amazon.transfer.connector;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,7 +61,14 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
                 .url(model.getUrl())
                 .build();
 
-        model.setTags(Converter.TagConverter.translateTagfromMap(request.getDesiredResourceTags()));
+        Map<String, String> allDesiredTagsMap = new HashMap<>();
+        if (request.getDesiredResourceTags() != null) {
+            allDesiredTagsMap.putAll(request.getDesiredResourceTags());
+        }
+        if (request.getSystemTags() != null) {
+            allDesiredTagsMap.putAll(request.getSystemTags());
+        }
+        model.setTags(Converter.TagConverter.translateTagfromMap(allDesiredTagsMap));
 
         Set<Tag> previousTags = Converter.TagConverter.translateTagfromMap(request.getPreviousResourceTags());
         Set<Tag> desiredTags = model.getTags();

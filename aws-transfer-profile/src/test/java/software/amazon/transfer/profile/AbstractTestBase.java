@@ -1,4 +1,4 @@
-package software.amazon.transfer.agreement;
+package software.amazon.transfer.profile;
 
 import java.util.Collections;
 import java.util.Map;
@@ -9,16 +9,6 @@ import com.google.common.collect.ImmutableSet;
 
 public class AbstractTestBase {
 
-    public static String TEST_ARN = "arn:test-arn";
-    public static String TEST_DESCRIPTION = "unit test";
-    public static String TEST_DESCRIPTION_2 = "another unit test";
-    public static String TEST_ACCESS_ROLE = "access-role";
-    public static String TEST_BASE_DIRECTORY = "/";
-    public static String TEST_LOCAL_PROFILE = "local-profile";
-    public static String TEST_PARTNER_PROFILE = "partner-profile";
-    public static String TEST_SERVER_ID = "test-server-id";
-    public static String TEST_STATUS = "ACTIVE";
-    public static String TEST_AGREEMENT_ID = "id";
     public static Map<String, String> RESOURCE_TAG_MAP = Collections.singletonMap("key", "value");
     public static Map<String, String> SYSTEM_TAG_MAP = Collections.singletonMap(
             "aws:cloudformation:stack-name", "StackName");

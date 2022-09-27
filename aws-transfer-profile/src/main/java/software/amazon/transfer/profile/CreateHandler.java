@@ -19,6 +19,8 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor
@@ -41,7 +43,15 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         final ResourceModel model = request.getDesiredResourceState();
-        model.setTags(Converter.TagConverter.translateTagfromMap(request.getDesiredResourceTags()));
+
+        Map<String, String> allTags = new HashMap<>();
+        if (request.getDesiredResourceTags() != null) {
+            allTags.putAll(request.getDesiredResourceTags());
+        }
+        if (request.getSystemTags() != null) {
+            allTags.putAll(request.getSystemTags());
+        }
+        model.setTags(Converter.TagConverter.translateTagfromMap(allTags));
 
         CreateProfileRequest createProfileRequest = CreateProfileRequest.builder()
                 .as2Id(model.getAs2Id())

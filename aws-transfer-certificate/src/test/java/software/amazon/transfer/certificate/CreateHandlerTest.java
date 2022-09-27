@@ -20,6 +20,7 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static software.amazon.transfer.certificate.AbstractTestBase.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,10 +56,13 @@ public class CreateHandlerTest {
                 .privateKey(TEST_PRIVATE_KEY)
                 .activeDate(TEST_ACTIVE_DATE)
                 .inactiveDate(TEST_INACTIVE_DATE)
+                .tags(MODEL_TAGS)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
             .desiredResourceState(model)
+            .desiredResourceTags(RESOURCE_TAG_MAP)
+            .systemTags(SYSTEM_TAG_MAP)
             .build();
 
         ImportCertificateResponse importCertificateResponse = ImportCertificateResponse.builder()
@@ -84,6 +89,11 @@ public class CreateHandlerTest {
         assertThat(testModel).hasFieldOrPropertyWithValue("privateKey", TEST_PRIVATE_KEY);
         assertThat(testModel).hasFieldOrPropertyWithValue("activeDate", TEST_ACTIVE_DATE);
         assertThat(testModel).hasFieldOrPropertyWithValue("inactiveDate", TEST_INACTIVE_DATE);
+
+        ArgumentCaptor<ImportCertificateRequest> requestCaptor = ArgumentCaptor.forClass(ImportCertificateRequest.class);
+        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        ImportCertificateRequest actualRequest = requestCaptor.getValue();
+        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
     }
 
     @Test
