@@ -81,7 +81,7 @@ public class CreateHandlerTest {
         ArgumentCaptor<CreateProfileRequest> requestCaptor = ArgumentCaptor.forClass(CreateProfileRequest.class);
         verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
         CreateProfileRequest actualRequest = requestCaptor.getValue();
-        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG); 
+        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
     }
 
     @Test

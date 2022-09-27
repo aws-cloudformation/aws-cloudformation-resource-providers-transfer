@@ -93,7 +93,7 @@ public class CreateHandlerTest {
         ArgumentCaptor<ImportCertificateRequest> requestCaptor = ArgumentCaptor.forClass(ImportCertificateRequest.class);
         verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
         ImportCertificateRequest actualRequest = requestCaptor.getValue();
-        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG); 
+        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
     }
 
     @Test

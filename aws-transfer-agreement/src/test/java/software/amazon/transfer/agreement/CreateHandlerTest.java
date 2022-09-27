@@ -92,7 +92,7 @@ public class CreateHandlerTest {
         ArgumentCaptor<CreateAgreementRequest> requestCaptor = ArgumentCaptor.forClass(CreateAgreementRequest.class);
         verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
         CreateAgreementRequest actualRequest = requestCaptor.getValue();
-        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG); 
+        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
     }
 
     @Test
