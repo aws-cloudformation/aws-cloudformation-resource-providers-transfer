@@ -19,12 +19,14 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static software.amazon.transfer.profile.AbstractTestBase.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest {
@@ -47,10 +49,13 @@ public class CreateHandlerTest {
         final ResourceModel model = ResourceModel.builder()
                 .as2Id("testid")
                 .profileType("PARTNER")
+                .tags(MODEL_TAGS)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
             .desiredResourceState(model)
+            .desiredResourceTags(RESOURCE_TAG_MAP)
+            .systemTags(SYSTEM_TAG_MAP)
             .build();
 
         CreateProfileResponse createProfileResponse = CreateProfileResponse.builder().profileId("p-123456").build();
@@ -72,6 +77,11 @@ public class CreateHandlerTest {
         assertThat(testModel).hasFieldOrPropertyWithValue("as2Id", "testid");
         assertThat(testModel).hasFieldOrPropertyWithValue("profileType", "PARTNER");
         assertThat(testModel).hasFieldOrPropertyWithValue("profileId", "p-123456");
+
+        ArgumentCaptor<CreateProfileRequest> requestCaptor = ArgumentCaptor.forClass(CreateProfileRequest.class);
+        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        CreateProfileRequest actualRequest = requestCaptor.getValue();
+        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG); 
     }
 
     @Test

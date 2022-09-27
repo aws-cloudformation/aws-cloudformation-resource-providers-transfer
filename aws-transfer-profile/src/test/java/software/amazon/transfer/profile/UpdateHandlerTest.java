@@ -26,10 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static software.amazon.transfer.profile.AbstractTestBase.*;
 
 import java.util.stream.Collectors;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,7 +37,6 @@ public class UpdateHandlerTest {
     private AmazonWebServicesClientProxy proxy;
     private Logger logger;
     private TransferClient client;
-    static Map<String, String> TEST_TAG_MAP = Collections.singletonMap("key", "value");
 
     @BeforeEach
     public void setup() {
@@ -86,7 +84,8 @@ public class UpdateHandlerTest {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         ProgressEvent<ResourceModel, CallbackContext> response
@@ -108,12 +107,20 @@ public class UpdateHandlerTest {
     @Test
     public void handleRequest_RemoveTagInvoked() {
         UpdateHandler handler = new UpdateHandler(client);
+        Set<Tag> systemTags = SYSTEM_TAG_MAP.entrySet()
+                .stream()
+                .map(
+                        tag -> Tag.builder().key(tag.getKey()).value(tag.getValue()).build()
+                )
+                .collect(Collectors.toSet());
+
 
         ResourceModel model = ResourceModel.builder().build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .previousResourceTags(TEST_TAG_MAP)
+                .previousResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         ProgressEvent<ResourceModel, CallbackContext> response
@@ -127,7 +134,7 @@ public class UpdateHandlerTest {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
-        assertThat(response.getResourceModel().getTags()).isEmpty();
+        assertThat(response.getResourceModel().getTags()).isEqualTo(systemTags);
         verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(UntagResourceRequest.class), any());
         verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(UpdateProfileRequest.class), any());
     }
@@ -144,7 +151,8 @@ public class UpdateHandlerTest {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         assertThrows(CfnInvalidRequestException.class, () -> {
@@ -164,7 +172,8 @@ public class UpdateHandlerTest {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         assertThrows(CfnServiceInternalErrorException.class, () -> {
@@ -184,7 +193,8 @@ public class UpdateHandlerTest {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         assertThrows(CfnNotFoundException.class, () -> {
@@ -204,7 +214,8 @@ public class UpdateHandlerTest {
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
-                .desiredResourceTags(TEST_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         assertThrows(CfnGeneralServiceException.class, () -> {

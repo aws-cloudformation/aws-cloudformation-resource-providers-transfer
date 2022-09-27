@@ -21,6 +21,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -30,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static software.amazon.transfer.connector.AbstractTestBase.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,10 +61,13 @@ public class CreateHandlerTest {
                 .as2Config(getAs2Config())
                 .loggingRole(TEST_LOGGING_ROLE)
                 .url(TEST_URL)
+                .tags(MODEL_TAGS)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
         CreateConnectorResponse createConnectorResponse = CreateConnectorResponse.builder()
@@ -87,6 +92,11 @@ public class CreateHandlerTest {
         assertThat(testModel).hasFieldOrPropertyWithValue("as2Config", getAs2Config());
         assertThat(testModel).hasFieldOrPropertyWithValue("loggingRole", TEST_LOGGING_ROLE);
         assertThat(testModel).hasFieldOrPropertyWithValue("url", TEST_URL);
+
+        ArgumentCaptor<CreateConnectorRequest> requestCaptor = ArgumentCaptor.forClass(CreateConnectorRequest.class);
+        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        CreateConnectorRequest actualRequest = requestCaptor.getValue();
+        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG); 
     }
 
     @Test

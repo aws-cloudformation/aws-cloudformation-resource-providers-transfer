@@ -67,8 +67,7 @@ _Minimum_: <code>1</code>
 _Maximum_: <code>16384</code>
 
 _Pattern_: <code>^[
-
- -ÿ]*</code>
+	 -ÿ]*</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -85,8 +84,7 @@ _Minimum_: <code>1</code>
 _Maximum_: <code>2097152</code>
 
 _Pattern_: <code>^[
-
- -ÿ]*</code>
+	 -ÿ]*</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -103,8 +101,7 @@ _Minimum_: <code>1</code>
 _Maximum_: <code>16384</code>
 
 _Pattern_: <code>^[
-
- -ÿ]*</code>
+	 -ÿ]*</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 

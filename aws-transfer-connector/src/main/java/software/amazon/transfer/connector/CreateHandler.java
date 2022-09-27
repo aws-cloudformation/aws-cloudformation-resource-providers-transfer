@@ -1,21 +1,18 @@
 package software.amazon.transfer.connector;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.NoArgsConstructor;
 import software.amazon.awssdk.services.transfer.TransferClient;
-import software.amazon.awssdk.services.transfer.model.As2ConnectorConfig;
 import software.amazon.awssdk.services.transfer.model.CreateConnectorRequest;
 import software.amazon.awssdk.services.transfer.model.CreateConnectorResponse;
-import software.amazon.awssdk.services.transfer.model.CreateWorkflowResponse;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-import software.amazon.awssdk.services.transfer.model.CreateWorkflowRequest;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
 import software.amazon.awssdk.services.transfer.model.ResourceExistsException;
@@ -49,7 +46,16 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         final ResourceModel model = request.getDesiredResourceState();
-        model.setTags(Converter.TagConverter.translateTagfromMap(request.getDesiredResourceTags()));
+
+        Map<String, String> allTags = new HashMap<>();
+        if (request.getDesiredResourceTags() != null) {
+            allTags.putAll(request.getDesiredResourceTags());
+        }
+        if (request.getSystemTags() != null) {
+            allTags.putAll(request.getSystemTags());
+        }
+        model.setTags(Converter.TagConverter.translateTagfromMap(allTags));
+
 
         CreateConnectorRequest createConnectorRequest = CreateConnectorRequest.builder()
                 .url(model.getUrl())

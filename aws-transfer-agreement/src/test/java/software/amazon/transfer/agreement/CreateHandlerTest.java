@@ -1,6 +1,7 @@
 package software.amazon.transfer.agreement;
 
 import software.amazon.awssdk.services.transfer.TransferClient;
+import software.amazon.awssdk.services.transfer.model.CreateAgreementRequest;
 import software.amazon.awssdk.services.transfer.model.CreateAgreementResponse;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
@@ -19,6 +20,7 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -27,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static software.amazon.transfer.agreement.AbstractTestBase.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,10 +55,13 @@ public class CreateHandlerTest {
                 .partnerProfileId(TEST_PARTNER_PROFILE)
                 .serverId(TEST_SERVER_ID)
                 .status(TEST_STATUS)
+                .tags(MODEL_TAGS)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
             .desiredResourceState(model)
+            .desiredResourceTags(RESOURCE_TAG_MAP)
+            .systemTags(SYSTEM_TAG_MAP)
             .build();
 
         CreateAgreementResponse createAgreementResponse = CreateAgreementResponse.builder()
@@ -82,6 +88,11 @@ public class CreateHandlerTest {
         assertThat(testModel).hasFieldOrPropertyWithValue("partnerProfileId", TEST_PARTNER_PROFILE);
         assertThat(testModel).hasFieldOrPropertyWithValue("serverId", TEST_SERVER_ID);
         assertThat(testModel).hasFieldOrPropertyWithValue("status", TEST_STATUS);
+
+        ArgumentCaptor<CreateAgreementRequest> requestCaptor = ArgumentCaptor.forClass(CreateAgreementRequest.class);
+        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        CreateAgreementRequest actualRequest = requestCaptor.getValue();
+        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG); 
     }
 
     @Test

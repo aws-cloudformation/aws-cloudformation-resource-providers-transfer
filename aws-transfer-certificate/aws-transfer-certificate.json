@@ -38,21 +38,21 @@
     "Certificate": {
       "description": "Specifies the certificate body to be imported.",
       "type": "string",
-      "pattern": "^[\t\n\r -\u00ff]*",
+      "pattern": "^[\n\r\t -\u00ff]*",
       "minLength": 1,
       "maxLength": 16384
     },
     "CertificateChain": {
       "description": "Specifies the certificate chain to be imported.",
       "type": "string",
-      "pattern": "^[\t\n\r -\u00ff]*",
+      "pattern": "^[\n\r\t -\u00ff]*",
       "minLength": 1,
       "maxLength": 2097152
     },
     "PrivateKey": {
       "description": "Specifies the private key for the certificate.",
       "type": "string",
-      "pattern": "^[\t\n\r -\u00ff]*",
+      "pattern": "^[\n\r\t -\u00ff]*",
       "minLength": 1,
       "maxLength": 16384
     },
