@@ -1,0 +1,15 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo ---- Pre-build ----
+      - echo region $AWS_REGION
+  build:
+    commands:
+      - echo Build started on `date`
+      - aws cloudformation delete-stack --stack-name connector-contract-dependency-stack
+      - aws cloudformation wait stack-delete-complete --stack-name connector-contract-dependency-stack
+      - echo "Successfully deleted stack connector-contract-dependency-stack"
+  post_build:
+    commands:
+      - echo Build completed on `date`

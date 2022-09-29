@@ -1,0 +1,53 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo ---- Pre-build ----
+      - echo region $AWS_REGION
+  build:
+    commands:
+      - echo Build started on `date`
+      - error_file=$(mktemp)
+      - trap 'rm ${error_file}' EXIT # delete the file when the script exits
+      - |
+        CREATE_RESPONSE=$(aws transfer import-certificate --usage SIGNING --certificate "-----BEGIN CERTIFICATE-----
+        MIIDezCCAmOgAwIBAgIESnHn9TANBgkqhkiG9w0BAQUFADBuMQswCQYDVQQGEwJV
+        UzERMA8GA1UECBMITmV3IFlvcmsxETAPBgNVBAcTCE5ldyBZb3JrMREwDwYDVQQK
+        EwhPcGVuQVMyQjELMAkGA1UECxMCUUExGTAXBgNVBAMTEE9wZW5BUzJCIFRlc3Rp
+        bmcwHhcNMTUwNzI3MTgwODQzWhcNMjUwNzI0MTgwODQzWjBuMQswCQYDVQQGEwJV
+        UzERMA8GA1UECBMITmV3IFlvcmsxETAPBgNVBAcTCE5ldyBZb3JrMREwDwYDVQQK
+        EwhPcGVuQVMyQjELMAkGA1UECxMCUUExGTAXBgNVBAMTEE9wZW5BUzJCIFRlc3Rp
+        bmcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC+1kS4nbcX8Sjp4znp
+        AHRMmLy0o4Z5WTflL2NmXdLiO6wtIzrTOfmyHgZt/itvV5CkWHC7XkPT99LdnWuT
+        slVYfMhrphcHSV2se5F0Cp7pguv8D3ooNz/XjO0vsq6Xtst2pU/3CCmuCt78H5BP
+        YfzcUiBgHJ1rm5BVflPt90fIfkFNatsWwTU+2YuoUDW3FlUbQ/8Ym7NO24IDfAIs
+        URETzGPEzYjYsy3K/5Jl1SWbYkyJCD6fHY8qjy2s6dOxmn2ncDqYx4ziPJUkQUdc
+        TvLwVQEJN3uMFYnHetgfmB9Ny7W+w7a/bmrGmZA7DyWKyL6m77fsjc7xgTSDRoL3
+        UJaVAgMBAAGjITAfMB0GA1UdDgQWBBQ+ASEQrWoVxlNKBz0Bj8PXc4GaaDANBgkq
+        hkiG9w0BAQUFAAOCAQEAL6zajyvmW07/8V2WaGsr95cMw/yQvqqhiOD+RDaNV0Pw
+        N2BQmVtuOYKyiC3yTW/FFed0SfbqwU8Q84/8O9S47HJZwqUI+pi/OMHf2+Q4hsMq
+        7+3Jf7qiM26zwVzB2vd0Iz4JbfWQNRHyaiygNN8lJ++xHQ27H3sxxsQzs/fEPvA7
+        yj8dI3eCVOFHipupHD7BBJ/tscY553mIyHNoVbGAk2DE4WDZ1DnvnC2oJK7giafF
+        IFwbhQLGEE36OYyHoPhKGXOZWfGoBo2jlOGFdKhJBO91xPV8YHWwP0UMcvi8K7Uq
+        u6rBwXqolY+nuoLgm5FYzYskgUdksxvDkAHE1cE9tQ==
+        -----END CERTIFICATE-----" --active-date 2022-03-22T18:04:35Z --inactive-date 2022-08-04T18:04:35Z) || true
+      - |
+        if [[ -n "$CREATE_RESPONSE" ]]; then
+          echo "Certificate imported successfully"
+          export CERTIFICATE_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.CertificateId')
+        else
+          echo "Something went wrong."
+        fi
+      - echo CertificateId ${CERTIFICATE_ID}
+      - |
+        aws cloudformation describe-stacks --stack-name certificate-contract-dependency-stack;
+        if [ $? -eq 0 ]; then
+          echo "CFN stack already exists. Deleting the stack"
+          aws cloudformation delete-stack --stack-name certificate-contract-dependency-stack
+          aws cloudformation wait stack-delete-complete --stack-name certificate-contract-dependency-stack
+        fi
+      - echo "Creating a new CFN stack"
+      - aws cloudformation create-stack --stack-name certificate-contract-dependency-stack --template-body file://dependency.yml --parameters ParameterKey=CertificateId,ParameterValue=${CERTIFICATE_ID}
+  post_build:
+    commands:
+      - echo Build completed on `date`

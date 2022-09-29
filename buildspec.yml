@@ -34,7 +34,8 @@ phases:
           echo "$CODEBUILD_SRC_DIR is empty"
         fi
     finally:
-      - cat "$CODEBUILD_SRC_DIR/aws-transfer-workflow/rpdk.log"
-      - cat "$CODEBUILD_SRC_DIR/aws-transfer-certificate/rpdk.log"
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-agreement/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-certificate/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-connector/rpdk.log"
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-profile/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-workflow/rpdk.log"

@@ -1,0 +1,19 @@
+Parameters:
+  LocalProfileId:
+    Type: String
+  PartnerProfileId:
+    Type: String
+Resources:
+  # Dummy resource for CloudFormation, do not remove!
+  DummyResource:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Properties: {}
+Outputs:
+  ConnectorsCustomLocalProfile:
+    Value: !Ref LocalProfileId
+    Export:
+      Name: awstransferconnectorcto1
+  ConnectorsCustomPartnerProfile:
+    Value: !Ref PartnerProfileId
+    Export:
+      Name: awstransferconnectorcto2

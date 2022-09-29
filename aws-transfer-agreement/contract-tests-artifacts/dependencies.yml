@@ -39,35 +39,14 @@ Resources:
           - Ref: Subnet
         VpcId:
           Ref: Vpc
-
-  AgreementsCustomLocalProfile:
-    Type: AWS::Transfer::Profile
-    Properties:
-      As2Id: LocalProfileId
-      ProfileType: LOCAL
-  AgreementsCustomPartnerProfile:
-    Type: AWS::Transfer::Profile
-    Properties:
-      As2Id: PartnerProfileId
-      ProfileType: PARTNER
 Outputs:
   AgreementsCustomAccessRole:
     Value:
       Fn::GetAtt: AgreementsCustomAccessRole.Arn
     Export:
-      Name: awstransferagreementcto1
+      Name: awstransferagreementcto3
   AgreementsCustomServer:
     Value:
       Fn::GetAtt: AgreementsCustomServer.ServerId
-    Export:
-      Name: awstransferagreementcto2
-  AgreementsCustomLocalProfile:
-    Value:
-      Ref: AgreementsCustomLocalProfile
-    Export:
-      Name: awstransferagreementcto3
-  AgreementsCustomPartnerProfile:
-    Value:
-      Ref: AgreementsCustomPartnerProfile
     Export:
       Name: awstransferagreementcto4

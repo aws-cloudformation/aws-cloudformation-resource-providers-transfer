@@ -1,0 +1,41 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo ---- Pre-build ----
+      - echo region $AWS_REGION
+  build:
+    commands:
+      - echo Build started on `date`
+      - error_file=$(mktemp)
+      - trap 'rm ${error_file}' EXIT # delete the file when the script exits
+      - CREATE_RESPONSE=$(aws transfer create-profile --as2-id LocalProfileId --profile-type LOCAL) || true
+      - |
+        if [[ -n "$CREATE_RESPONSE" ]]; then
+          echo "Local Profile created successfully"
+          export LOCAL_PROFILE_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.ProfileId')
+        else
+          echo "Something went wrong."
+        fi
+      - echo LocalProfileId ${LOCAL_PROFILE_ID}
+      - CREATE_RESPONSE=$(aws transfer create-profile --as2-id PartnerProfileId --profile-type PARTNER) || true
+      - |
+        if [[ -n "$CREATE_RESPONSE" ]]; then
+          echo "Partner Profile created successfully"
+          export PARTNER_PROFILE_ID=$(echo "${CREATE_RESPONSE}" | jq -r '.ProfileId')
+        else
+          echo "Something went wrong."
+        fi
+      - echo PartnerProfileId ${PARTNER_PROFILE_ID}
+      - |
+        aws cloudformation describe-stacks --stack-name connector-contract-dependency-stack;
+        if [ $? -eq 0 ]; then
+          echo "CFN stack already exists. Deleting the stack"
+          aws cloudformation delete-stack --stack-name connector-contract-dependency-stack
+          aws cloudformation wait stack-delete-complete --stack-name connector-contract-dependency-stack
+        fi
+      - echo "Creating a new CFN stack"
+      - aws cloudformation create-stack --stack-name connector-contract-dependency-stack --template-body file://dependency.yml --parameters ParameterKey=LocalProfileId,ParameterValue=${LOCAL_PROFILE_ID} ParameterKey=PartnerProfileId,ParameterValue=${PARTNER_PROFILE_ID}
+  post_build:
+    commands:
+      - echo Build completed on `date`

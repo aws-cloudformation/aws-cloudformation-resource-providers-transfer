@@ -1,11 +1,11 @@
 {
   "CreateInputs": {
     "Description": "IntegTest",
-    "ServerId": "{{awstransferagreementcto2}}",
-    "LocalProfileId": "{{awstransferagreementcto3}}",
-    "PartnerProfileId": "{{awstransferagreementcto4}}",
+    "ServerId": "{{awstransferagreementcto4}}",
+    "LocalProfileId": "{{awstransferagreementcto1}}",
+    "PartnerProfileId": "{{awstransferagreementcto2}}",
     "BaseDirectory": "/some-directory",
-    "AccessRole": "{{awstransferagreementcto1}}",
+    "AccessRole": "{{awstransferagreementcto3}}",
     "Status": "ACTIVE",
     "Tags": [
       {

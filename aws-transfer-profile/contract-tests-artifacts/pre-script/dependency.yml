@@ -1,0 +1,13 @@
+Parameters:
+  CertificateId:
+    Type: String
+Resources:
+  # Dummy resource for CloudFormation, do not remove!
+  DummyResource:
+    Type: AWS::CloudFormation::WaitConditionHandle
+    Properties: {}
+Outputs:
+  ProfileCustomCertificate:
+    Value: !Ref CertificateId
+    Export:
+      Name: awstransferprofilecto1
