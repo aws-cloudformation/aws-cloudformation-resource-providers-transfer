@@ -9,6 +9,7 @@ phases:
       -  pip install requests --upgrade
       -  pip install pyyaml --upgrade
       -  pip install boto3 --upgrade
+      -  pip install --upgrade 'urllib3>=1.26.0'
       -  pip install pre-commit
       -  pip install cloudformation-cli-java-plugin
   build:
@@ -34,7 +35,8 @@ phases:
           echo "$CODEBUILD_SRC_DIR is empty"
         fi
     finally:
-      - cat "$CODEBUILD_SRC_DIR/aws-transfer-workflow/rpdk.log"
-      - cat "$CODEBUILD_SRC_DIR/aws-transfer-certificate/rpdk.log"
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-agreement/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-certificate/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-connector/rpdk.log"
       - cat "$CODEBUILD_SRC_DIR/aws-transfer-profile/rpdk.log"
+      - cat "$CODEBUILD_SRC_DIR/aws-transfer-workflow/rpdk.log"
