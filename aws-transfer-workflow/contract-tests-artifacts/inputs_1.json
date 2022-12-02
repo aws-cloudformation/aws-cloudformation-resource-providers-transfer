@@ -10,6 +10,20 @@
         }
       },
       {
+        "Type": "DECRYPT",
+        "DecryptStepDetails": {
+          "Name": "decryptFile",
+          "DestinationFileLocation": {
+            "S3FileLocation": {
+              "Bucket": "test",
+              "Key": "test_decrypted/"
+            }
+          },
+          "OverwriteExisting": "FALSE",
+          "SourceFileLocation": "${previous.file}"
+        }
+      },
+      {
         "Type": "COPY",
         "CopyStepDetails": {
           "Name": "copytofolder",
@@ -54,6 +68,20 @@
         "Type": "DELETE",
         "DeleteStepDetails": {
           "Name": "deleteallfiles",
+          "SourceFileLocation": "${previous.file}"
+        }
+      },
+      {
+        "Type": "DECRYPT",
+        "CopyStepDetails": {
+          "Name": "decryptFile",
+          "DestinationFileLocation": {
+            "S3FileLocation": {
+              "Bucket": "test",
+              "Key": "test_decrypted/"
+            }
+          },
+          "OverwriteExisting": "FALSE",
           "SourceFileLocation": "${previous.file}"
         }
       },

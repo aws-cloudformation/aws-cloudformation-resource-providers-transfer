@@ -25,12 +25,33 @@
       ],
       "additionalProperties": false
     },
+    "EfsInputFileLocation": {
+      "description": "Specifies the details for an EFS file.",
+      "type": "object",
+      "properties": {
+        "FileSystemId": {
+          "description": "Specifies the EFS filesystem that contains the file.",
+          "type": "string",
+          "pattern": "^(arn:aws[-a-z]*:elasticfilesystem:[0-9a-z-:]+:(access-point/fsap|file-system/fs)-[0-9a-f]{8,40}|fs(ap)?-[0-9a-f]{8,40})$",
+          "minLength": 0,
+          "maxLength": 128
+        },
+        "Path": {
+          "description": "The name assigned to the file when it was created in EFS. You use the object path to retrieve the object.",
+          "type": "string",
+          "pattern": "^[^\\x00]+$",
+          "minLength": 1,
+          "maxLength": 65536
+        }
+      },
+      "additionalProperties": false
+    },
     "S3InputFileLocation": {
-      "description": "Specifies the details for the S3 file being copied.",
+      "description": "Specifies the details for a S3 file.",
       "type": "object",
       "properties": {
         "Bucket": {
-          "description": "Specifies the S3 bucket that contains the file being copied.",
+          "description": "Specifies the S3 bucket that contains the file.",
           "type": "string",
           "pattern": "^[a-z0-9][\\.\\-a-z0-9]{1,61}[a-z0-9]$",
           "minLength": 3,
@@ -52,6 +73,9 @@
       "properties": {
         "S3FileLocation": {
           "$ref": "#/definitions/S3InputFileLocation"
+        },
+        "EfsFileLocation": {
+          "$ref": "#/definitions/EfsInputFileLocation"
         }
       },
       "additionalProperties": false
@@ -126,6 +150,45 @@
           },
           "additionalProperties": false
         },
+        "DecryptStepDetails": {
+          "description": "Details for a step that performs a file decryption.",
+          "type": "object",
+          "properties": {
+            "DestinationFileLocation": {
+              "$ref": "#/definitions/InputFileLocation"
+            },
+            "Name": {
+              "description": "The name of the step, used as an identifier.",
+              "type": "string",
+              "pattern": "^[\\w-]*$",
+              "minLength": 0,
+              "maxLength": 30
+            },
+            "Type": {
+              "description": "Specifies which encryption method to use.",
+              "type": "string",
+              "enum": [
+                "PGP"
+              ]
+            },
+            "OverwriteExisting": {
+              "description": "A flag that indicates whether or not to overwrite an existing file of the same name. The default is FALSE.",
+              "type": "string",
+              "enum": [
+                "TRUE",
+                "FALSE"
+              ]
+            },
+            "SourceFileLocation": {
+              "description": "Specifies which file to use as input to the workflow step.",
+              "type": "string",
+              "pattern": "^\\$\\{(\\w+.)+\\w+\\}$",
+              "minLength": 0,
+              "maxLength": 256
+            }
+          },
+          "additionalProperties": false
+        },
         "DeleteStepDetails": {
           "description": "Details for a step that deletes the file.",
           "type": "object",
@@ -183,6 +246,7 @@
           "enum": [
             "COPY",
             "CUSTOM",
+            "DECRYPT",
             "DELETE",
             "TAG"
           ]

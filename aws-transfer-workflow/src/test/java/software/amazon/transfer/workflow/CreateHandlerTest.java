@@ -88,6 +88,48 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     @Test
+    public void  handleRequest_SimpleSuccess_Decrypt() {
+        CreateHandler handler = new CreateHandler(client);
+
+        ResourceModel model = ResourceModel.builder()
+                .description(TEST_DESCRIPTION)
+                .onExceptionSteps(getModelDecryptWorkflowSteps())
+                .steps(getModelDecryptWorkflowSteps())
+                .tags(MODEL_TAGS)
+                .build();
+
+        ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
+                .desiredResourceState(model)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
+                .build();
+
+        CreateWorkflowResponse createWorkflowResponse = CreateWorkflowResponse.builder().workflowId("id").build();
+        doReturn(createWorkflowResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+
+        ProgressEvent<ResourceModel, CallbackContext> response
+                = handler.handleRequest(proxy, request, null, logger);
+
+        ResourceModel testModel = response.getResourceModel();
+        assertThat(response).isNotNull();
+        assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+        assertThat(response.getCallbackContext()).isNull();
+        assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(testModel).isEqualTo(model);
+        assertThat(response.getResourceModels()).isNull();
+        assertThat(response.getMessage()).isNull();
+        assertThat(response.getErrorCode()).isNull();
+        assertThat(testModel).hasFieldOrPropertyWithValue("description", TEST_DESCRIPTION);
+        assertThat(testModel).hasFieldOrPropertyWithValue("steps", getModelDecryptWorkflowSteps());
+        assertThat(testModel).hasFieldOrPropertyWithValue("onExceptionSteps", getModelDecryptWorkflowSteps());
+
+        ArgumentCaptor<CreateWorkflowRequest> requestCaptor = ArgumentCaptor.forClass(CreateWorkflowRequest.class);
+        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        CreateWorkflowRequest actualRequest = requestCaptor.getValue();
+        assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
+    }
+
+    @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
         CreateHandler handler = new CreateHandler(client);
 
