@@ -13,6 +13,7 @@
         "Type": "DECRYPT",
         "DecryptStepDetails": {
           "Name": "decryptFile",
+          "Type": "PGP",
           "DestinationFileLocation": {
             "S3FileLocation": {
               "Bucket": "test",
@@ -73,12 +74,13 @@
       },
       {
         "Type": "DECRYPT",
-        "CopyStepDetails": {
+        "DecryptStepDetails": {
           "Name": "decryptFile",
+          "Type": "PGP",
           "DestinationFileLocation": {
             "S3FileLocation": {
               "Bucket": "test",
-              "Key": "test_decrypted/"
+              "Key": "test_decryptedd/"
             }
           },
           "OverwriteExisting": "FALSE",
