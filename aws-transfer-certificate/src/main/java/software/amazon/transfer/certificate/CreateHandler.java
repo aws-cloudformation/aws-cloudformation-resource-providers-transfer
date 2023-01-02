@@ -81,7 +81,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             model.setCertificateId(response.certificateId());
             logger.log(String.format("%s created successfully", ResourceModel.TYPE_NAME));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(importCertificateRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("ImportCertificate", e);
         } catch (ResourceExistsException e) {

@@ -77,7 +77,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             model.setAgreementId(response.agreementId());
             logger.log(String.format("%s created successfully", ResourceModel.TYPE_NAME));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(createAgreementRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("createAgreement", e);
         } catch (ResourceExistsException e) {

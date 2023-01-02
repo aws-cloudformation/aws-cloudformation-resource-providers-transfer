@@ -111,7 +111,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(request.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("Updating tags for certificate", e);
         } catch (ResourceNotFoundException e) {
