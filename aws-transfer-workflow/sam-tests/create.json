@@ -1,8 +1,8 @@
 {
   "credentials": {
-    "accessKeyId": "ASIAS4JYS6NFWVJ327UR",
-    "secretAccessKey": "+6h5JIjVvcc3r64AhdMPmwtMg/HdisMyz6Tblfx2",
-    "sessionToken": "IQoJb3JpZ2luX2VjEMD//////////wEaCXVzLWVhc3QtMSJHMEUCIQDk66YepLcBMYMpo5+08oEa0qX8jnGIGFP99rI1f6P/TAIgRaLr/HmSxlzzokNWoVhA1HIAMVTAuRz4xN2hZCYqlgIqnwIIGRABGgwxOTgyMjQwNDg5NzEiDP/9X7M+28BZOPWd6yr8ASrJTONEW5xCOjYbYZoNpKKmcS+1cCbMBj5QQfzGTpWA1meLNZV27XFGAnZxKjNwwd4GawSFXRgR/B6ZsQDN2A7nqfndGMZCkLWFg/ZMULqbKgJIfUNDHtvOifi/DiClaYji/m9xM3XOm9Wf3duM92MImdLrLjHZW/CHFl+oOifZ8rObyevBZOA8gP5O1XTJKB9F1cxxG/NC+R3Vlb4RtIEMuHka2SIr2w8EiXfNmT1hxjAOrApeNfD7M5F4hSR+Bfeh3/E6w/+eVqH8eQRdQytn24ZgEsI5SzogeRf86yPB00Nd9vDJn4tdrBhNS7Q7waY994AyfsHTuZSGmDCJ4tudBjqdAUh4iYpZHIgq7D/A7M6Lf/EP6SqVsnGv43TE1+hc1xaJ1UcbMjrTmkOOh702RHV9nz8iH3jUSDR/W8Ibiv5kaXDiNZfHqUL3rzhTYDpfAUxmEK78mpVEQ4618mI2uE85KyTDBMRbOF7tU5GKclBfxHeHNZ3iJR56+xCev4RY28GnZ6si7/xCtvT8dW1maK4xESmw8UabSk/F1cVbUkk="
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "sessionToken": ""
   },
   "action": "CREATE",
   "request": {

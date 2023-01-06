@@ -68,7 +68,7 @@
       "additionalProperties": false
     },
     "InputFileLocation": {
-      "description": "Specifies the location for the file being copied. Only applicable for the Copy or Decrypt type of workflow steps.",
+      "description": "Specifies the location for the file being decrypted. Only applicable for the Decrypt type of workflow steps.",
       "type": "object",
       "properties": {
         "S3FileLocation": {
@@ -81,7 +81,7 @@
       "additionalProperties": false
     },
     "S3FileLocation": {
-      "description": "Specifies the location for the file being copied. Only applicable for the Copy or Decrypt type of workflow steps.",
+      "description": "Specifies the location for the file being copied. Only applicable for the Copy type of workflow steps.",
       "type": "object",
       "properties": {
         "S3FileLocation": {
