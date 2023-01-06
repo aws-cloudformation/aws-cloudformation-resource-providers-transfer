@@ -1,12 +1,12 @@
 {
   "credentials": {
-    "accessKeyId": "",
-    "secretAccessKey": "",
-    "sessionToken": ""
+    "accessKeyId": "ASIAS4JYS6NFWVJ327UR",
+    "secretAccessKey": "+6h5JIjVvcc3r64AhdMPmwtMg/HdisMyz6Tblfx2",
+    "sessionToken": "IQoJb3JpZ2luX2VjEMD//////////wEaCXVzLWVhc3QtMSJHMEUCIQDk66YepLcBMYMpo5+08oEa0qX8jnGIGFP99rI1f6P/TAIgRaLr/HmSxlzzokNWoVhA1HIAMVTAuRz4xN2hZCYqlgIqnwIIGRABGgwxOTgyMjQwNDg5NzEiDP/9X7M+28BZOPWd6yr8ASrJTONEW5xCOjYbYZoNpKKmcS+1cCbMBj5QQfzGTpWA1meLNZV27XFGAnZxKjNwwd4GawSFXRgR/B6ZsQDN2A7nqfndGMZCkLWFg/ZMULqbKgJIfUNDHtvOifi/DiClaYji/m9xM3XOm9Wf3duM92MImdLrLjHZW/CHFl+oOifZ8rObyevBZOA8gP5O1XTJKB9F1cxxG/NC+R3Vlb4RtIEMuHka2SIr2w8EiXfNmT1hxjAOrApeNfD7M5F4hSR+Bfeh3/E6w/+eVqH8eQRdQytn24ZgEsI5SzogeRf86yPB00Nd9vDJn4tdrBhNS7Q7waY994AyfsHTuZSGmDCJ4tudBjqdAUh4iYpZHIgq7D/A7M6Lf/EP6SqVsnGv43TE1+hc1xaJ1UcbMjrTmkOOh702RHV9nz8iH3jUSDR/W8Ibiv5kaXDiNZfHqUL3rzhTYDpfAUxmEK78mpVEQ4618mI2uE85KyTDBMRbOF7tU5GKclBfxHeHNZ3iJR56+xCev4RY28GnZ6si7/xCtvT8dW1maK4xESmw8UabSk/F1cVbUkk="
   },
   "action": "CREATE",
   "request": {
-    "clientRequestToken": "0be766ac-342d-44fc-9e78-673408625cb3",
+    "clientRequestToken": "b82eac8e-4706-477c-97ee-0fd9270cc005",
     "desiredResourceState": {
       "Description": "SamLocalTest",
       "Steps": [
@@ -14,6 +14,18 @@
           "Type": "DELETE",
           "DeleteStepDetails": {
             "Name": "deleteallfiles"
+          }
+        },
+        {
+          "Type": "COPY",
+          "CopyStepDetails": {
+            "Name": "copy",
+            "DestinationFileLocation": {
+              "S3FileLocation": {
+                "Bucket": "test-bucket",
+                "Key": "test-key/"
+              }
+            }
           }
         },
         {
@@ -25,6 +37,19 @@
               "S3FileLocation": {
                 "Bucket": "test-bucket",
                 "Key": "test-key/"
+              }
+            }
+          }
+        },
+        {
+          "Type": "DECRYPT",
+          "DecryptStepDetails": {
+            "Name": "decrypt",
+            "Type": "PGP",
+            "DestinationFileLocation": {
+              "EfsFileLocation": {
+                "FileSystemId": "arn:aws:elasticfilesystem:us-east-1:1111333322228888:file-system/fs-0123456789abcdef8",
+                "Path": "test-key/"
               }
             }
           }

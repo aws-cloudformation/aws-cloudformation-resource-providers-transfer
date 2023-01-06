@@ -68,7 +68,7 @@
       "additionalProperties": false
     },
     "InputFileLocation": {
-      "description": "Specifies the location for the file being copied. Only applicable for the Copy type of workflow steps.",
+      "description": "Specifies the location for the file being copied. Only applicable for the Copy or Decrypt type of workflow steps.",
       "type": "object",
       "properties": {
         "S3FileLocation": {
@@ -76,6 +76,16 @@
         },
         "EfsFileLocation": {
           "$ref": "#/definitions/EfsInputFileLocation"
+        }
+      },
+      "additionalProperties": false
+    },
+    "S3FileLocation": {
+      "description": "Specifies the location for the file being copied. Only applicable for the Copy or Decrypt type of workflow steps.",
+      "type": "object",
+      "properties": {
+        "S3FileLocation": {
+          "$ref": "#/definitions/S3InputFileLocation"
         }
       },
       "additionalProperties": false
@@ -89,7 +99,7 @@
           "type": "object",
           "properties": {
             "DestinationFileLocation": {
-              "$ref": "#/definitions/InputFileLocation"
+              "$ref": "#/definitions/S3FileLocation"
             },
             "Name": {
               "description": "The name of the step, used as an identifier.",

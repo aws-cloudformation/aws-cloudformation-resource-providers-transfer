@@ -39,7 +39,7 @@ public class AbstractTestBase {
             .copyStepDetails(CopyStepDetails.builder()
                     .name("COPY")
                     .overwriteExisting(OverwriteExisting.TRUE.toString())
-                    .destinationFileLocation(InputFileLocation.builder()
+                    .destinationFileLocation(S3FileLocation.builder()
                             .s3FileLocation(S3InputFileLocation.builder()
                                     .bucket("bucket")
                                     .key("key")
