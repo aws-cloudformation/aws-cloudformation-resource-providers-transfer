@@ -12,11 +12,41 @@
       {
         "Type": "COPY",
         "CopyStepDetails": {
-          "Name": "copytofolder",
+          "Name": "copyToS3Folder",
           "DestinationFileLocation": {
             "S3FileLocation": {
               "Bucket": "test",
               "Key": "test/"
+            }
+          },
+          "OverwriteExisting": "FALSE",
+          "SourceFileLocation": "${previous.file}"
+        }
+      },
+      {
+        "Type": "DECRYPT",
+        "DecryptStepDetails": {
+          "Name": "decrypttofolder",
+          "Type": "PGP",
+          "DestinationFileLocation": {
+            "S3FileLocation": {
+              "Bucket": "test",
+              "Key": "test/"
+            }
+          },
+          "OverwriteExisting": "FALSE",
+          "SourceFileLocation": "${previous.file}"
+        }
+      },
+      {
+        "Type": "DECRYPT",
+        "DecryptStepDetails": {
+          "Name": "decrypttofolder",
+          "Type": "PGP",
+          "DestinationFileLocation": {
+            "EfsFileLocation": {
+              "FileSystemId": "arn:aws:elasticfilesystem:us-east-1:1111333322228888:file-system/fs-0123456789abcdef8",
+              "Path": "test/"
             }
           },
           "OverwriteExisting": "FALSE",
@@ -60,11 +90,41 @@
       {
         "Type": "COPY",
         "CopyStepDetails": {
-          "Name": "copytofolder",
+          "Name": "copyToS3Folder",
           "DestinationFileLocation": {
             "S3FileLocation": {
               "Bucket": "test",
               "Key": "test/"
+            }
+          },
+          "OverwriteExisting": "FALSE",
+          "SourceFileLocation": "${previous.file}"
+        }
+      },
+      {
+        "Type": "DECRYPT",
+        "DecryptStepDetails": {
+          "Name": "decryptToS3Folder",
+          "Type": "PGP",
+          "DestinationFileLocation": {
+            "S3FileLocation": {
+              "Bucket": "test",
+              "Key": "test/"
+            }
+          },
+          "OverwriteExisting": "FALSE",
+          "SourceFileLocation": "${previous.file}"
+        }
+      },
+      {
+        "Type": "DECRYPT",
+        "DecryptStepDetails": {
+          "Name": "decryptToEfsFolder",
+          "Type": "PGP",
+          "DestinationFileLocation": {
+            "EfsFileLocation": {
+              "FileSystemId": "arn:aws:elasticfilesystem:us-east-1:1111333322228888:file-system/fs-0123456789abcdef8",
+              "Path": "test/"
             }
           },
           "OverwriteExisting": "FALSE",

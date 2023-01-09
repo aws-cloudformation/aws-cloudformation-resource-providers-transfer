@@ -39,7 +39,7 @@ public class AbstractTestBase {
             .copyStepDetails(CopyStepDetails.builder()
                     .name("COPY")
                     .overwriteExisting(OverwriteExisting.TRUE.toString())
-                    .destinationFileLocation(InputFileLocation.builder()
+                    .destinationFileLocation(S3FileLocation.builder()
                             .s3FileLocation(S3InputFileLocation.builder()
                                     .bucket("bucket")
                                     .key("key")
@@ -48,5 +48,23 @@ public class AbstractTestBase {
                     .build())
             .build();
     return Collections.singletonList(step);
+  }
+
+  public List<WorkflowStep> getModelDecryptWorkflowSteps() {
+        WorkflowStep step = WorkflowStep.builder()
+                .type(WorkflowStepType.DECRYPT.toString())
+                .decryptStepDetails(DecryptStepDetails.builder()
+                        .name("DECRYPT")
+                        .type("PGP")
+                        .overwriteExisting(OverwriteExisting.TRUE.toString())
+                        .destinationFileLocation(InputFileLocation.builder()
+                                .s3FileLocation(S3InputFileLocation.builder()
+                                        .bucket("bucket")
+                                        .key("key")
+                                        .build())
+                                .build())
+                        .build())
+                .build();
+        return Collections.singletonList(step);
   }
 }

@@ -15,6 +15,44 @@
           "DeleteStepDetails": {
             "Name": "deleteallfiles"
           }
+        },
+        {
+          "Type": "COPY",
+          "CopyStepDetails": {
+            "Name": "copy",
+            "DestinationFileLocation": {
+              "S3FileLocation": {
+                "Bucket": "test-bucket",
+                "Key": "test-key/"
+              }
+            }
+          }
+        },
+        {
+          "Type": "DECRYPT",
+          "DecryptStepDetails": {
+            "Name": "decrypt",
+            "Type": "PGP",
+            "DestinationFileLocation": {
+              "S3FileLocation": {
+                "Bucket": "test-bucket",
+                "Key": "test-key/"
+              }
+            }
+          }
+        },
+        {
+          "Type": "DECRYPT",
+          "DecryptStepDetails": {
+            "Name": "decrypt",
+            "Type": "PGP",
+            "DestinationFileLocation": {
+              "EfsFileLocation": {
+                "FileSystemId": "arn:aws:elasticfilesystem:us-east-1:1111333322228888:file-system/fs-0123456789abcdef8",
+                "Path": "test-key/"
+              }
+            }
+          }
         }
       ]
     },
