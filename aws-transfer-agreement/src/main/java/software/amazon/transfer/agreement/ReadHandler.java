@@ -77,7 +77,7 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(describeAgreementRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + describeAgreementRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("describeAgreement", e);
         } catch (ResourceNotFoundException e) {

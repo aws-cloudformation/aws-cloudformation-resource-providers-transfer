@@ -71,7 +71,7 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(describeProfileRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + describeProfileRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("describeProfile", e);
         } catch (ResourceNotFoundException e) {

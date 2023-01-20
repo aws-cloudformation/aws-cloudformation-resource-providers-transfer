@@ -45,7 +45,7 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
             proxy.injectCredentialsAndInvokeV2(deleteCertificateRequest, client::deleteCertificate);
             logger.log(String.format("%s %s deleted successfully", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier()));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(deleteCertificateRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + deleteCertificateRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("deleteCertificate", e);
         } catch (ResourceNotFoundException e) {

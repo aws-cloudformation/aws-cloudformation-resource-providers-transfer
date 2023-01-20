@@ -70,7 +70,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             model.setProfileId(response.profileId());
             logger.log(String.format("%s created successfully", ResourceModel.TYPE_NAME));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(createProfileRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + createProfileRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("createProfile", e);
         } catch (ResourceNotFoundException e) {

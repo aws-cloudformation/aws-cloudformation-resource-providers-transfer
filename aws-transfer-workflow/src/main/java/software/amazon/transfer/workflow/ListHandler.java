@@ -64,7 +64,7 @@ public class ListHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(listWorkflowsRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + listWorkflowsRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("listWorkflow", e);
         } catch (TransferException e) {

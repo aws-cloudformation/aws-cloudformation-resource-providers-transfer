@@ -47,7 +47,7 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
             logger.log(
                     String.format("%s %s deleted successfully", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier()));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(deleteConnectorRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + deleteConnectorRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("deleteConnector", e);
         } catch (ResourceNotFoundException e) {

@@ -74,7 +74,7 @@ public class ListHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(listCertificatesRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + listCertificatesRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("listCertificate", e);
         } catch (TransferException e) {

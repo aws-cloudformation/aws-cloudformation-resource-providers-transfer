@@ -47,7 +47,7 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
             proxy.injectCredentialsAndInvokeV2(deleteAgreementRequest, client::deleteAgreement);
             logger.log(String.format("%s %s deleted successfully", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier()));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(deleteAgreementRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + deleteAgreementRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("deleteAgreement", e);
         } catch (ResourceNotFoundException e) {
