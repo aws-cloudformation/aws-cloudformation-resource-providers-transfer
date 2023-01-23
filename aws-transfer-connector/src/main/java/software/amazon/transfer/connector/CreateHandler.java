@@ -76,7 +76,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             model.setConnectorId(response.connectorId());
             logger.log(String.format("%s created successfully", ResourceModel.TYPE_NAME));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(createConnectorRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + createConnectorRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("createConnector", e);
         } catch (ResourceExistsException e) {

@@ -90,7 +90,7 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(describeCertificateRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + describeCertificateRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("describeCertificate", e);
         } catch (ResourceNotFoundException e) {

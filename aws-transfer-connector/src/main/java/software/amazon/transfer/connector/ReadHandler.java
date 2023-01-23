@@ -75,7 +75,7 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(describeConnectorRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + describeConnectorRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("describeConnector", e);
         } catch (ResourceNotFoundException e) {

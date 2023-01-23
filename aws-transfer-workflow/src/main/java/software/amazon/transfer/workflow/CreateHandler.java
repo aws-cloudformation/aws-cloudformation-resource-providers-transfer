@@ -81,7 +81,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             model.setWorkflowId(response.workflowId());
             logger.log(String.format("%s created successfully", ResourceModel.TYPE_NAME));
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(createWorkflowRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + createWorkflowRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("createWorkflow", e);
         } catch (ResourceExistsException e) {

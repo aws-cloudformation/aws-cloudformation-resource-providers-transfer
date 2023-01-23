@@ -71,7 +71,7 @@ public class ListHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(listAgreementsRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + listAgreementsRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("listAgreement", e);
         } catch (TransferException e) {

@@ -68,7 +68,7 @@ public class ListHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(listProfilesRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + listProfilesRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("listProfiles", e);
         } catch (TransferException e) {

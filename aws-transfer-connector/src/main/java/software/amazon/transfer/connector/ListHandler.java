@@ -64,7 +64,7 @@ public class ListHandler extends BaseHandler<CallbackContext> {
                     .status(OperationStatus.SUCCESS)
                     .build();
         } catch (InvalidRequestException e) {
-            throw new CfnInvalidRequestException(listConnectorsRequest.toString(), e);
+            throw new CfnInvalidRequestException(e.getMessage() + " " + listConnectorsRequest.toString(), e);
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("listConnector", e);
         } catch (TransferException e) {
