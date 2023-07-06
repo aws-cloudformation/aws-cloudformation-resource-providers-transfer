@@ -17,7 +17,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "<a href="#encryptionalgorithm" title="EncryptionAlgorithm">EncryptionAlgorithm</a>" : <i>String</i>,
     "<a href="#signingalgorithm" title="SigningAlgorithm">SigningAlgorithm</a>" : <i>String</i>,
     "<a href="#mdnsigningalgorithm" title="MdnSigningAlgorithm">MdnSigningAlgorithm</a>" : <i>String</i>,
-    "<a href="#mdnresponse" title="MdnResponse">MdnResponse</a>" : <i>String</i>
+    "<a href="#mdnresponse" title="MdnResponse">MdnResponse</a>" : <i>String</i>,
+    "<a href="#basicauthsecretid" title="BasicAuthSecretId">BasicAuthSecretId</a>" : <i>String</i>
 }
 </pre>
 
@@ -32,6 +33,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <a href="#signingalgorithm" title="SigningAlgorithm">SigningAlgorithm</a>: <i>String</i>
 <a href="#mdnsigningalgorithm" title="MdnSigningAlgorithm">MdnSigningAlgorithm</a>: <i>String</i>
 <a href="#mdnresponse" title="MdnResponse">MdnResponse</a>: <i>String</i>
+<a href="#basicauthsecretid" title="BasicAuthSecretId">BasicAuthSecretId</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -44,9 +46,9 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>19</code>
+_Minimum Length_: <code>19</code>
 
-_Maximum_: <code>19</code>
+_Maximum Length_: <code>19</code>
 
 _Pattern_: <code>^p-([0-9a-f]{17})$</code>
 
@@ -60,9 +62,9 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>19</code>
+_Minimum Length_: <code>19</code>
 
-_Maximum_: <code>19</code>
+_Maximum Length_: <code>19</code>
 
 _Pattern_: <code>^p-([0-9a-f]{17})$</code>
 
@@ -76,9 +78,9 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>1024</code>
+_Maximum Length_: <code>1024</code>
 
 _Pattern_: <code>^[\p{Print}\p{Blank}]+</code>
 
@@ -141,6 +143,18 @@ _Required_: No
 _Type_: String
 
 _Allowed Values_: <code>SYNC</code> | <code>NONE</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### BasicAuthSecretId
+
+ARN or name of the secret in AWS Secrets Manager which contains the credentials for Basic authentication. If empty, Basic authentication is disabled for the AS2 connector
+
+_Required_: No
+
+_Type_: String
+
+_Maximum Length_: <code>2048</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

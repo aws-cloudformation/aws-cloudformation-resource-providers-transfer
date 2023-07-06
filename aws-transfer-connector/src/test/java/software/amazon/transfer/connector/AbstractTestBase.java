@@ -22,6 +22,7 @@ public class AbstractTestBase {
     public static String TEST_SIGNING_ALGORITHM = "SHA256";
     public static String TEST_MDN_SIGNING_ALGORITHM = "SHA256";
     public static String TEST_MDN_RESPONSE = "SYNC";
+    public static String TEST_BASIC_AUTH_SECRET = "basic-auth-secret";
     public static Map<String, String> RESOURCE_TAG_MAP = Collections.singletonMap("key", "value");
     public static Map<String, String> SYSTEM_TAG_MAP = Collections.singletonMap(
             "aws:cloudformation:stack-name", "StackName");
@@ -52,6 +53,7 @@ public class AbstractTestBase {
         .signingAlgorithm(TEST_SIGNING_ALGORITHM)
         .mdnSigningAlgorithm(TEST_MDN_SIGNING_ALGORITHM)
         .mdnResponse(TEST_MDN_RESPONSE)
+        .basicAuthSecretId(TEST_BASIC_AUTH_SECRET)
         .build();
     }
 }

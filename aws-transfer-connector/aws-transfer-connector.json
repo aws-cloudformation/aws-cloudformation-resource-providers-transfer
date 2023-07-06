@@ -107,6 +107,12 @@
             "SYNC",
             "NONE"
           ]
+        },
+        "BasicAuthSecretId": {
+          "type": "string",
+          "description": "ARN or name of the secret in AWS Secrets Manager which contains the credentials for Basic authentication. If empty, Basic authentication is disabled for the AS2 connector",
+          "minLength": 0,
+          "maxLength": 2048
         }
       },
       "additionalProperties": false
