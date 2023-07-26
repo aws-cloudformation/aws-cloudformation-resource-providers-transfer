@@ -56,6 +56,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         UpdateConnectorRequest updateConnectorRequest = UpdateConnectorRequest.builder()
                 .accessRole(model.getAccessRole())
                 .as2Config(Converter.As2ConfigConverter.toSdk(model.getAs2Config()))
+                .sftpConfig(Converter.SftpConfigConverter.toSdk(model.getSftpConfig()))
                 .connectorId(model.getConnectorId())
                 .loggingRole(model.getLoggingRole())
                 .url(model.getUrl())

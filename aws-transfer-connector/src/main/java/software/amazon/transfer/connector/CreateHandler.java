@@ -56,11 +56,12 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
         model.setTags(Converter.TagConverter.translateTagfromMap(allTags));
 
-
         CreateConnectorRequest createConnectorRequest = CreateConnectorRequest.builder()
                 .url(model.getUrl())
                 .as2Config(
                         model.getAs2Config() != null ? Converter.As2ConfigConverter.toSdk(model.getAs2Config()) : null)
+                .sftpConfig(
+                         model.getSftpConfig() != null ? Converter.SftpConfigConverter.toSdk(model.getSftpConfig()) : null)
                 .accessRole(model.getAccessRole())
                 .loggingRole(model.getLoggingRole())
                 .tags((CollectionUtils.isNullOrEmpty(model.getTags())) ? null

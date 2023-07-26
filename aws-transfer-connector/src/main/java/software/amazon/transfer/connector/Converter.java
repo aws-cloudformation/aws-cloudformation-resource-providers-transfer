@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import software.amazon.awssdk.services.transfer.model.As2ConnectorConfig;
+import software.amazon.awssdk.services.transfer.model.SftpConnectorConfig;
 
 public class Converter {
     static class TagConverter {
@@ -83,6 +84,33 @@ public class Converter {
             modelAs2Config.setBasicAuthSecretId(as2ConnectorConfig.basicAuthSecretId());
 
             return modelAs2Config;
+        }
+    }
+
+    static class SftpConfigConverter {
+        static SftpConnectorConfig toSdk(
+                software.amazon.transfer.connector.SftpConfig sftpConfig) {
+            if (sftpConfig == null) {
+                return null;
+            }
+
+            return SftpConnectorConfig.builder()
+                    .userSecretId(sftpConfig.getUserSecretId())
+                    .trustedHostKeys(sftpConfig.getTrustedHostKeys())
+                    .build();
+
+        }
+
+        static software.amazon.transfer.connector.SftpConfig fromSdk(SftpConnectorConfig sftpConnectorConfig) {
+            if (sftpConnectorConfig == null) {
+                return null;
+            }
+            software.amazon.transfer.connector.SftpConfig modelSftpConfig = new software.amazon.transfer.connector.SftpConfig();
+
+            modelSftpConfig.setUserSecretId(sftpConnectorConfig.userSecretId());
+            modelSftpConfig.setTrustedHostKeys(sftpConnectorConfig.trustedHostKeys());
+
+            return modelSftpConfig;
         }
     }
 }

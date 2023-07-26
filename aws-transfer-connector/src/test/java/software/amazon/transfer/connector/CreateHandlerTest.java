@@ -59,6 +59,7 @@ public class CreateHandlerTest {
         final ResourceModel model = ResourceModel.builder()
                 .accessRole(TEST_ACCESS_ROLE)
                 .as2Config(getAs2Config())
+                .sftpConfig(getSftpConfig())
                 .loggingRole(TEST_LOGGING_ROLE)
                 .url(TEST_URL)
                 .tags(MODEL_TAGS)
@@ -90,6 +91,7 @@ public class CreateHandlerTest {
         assertThat(response.getErrorCode()).isNull();
         assertThat(testModel).hasFieldOrPropertyWithValue("accessRole", TEST_ACCESS_ROLE);
         assertThat(testModel).hasFieldOrPropertyWithValue("as2Config", getAs2Config());
+        assertThat(testModel).hasFieldOrPropertyWithValue("sftpConfig", getSftpConfig());
         assertThat(testModel).hasFieldOrPropertyWithValue("loggingRole", TEST_LOGGING_ROLE);
         assertThat(testModel).hasFieldOrPropertyWithValue("url", TEST_URL);
 
