@@ -60,6 +60,9 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .as2Config(describedConnector.as2Config() != null
                             ? Converter.As2ConfigConverter.fromSdk(describedConnector.as2Config())
                             : null)
+                    .sftpConfig(describedConnector.sftpConfig() != null
+                             ? Converter.SftpConfigConverter.fromSdk(describedConnector.sftpConfig())
+                             : null)
                     .connectorId(describedConnector.connectorId())
                     .loggingRole(describedConnector.loggingRole())
                     .tags((CollectionUtils.isNullOrEmpty(describedConnector.tags())) ? null

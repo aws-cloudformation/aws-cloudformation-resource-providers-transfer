@@ -14,6 +14,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "Properties" : {
         "<a href="#accessrole" title="AccessRole">AccessRole</a>" : <i>String</i>,
         "<a href="#as2config" title="As2Config">As2Config</a>" : <i><a href="as2config.md">As2Config</a></i>,
+        "<a href="#sftpconfig" title="SftpConfig">SftpConfig</a>" : <i><a href="sftpconfig.md">SftpConfig</a></i>,
         "<a href="#loggingrole" title="LoggingRole">LoggingRole</a>" : <i>String</i>,
         "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
         "<a href="#url" title="Url">Url</a>" : <i>String</i>
@@ -28,6 +29,7 @@ Type: AWS::Transfer::Connector
 Properties:
     <a href="#accessrole" title="AccessRole">AccessRole</a>: <i>String</i>
     <a href="#as2config" title="As2Config">As2Config</a>: <i><a href="as2config.md">As2Config</a></i>
+    <a href="#sftpconfig" title="SftpConfig">SftpConfig</a>: <i><a href="sftpconfig.md">SftpConfig</a></i>
     <a href="#loggingrole" title="LoggingRole">LoggingRole</a>: <i>String</i>
     <a href="#tags" title="Tags">Tags</a>: <i>
       - <a href="tag.md">Tag</a></i>
@@ -56,9 +58,19 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 Configuration for an AS2 connector.
 
-_Required_: Yes
+_Required_: No
 
 _Type_: <a href="as2config.md">As2Config</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### SftpConfig
+
+Configuration for an SFTP connector.
+
+_Required_: No
+
+_Type_: <a href="sftpconfig.md">SftpConfig</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -80,7 +92,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 #### Tags
 
-Key-value pairs that can be used to group and search for workflows. Tags are metadata attached to workflows for any purpose.
+Key-value pairs that can be used to group and search for connectors. Tags are metadata attached to connectors for any purpose.
 
 _Required_: No
 
@@ -114,7 +126,7 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 
 #### Arn
 
-Specifies the unique Amazon Resource Name (ARN) for the workflow.
+Specifies the unique Amazon Resource Name (ARN) for the connector.
 
 #### ConnectorId
 
