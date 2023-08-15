@@ -1,0 +1,17 @@
+{
+  "action": "UPDATE",
+  "request": {
+    "awsAccountId": "",
+    "awsPartition": "aws",
+    "region": "us-east-1",
+    "clientRequestToken": "e646a1aa-35ea-11ec-8d3d-0242ac140003",
+    "desiredResourceState": {
+      "ServerId": "s-209b4c7113c94feaa"
+    },
+    "previousResourceState": {
+      "ServerId": "s-209b4c7113c94feaa"
+    },
+    "logicalResourceIdentifier": "Server"
+  },
+  "callbackContext": null
+}

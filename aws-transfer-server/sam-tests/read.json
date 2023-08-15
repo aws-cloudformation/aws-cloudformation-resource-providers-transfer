@@ -1,0 +1,11 @@
+{
+  "action": "READ",
+  "request": {
+    "clientRequestToken": "b1bc6fb0-21e7-4b2a-8e02-999cece8de9e",
+    "desiredResourceState": {
+      "ServerId": "s-6762b2f82d1142039"
+    },
+    "logicalResourceIdentifier": "Server"
+  },
+  "callbackContext": null
+}
