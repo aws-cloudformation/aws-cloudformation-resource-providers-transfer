@@ -1,0 +1,31 @@
+{
+  "action": "CREATE",
+  "request": {
+    "clientRequestToken": "4bbcd219-5f34-449a-8e99-8de91dbe95ed",
+    "desiredResourceState": {
+      "Domain": "S3",
+      "EndpointType": "VPC",
+      "EndpointDetails": {
+        "VpcId": "vpc-0d7905426d2ceb45f",
+        "SubnetIds": [
+          "subnet-010674c6e6c8d90e1",
+          "subnet-0364e5a496e74650a"
+        ],
+        "SecurityGroupIds": [
+          "sg-0cab53a922c4b80bd",
+          "sg-01236505e22112e6a"
+        ]
+      },
+      "IdentityProviderType": "AWS_DIRECTORY_SERVICE",
+      "IdentityProviderDetails": {
+        "DirectoryId": "d-906780f473"
+      }
+    },
+    "desiredResourceTags": {
+      "yorkshire": "terrier"
+    },
+    "previousResourceState": {},
+    "logicalResourceIdentifier": "Server"
+  },
+  "callbackContext": null
+}

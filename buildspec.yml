@@ -19,8 +19,7 @@ phases:
         . .venv/bin/activate
         if [ "$(ls -A $CODEBUILD_SRC_DIR)" ]; then
           cd $CODEBUILD_SRC_DIR
-          # skip hidden folders
-          dirs=$(find . -not -path "\./\.*" -mindepth 1 -maxdepth 1 -type d)
+          dirs=$(find . -name 'aws-transfer-*' -mindepth 1 -maxdepth 1 -type d | sort)
           echo "Folders to build: $dirs"
           for directory in $dirs; do
             cd "$directory"
@@ -28,16 +27,21 @@ phases:
             if [ "$?" -ne 0 ] ; then
                 echo "Build failed!"
                 exit 1
-            else
-                cd ".."
             fi
+            cd ".."
           done
         else
           echo "$CODEBUILD_SRC_DIR is empty"
         fi
     finally:
-      - cat "$CODEBUILD_SRC_DIR/aws-transfer-agreement/rpdk.log"
-      - cat "$CODEBUILD_SRC_DIR/aws-transfer-certificate/rpdk.log"
-      - cat "$CODEBUILD_SRC_DIR/aws-transfer-connector/rpdk.log"
-      - cat "$CODEBUILD_SRC_DIR/aws-transfer-profile/rpdk.log"
-      - cat "$CODEBUILD_SRC_DIR/aws-transfer-workflow/rpdk.log"
+      - |
+        cd $CODEBUILD_SRC_DIR
+        dirs=$(find . -name 'aws-transfer-*' -mindepth 1 -maxdepth 1 -type d | sort)
+        for directory in $dirs; do
+          if [ -f "$directory/rpdk.log" ] ; then
+            echo "Logs from $directory"
+            cat "$directory/rpdk.log"
+          else
+            echo "No logs found for $directory"
+          fi
+        done
