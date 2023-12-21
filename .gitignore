@@ -14,7 +14,12 @@ out/
 .project
 .attach_pid*
 .factorypath
+
+# Gradle
 .gradle
+/gradle/wrapper/
+/gradlew
+/gradlew.bat
 
 # auto-generated files
 target/
