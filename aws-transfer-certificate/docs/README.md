@@ -62,13 +62,11 @@ _Required_: Yes
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>16384</code>
+_Maximum Length_: <code>16384</code>
 
-_Pattern_: <code>^[
-
- -ÿ]*</code>
+_Pattern_: <code>^[\t\n\r\u0020-\u00FF]+$</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -80,13 +78,11 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>2097152</code>
+_Maximum Length_: <code>2097152</code>
 
-_Pattern_: <code>^[
-
- -ÿ]*</code>
+_Pattern_: <code>^[\t\n\r\u0020-\u00FF]+$</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -98,13 +94,11 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>16384</code>
+_Maximum Length_: <code>16384</code>
 
-_Pattern_: <code>^[
-
- -ÿ]*</code>
+_Pattern_: <code>^[\t\n\r\u0020-\u00FF]+$</code>
 
 _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-replacement)
 
@@ -136,11 +130,11 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>200</code>
+_Maximum Length_: <code>200</code>
 
-_Pattern_: <code>^[\w\- ]*$</code>
+_Pattern_: <code>^[\u0021-\u007E]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

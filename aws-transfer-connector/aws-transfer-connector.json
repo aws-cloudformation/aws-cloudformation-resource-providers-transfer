@@ -61,7 +61,7 @@
         "MessageSubject": {
           "type": "string",
           "description": "The message subject for this AS2 connector configuration.",
-          "pattern": "^[\\p{Print}\\p{Blank}]+",
+          "pattern": "^[\\u0020-\\u007E\\t]+$",
           "minLength": 1,
           "maxLength": 1024
         },

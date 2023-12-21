@@ -82,7 +82,7 @@ _Minimum Length_: <code>1</code>
 
 _Maximum Length_: <code>1024</code>
 
-_Pattern_: <code>^[\p{Print}\p{Blank}]+</code>
+_Pattern_: <code>^[\u0020-\u007E\t]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

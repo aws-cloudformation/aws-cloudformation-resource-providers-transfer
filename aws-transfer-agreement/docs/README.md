@@ -50,11 +50,11 @@ _Required_: No
 
 _Type_: String
 
-_Minimum_: <code>1</code>
+_Minimum Length_: <code>1</code>
 
-_Maximum_: <code>200</code>
+_Maximum Length_: <code>200</code>
 
-_Pattern_: <code>^[\w\- ]*$</code>
+_Pattern_: <code>^[\u0021-\u007E]+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -66,9 +66,9 @@ _Required_: Yes
 
 _Type_: String
 
-_Minimum_: <code>19</code>
+_Minimum Length_: <code>19</code>
 
-_Maximum_: <code>19</code>
+_Maximum Length_: <code>19</code>
 
 _Pattern_: <code>^s-([0-9a-f]{17})$</code>
 
@@ -82,9 +82,9 @@ _Required_: Yes
 
 _Type_: String
 
-_Minimum_: <code>19</code>
+_Minimum Length_: <code>19</code>
 
-_Maximum_: <code>19</code>
+_Maximum Length_: <code>19</code>
 
 _Pattern_: <code>^p-([0-9a-f]{17})$</code>
 
@@ -98,9 +98,9 @@ _Required_: Yes
 
 _Type_: String
 
-_Minimum_: <code>19</code>
+_Minimum Length_: <code>19</code>
 
-_Maximum_: <code>19</code>
+_Maximum Length_: <code>19</code>
 
 _Pattern_: <code>^p-([0-9a-f]{17})$</code>
 
@@ -114,9 +114,9 @@ _Required_: Yes
 
 _Type_: String
 
-_Maximum_: <code>1024</code>
+_Maximum Length_: <code>1024</code>
 
-_Pattern_: <code>^$|/.*</code>
+_Pattern_: <code>^(|/.*)$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -128,9 +128,9 @@ _Required_: Yes
 
 _Type_: String
 
-_Minimum_: <code>20</code>
+_Minimum Length_: <code>20</code>
 
-_Maximum_: <code>2048</code>
+_Maximum Length_: <code>2048</code>
 
 _Pattern_: <code>arn:.*role/.*</code>
 
