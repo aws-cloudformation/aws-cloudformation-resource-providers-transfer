@@ -5,6 +5,7 @@ import static software.amazon.transfer.user.translators.Translator.translateToSd
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.HomeDirectoryType;
 import software.amazon.awssdk.services.transfer.model.UpdateUserRequest;
@@ -50,51 +51,14 @@ public class UpdateHandler extends BaseHandlerStd {
 
         return ProgressEvent.progress(newModel, callbackContext)
                 .then(progress -> updateUser(proxy, proxyClient, clientRequestToken, progress))
-                .then(
-                        progress ->
-                                deleteSshPublicKeys(
-                                        proxy,
-                                        proxyClient,
-                                        clientRequestToken,
-                                        UPDATE,
-                                        keysToDelete,
-                                        progress))
-                .then(
-                        progress ->
-                                importSshPublicKeys(
-                                        proxy,
-                                        proxyClient,
-                                        clientRequestToken,
-                                        UPDATE,
-                                        keysToAdd,
-                                        progress))
-                .then(
-                        progress ->
-                                addTags(
-                                        progress,
-                                        request,
-                                        newModel,
-                                        proxy,
-                                        proxyClient,
-                                        callbackContext))
-                .then(
-                        progress ->
-                                removeTags(
-                                        progress,
-                                        request,
-                                        newModel,
-                                        proxy,
-                                        proxyClient,
-                                        callbackContext))
-                .then(
-                        progress ->
-                                new ReadHandler()
-                                        .handleRequest(
-                                                proxy,
-                                                request,
-                                                callbackContext,
-                                                proxyClient,
-                                                logger));
+                .then(progress ->
+                        deleteSshPublicKeys(proxy, proxyClient, clientRequestToken, UPDATE, keysToDelete, progress))
+                .then(progress ->
+                        importSshPublicKeys(proxy, proxyClient, clientRequestToken, UPDATE, keysToAdd, progress))
+                .then(progress -> addTags(progress, request, newModel, proxy, proxyClient, callbackContext))
+                .then(progress -> removeTags(progress, request, newModel, proxy, proxyClient, callbackContext))
+                .then(progress ->
+                        new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     private ProgressEvent<ResourceModel, CallbackContext> updateUser(
@@ -109,29 +73,22 @@ public class UpdateHandler extends BaseHandlerStd {
                         progress.getCallbackContext())
                 .translateToServiceRequest(this::translateToUpdateRequest)
                 .makeServiceCall(this::updateUser)
-                .handleError(
-                        (ignored, exception, client, model, context) ->
-                                handleError(UPDATE, exception, model, context, clientRequestToken))
+                .handleError((ignored, exception, client, model, context) ->
+                        handleError(UPDATE, exception, model, context, clientRequestToken))
                 .progress();
     }
 
-    private UpdateUserResponse updateUser(
-            UpdateUserRequest request, ProxyClient<TransferClient> client) {
+    private UpdateUserResponse updateUser(UpdateUserRequest request, ProxyClient<TransferClient> client) {
         try (TransferClient transferClient = client.client()) {
-            UpdateUserResponse response =
-                    client.injectCredentialsAndInvokeV2(request, transferClient::updateUser);
-            log(
-                    "has successfully been updated.",
-                    userIdentifier(request.serverId(), request.userName()));
+            UpdateUserResponse response = client.injectCredentialsAndInvokeV2(request, transferClient::updateUser);
+            log("has successfully been updated.", userIdentifier(request.serverId(), request.userName()));
             return response;
         }
     }
 
     private UpdateUserRequest translateToUpdateRequest(final ResourceModel model) {
-        HomeDirectoryType homeDirectoryType =
-                HomeDirectoryType.valueOf(
-                        Optional.ofNullable(model.getHomeDirectoryType())
-                                .orElse(HomeDirectoryType.PATH.name()));
+        HomeDirectoryType homeDirectoryType = HomeDirectoryType.valueOf(
+                Optional.ofNullable(model.getHomeDirectoryType()).orElse(HomeDirectoryType.PATH.name()));
 
         return UpdateUserRequest.builder()
                 .serverId(model.getServerId())
@@ -140,9 +97,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 .role(model.getRole())
                 .homeDirectoryType(homeDirectoryType)
                 .homeDirectory(model.getHomeDirectory())
-                .homeDirectoryMappings(
-                        Translator.translateToSdkHomeDirectoryMappings(
-                                model.getHomeDirectoryMappings()))
+                .homeDirectoryMappings(Translator.translateToSdkHomeDirectoryMappings(model.getHomeDirectoryMappings()))
                 .posixProfile(translateToSdkPosixProfile(model.getPosixProfile()))
                 .build();
     }

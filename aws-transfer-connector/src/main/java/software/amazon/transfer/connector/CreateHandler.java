@@ -4,15 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import lombok.NoArgsConstructor;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateConnectorRequest;
 import software.amazon.awssdk.services.transfer.model.CreateConnectorResponse;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
-import software.amazon.cloudformation.proxy.OperationStatus;
-import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
 import software.amazon.awssdk.services.transfer.model.ResourceExistsException;
@@ -23,8 +17,15 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.CfnThrottlingException;
+import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
+import software.amazon.cloudformation.proxy.Logger;
+import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import com.amazonaws.util.CollectionUtils;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class CreateHandler extends BaseHandler<CallbackContext> {
@@ -61,19 +62,22 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
                 .as2Config(
                         model.getAs2Config() != null ? Converter.As2ConfigConverter.toSdk(model.getAs2Config()) : null)
                 .sftpConfig(
-                         model.getSftpConfig() != null ? Converter.SftpConfigConverter.toSdk(model.getSftpConfig()) : null)
+                        model.getSftpConfig() != null
+                                ? Converter.SftpConfigConverter.toSdk(model.getSftpConfig())
+                                : null)
                 .accessRole(model.getAccessRole())
                 .loggingRole(model.getLoggingRole())
-                .tags((CollectionUtils.isNullOrEmpty(model.getTags())) ? null
-                        : model.getTags()
-                                .stream()
-                                .map(Converter.TagConverter::toSdk)
-                                .collect(Collectors.toList()))
+                .tags(
+                        (CollectionUtils.isNullOrEmpty(model.getTags()))
+                                ? null
+                                : model.getTags().stream()
+                                        .map(Converter.TagConverter::toSdk)
+                                        .collect(Collectors.toList()))
                 .build();
 
         try {
-            CreateConnectorResponse response = proxy.injectCredentialsAndInvokeV2(createConnectorRequest,
-                    client::createConnector);
+            CreateConnectorResponse response =
+                    proxy.injectCredentialsAndInvokeV2(createConnectorRequest, client::createConnector);
             model.setConnectorId(response.connectorId());
             logger.log(String.format("%s created successfully", ResourceModel.TYPE_NAME));
         } catch (InvalidRequestException e) {

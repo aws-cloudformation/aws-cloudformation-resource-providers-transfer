@@ -3,6 +3,7 @@ package software.amazon.transfer.server;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.util.stream.Stream;
+
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.ec2.Ec2Client;
@@ -32,7 +34,9 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(SoftAssertionsExtension.class)
 public class BaseHandlerStdTest {
 
-    @Mock private Logger logger;
+    @Mock
+    private Logger logger;
+
     private ResourceModel model;
     private CallbackContext context;
     private MockTestHandler handler;
@@ -63,26 +67,24 @@ public class BaseHandlerStdTest {
     }
 
     private static Stream<Arguments> providerErrorLogicTestParams() {
-        ThrottlingException throttlingException =
-                ThrottlingException.builder()
-                        .retryAfterSeconds("5")
-                        .cause(new NullPointerException("Test exception"))
-                        .message("Throw NPE")
-                        .statusCode(404)
-                        .requestId("RequestID")
-                        .build();
-        ConflictException conflictException =
-                ConflictException.builder()
-                        .cause(new NullPointerException("Test exception"))
-                        .message("Throw NPE")
-                        .statusCode(404)
-                        .requestId("RequestID")
-                        .build();
-        AwsServiceException awsServiceException =
-                AwsServiceException.builder()
-                        .awsErrorDetails(
-                                AwsErrorDetails.builder().errorCode("ThrottlingException").build())
-                        .build();
+        ThrottlingException throttlingException = ThrottlingException.builder()
+                .retryAfterSeconds("5")
+                .cause(new NullPointerException("Test exception"))
+                .message("Throw NPE")
+                .statusCode(404)
+                .requestId("RequestID")
+                .build();
+        ConflictException conflictException = ConflictException.builder()
+                .cause(new NullPointerException("Test exception"))
+                .message("Throw NPE")
+                .statusCode(404)
+                .requestId("RequestID")
+                .build();
+        AwsServiceException awsServiceException = AwsServiceException.builder()
+                .awsErrorDetails(AwsErrorDetails.builder()
+                        .errorCode("ThrottlingException")
+                        .build())
+                .build();
 
         return Stream.of(
                 Arguments.of(throttlingException, true, 5, 30, 29),
@@ -93,8 +95,7 @@ public class BaseHandlerStdTest {
 
     @ParameterizedTest
     @MethodSource({"providerErrorLogicTestParams"})
-    public void simpleHandleErrorLogicTest(
-            Exception thrown, boolean inProgress, int delay, int retries, int expected) {
+    public void simpleHandleErrorLogicTest(Exception thrown, boolean inProgress, int delay, int retries, int expected) {
         context.setNumRetries(retries);
         assertErrorHandled(thrown, inProgress, delay);
         assertThat(context.getNumRetries()).isEqualTo(expected);

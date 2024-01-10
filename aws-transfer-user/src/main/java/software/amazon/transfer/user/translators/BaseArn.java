@@ -36,13 +36,12 @@ public abstract class BaseArn {
     }
 
     public String getArn() {
-        String resource =
-                ArnResource.builder()
-                        .withResourceType(getResourceType())
-                        .withResource(getResourceId())
-                        .build()
-                        .toString()
-                        .replace(":", RESOURCE_DELIMITER);
+        String resource = ArnResource.builder()
+                .withResourceType(getResourceType())
+                .withResource(getResourceId())
+                .build()
+                .toString()
+                .replace(":", RESOURCE_DELIMITER);
 
         return Arn.builder()
                 .withPartition(getRegion().getPartition())

@@ -1,5 +1,16 @@
 package software.amazon.transfer.agreement;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static software.amazon.transfer.agreement.AbstractTestBase.*;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
@@ -14,16 +25,6 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static software.amazon.transfer.agreement.AbstractTestBase.*;
 
 @ExtendWith(MockitoExtension.class)
 public class DeleteHandlerTest {
@@ -41,16 +42,15 @@ public class DeleteHandlerTest {
     public void handleRequest_SimpleSuccess() {
         final DeleteHandler handler = new DeleteHandler(client);
 
-        final ResourceModel model = ResourceModel.builder()
-                .agreementId(TEST_AGREEMENT_ID)
-                .build();
+        final ResourceModel model =
+                ResourceModel.builder().agreementId(TEST_AGREEMENT_ID).build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+                .desiredResourceState(model)
+                .build();
 
-        final ProgressEvent<ResourceModel, CallbackContext> response
-            = handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                handler.handleRequest(proxy, request, null, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -66,9 +66,7 @@ public class DeleteHandlerTest {
     public void handleRequest_InvalidRequestExceptionFailed() {
         DeleteHandler handler = new DeleteHandler(client);
 
-        doThrow(InvalidRequestException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InvalidRequestException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -78,16 +76,14 @@ public class DeleteHandlerTest {
 
         assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
         DeleteHandler handler = new DeleteHandler(client);
 
-        doThrow(InternalServiceErrorException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InternalServiceErrorException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -97,16 +93,14 @@ public class DeleteHandlerTest {
 
         assertThrows(CfnServiceInternalErrorException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
     public void handleRequest_ResourceNotFoundExceptionFailed() {
         DeleteHandler handler = new DeleteHandler(client);
 
-        doThrow(ResourceNotFoundException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doThrow(ResourceNotFoundException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         ResourceModel model = ResourceModel.builder()
                 .agreementId(TEST_AGREEMENT_ID)
@@ -119,16 +113,14 @@ public class DeleteHandlerTest {
 
         assertThrows(CfnNotFoundException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
         DeleteHandler handler = new DeleteHandler(client);
 
-        doThrow(TransferException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doThrow(TransferException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -138,6 +130,6 @@ public class DeleteHandlerTest {
 
         assertThrows(CfnGeneralServiceException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 }

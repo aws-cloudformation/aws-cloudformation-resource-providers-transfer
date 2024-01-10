@@ -1,7 +1,9 @@
 package software.amazon.transfer.profile;
 
-import com.amazonaws.util.CollectionUtils;
-import lombok.NoArgsConstructor;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateProfileRequest;
 import software.amazon.awssdk.services.transfer.model.CreateProfileResponse;
@@ -15,13 +17,13 @@ import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorExceptio
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.amazonaws.util.CollectionUtils;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class CreateHandler extends BaseHandler<CallbackContext> {
@@ -56,11 +58,12 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         CreateProfileRequest createProfileRequest = CreateProfileRequest.builder()
                 .as2Id(model.getAs2Id())
                 .certificateIds(model.getCertificateIds())
-                .tags((CollectionUtils.isNullOrEmpty(model.getTags())) ?
-                        null : model.getTags()
-                        .stream()
-                        .map(Converter.TagConverter::toSdk)
-                        .collect(Collectors.toList()))
+                .tags(
+                        (CollectionUtils.isNullOrEmpty(model.getTags()))
+                                ? null
+                                : model.getTags().stream()
+                                        .map(Converter.TagConverter::toSdk)
+                                        .collect(Collectors.toList()))
                 .profileType(model.getProfileType())
                 .build();
 
@@ -74,8 +77,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("createProfile", e);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
-                    model.getProfileType());
+            throw new CfnNotFoundException(ResourceModel.TYPE_NAME, model.getProfileType());
         } catch (TransferException e) {
             throw new CfnGeneralServiceException(e.getMessage(), e);
         }

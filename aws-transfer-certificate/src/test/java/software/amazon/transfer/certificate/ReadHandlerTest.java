@@ -1,5 +1,17 @@
 package software.amazon.transfer.certificate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static software.amazon.transfer.certificate.AbstractTestBase.*;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.DescribeCertificateResponse;
 import software.amazon.awssdk.services.transfer.model.DescribedCertificate;
@@ -16,17 +28,6 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static software.amazon.transfer.certificate.AbstractTestBase.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ReadHandlerTest {
@@ -44,13 +45,12 @@ public class ReadHandlerTest {
     public void handleRequest_SimpleSuccess() {
         final ReadHandler handler = new ReadHandler(client);
 
-        final ResourceModel model = ResourceModel.builder()
-                .certificateId(TEST_CERTIFICATE_ID)
-                .build();
+        final ResourceModel model =
+                ResourceModel.builder().certificateId(TEST_CERTIFICATE_ID).build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+                .desiredResourceState(model)
+                .build();
 
         DescribeCertificateResponse describeCertificateResponse = DescribeCertificateResponse.builder()
                 .certificate(DescribedCertificate.builder()
@@ -59,8 +59,8 @@ public class ReadHandlerTest {
                 .build();
         doReturn(describeCertificateResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
-        final ProgressEvent<ResourceModel, CallbackContext> response
-            = handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                handler.handleRequest(proxy, request, null, logger);
         ResourceModel testModel = response.getResourceModel();
 
         assertThat(response).isNotNull();
@@ -77,9 +77,7 @@ public class ReadHandlerTest {
     public void handleRequest_InvalidRequestExceptionFailed() {
         ReadHandler handler = new ReadHandler(client);
 
-        doThrow(InvalidRequestException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InvalidRequestException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -89,16 +87,14 @@ public class ReadHandlerTest {
 
         assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
         ReadHandler handler = new ReadHandler(client);
 
-        doThrow(InternalServiceErrorException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InternalServiceErrorException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -108,20 +104,17 @@ public class ReadHandlerTest {
 
         assertThrows(CfnServiceInternalErrorException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
     public void handleRequest_ResourceNotFoundExceptionFailed() {
         ReadHandler handler = new ReadHandler(client);
 
-        doThrow(ResourceNotFoundException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doThrow(ResourceNotFoundException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
-        ResourceModel model = ResourceModel.builder()
-                .certificateId(TEST_CERTIFICATE_ID)
-                .build();
+        ResourceModel model =
+                ResourceModel.builder().certificateId(TEST_CERTIFICATE_ID).build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
@@ -129,16 +122,14 @@ public class ReadHandlerTest {
 
         assertThrows(CfnNotFoundException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
         ReadHandler handler = new ReadHandler(client);
 
-        doThrow(TransferException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doThrow(TransferException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -148,6 +139,6 @@ public class ReadHandlerTest {
 
         assertThrows(CfnGeneralServiceException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 }

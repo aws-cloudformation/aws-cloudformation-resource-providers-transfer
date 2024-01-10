@@ -1,7 +1,18 @@
 package software.amazon.transfer.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
-import software.amazon.awssdk.services.transfer.model.CreateProfileRequest;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
 import software.amazon.awssdk.services.transfer.model.ListProfilesRequest;
@@ -18,17 +29,6 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class ListHandlerTest {
@@ -55,22 +55,19 @@ public class ListHandlerTest {
                 .as2Id("testas2id")
                 .build();
 
-        final ResourceModel model = ResourceModel.builder()
-                .profileId("testid")
-                .build();
+        final ResourceModel model = ResourceModel.builder().profileId("testid").build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
                 .build();
 
-        ListProfilesResponse listProfilesResponse = ListProfilesResponse.builder()
-                .profiles(listedProfile)
-                .build();
+        ListProfilesResponse listProfilesResponse =
+                ListProfilesResponse.builder().profiles(listedProfile).build();
 
         doReturn(listProfilesResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
-            handler.handleRequest(proxy, request, null, logger);
+                handler.handleRequest(proxy, request, null, logger);
 
         List<ResourceModel> testModels = response.getResourceModels();
 
@@ -91,6 +88,7 @@ public class ListHandlerTest {
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
     }
+
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
         ListHandler handler = new ListHandler(client);
@@ -107,7 +105,7 @@ public class ListHandlerTest {
 
         assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -126,7 +124,7 @@ public class ListHandlerTest {
 
         assertThrows(CfnServiceInternalErrorException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -145,7 +143,7 @@ public class ListHandlerTest {
 
         assertThrows(CfnGeneralServiceException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -164,6 +162,6 @@ public class ListHandlerTest {
 
         assertThrows(CfnNotFoundException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 }

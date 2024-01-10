@@ -4,7 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang3.StringUtils;
+
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.Address;
@@ -56,12 +58,10 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     private static final String THROTTLING_EXCEPTION_ERR_CODE = "ThrottlingException";
     protected Logger logger;
 
-    protected static DescribedServer describeServer(
-            ProxyClient<TransferClient> client, ResourceModel model) {
+    protected static DescribedServer describeServer(ProxyClient<TransferClient> client, ResourceModel model) {
         try (TransferClient transferClient = client.client()) {
             DescribeServerRequest describeRequest = Translator.translateToReadRequest(model);
-            return client.injectCredentialsAndInvokeV2(
-                            describeRequest, transferClient::describeServer)
+            return client.injectCredentialsAndInvokeV2(describeRequest, transferClient::describeServer)
                     .server();
         }
     }
@@ -76,8 +76,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
     protected static List<String> getAddressAllocationIds(ResourceModel model) {
         if (model.getEndpointDetails() == null
-                || CollectionUtils.isNullOrEmpty(
-                        model.getEndpointDetails().getAddressAllocationIds())) {
+                || CollectionUtils.isNullOrEmpty(model.getEndpointDetails().getAddressAllocationIds())) {
             return Collections.emptyList();
         }
         return model.getEndpointDetails().getAddressAllocationIds();
@@ -148,17 +147,14 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         }
 
         if (ex instanceof InvalidRequestException) {
-            return translateToFailure(
-                    op, ex, HandlerErrorCode.InvalidRequest, model, ctx, reqToken);
+            return translateToFailure(op, ex, HandlerErrorCode.InvalidRequest, model, ctx, reqToken);
         }
 
         if (ex instanceof InvalidNextTokenException) {
-            return translateToFailure(
-                    op, ex, HandlerErrorCode.InvalidRequest, model, ctx, reqToken);
+            return translateToFailure(op, ex, HandlerErrorCode.InvalidRequest, model, ctx, reqToken);
         }
 
-        return translateToFailure(
-                op, ex, HandlerErrorCode.GeneralServiceException, model, ctx, reqToken);
+        return translateToFailure(op, ex, HandlerErrorCode.GeneralServiceException, model, ctx, reqToken);
     }
 
     private ProgressEvent<ResourceModel, CallbackContext> translateToFailure(
@@ -168,8 +164,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             ResourceModel model,
             CallbackContext ctx,
             String reqToken) {
-        logger.log(
-                String.format(FAILURE_LOG_MESSAGE, reqToken, model.getPrimaryIdentifier(), op, ex));
+        logger.log(String.format(FAILURE_LOG_MESSAGE, reqToken, model.getPrimaryIdentifier(), op, ex));
         return ProgressEvent.failed(model, ctx, errorCode, ex.getMessage());
     }
 
@@ -232,15 +227,13 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         if (e instanceof ThrottlingException) {
             String retryAfterSeconds = ((ThrottlingException) e).retryAfterSeconds();
             return Integer.parseInt(
-                    Optional.ofNullable(retryAfterSeconds)
-                            .orElse(String.valueOf(THROTTLE_CALLBACK_DELAY_SECONDS)));
+                    Optional.ofNullable(retryAfterSeconds).orElse(String.valueOf(THROTTLE_CALLBACK_DELAY_SECONDS)));
         }
         return THROTTLE_CALLBACK_DELAY_SECONDS;
     }
 
     private String getErrorCode(Exception e) {
-        if (e instanceof AwsServiceException
-                && ((AwsServiceException) e).awsErrorDetails() != null) {
+        if (e instanceof AwsServiceException && ((AwsServiceException) e).awsErrorDetails() != null) {
             return ((AwsServiceException) e).awsErrorDetails().errorCode();
         }
         return e.getMessage();
@@ -292,19 +285,18 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     private static final String VPC_ENDPOINT_AVAILABLE =
             software.amazon.awssdk.services.ec2.model.State.AVAILABLE.name().toLowerCase();
 
-    protected boolean isVpcEndpointAvailable(
-            String vpcEndpointId, ProxyClient<Ec2Client> ec2Client) {
+    protected boolean isVpcEndpointAvailable(String vpcEndpointId, ProxyClient<Ec2Client> ec2Client) {
         VpcEndpoint vpcEndpoint = getVpcEndpoint(vpcEndpointId, ec2Client);
 
         String state = vpcEndpoint.stateAsString().toLowerCase();
         return VPC_ENDPOINT_AVAILABLE.equals(state);
     }
 
-    protected static VpcEndpoint getVpcEndpoint(
-            String vpcEndpointId, ProxyClient<Ec2Client> ec2Client) {
+    protected static VpcEndpoint getVpcEndpoint(String vpcEndpointId, ProxyClient<Ec2Client> ec2Client) {
         try (Ec2Client client = ec2Client.client()) {
-            DescribeVpcEndpointsRequest request =
-                    DescribeVpcEndpointsRequest.builder().vpcEndpointIds(vpcEndpointId).build();
+            DescribeVpcEndpointsRequest request = DescribeVpcEndpointsRequest.builder()
+                    .vpcEndpointIds(vpcEndpointId)
+                    .build();
             DescribeVpcEndpointsResponse response =
                     ec2Client.injectCredentialsAndInvokeV2(request, client::describeVpcEndpoints);
 
@@ -317,17 +309,14 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         return EndpointType.VPC.name().equals(model.getEndpointType());
     }
 
-    protected boolean privateIpsAvailable(
-            List<String> allocationIds, ProxyClient<Ec2Client> ec2Client) {
+    protected boolean privateIpsAvailable(List<String> allocationIds, ProxyClient<Ec2Client> ec2Client) {
         DescribeAddressesRequest request =
                 DescribeAddressesRequest.builder().allocationIds(allocationIds).build();
         try (Ec2Client client = ec2Client.client()) {
-            List<Address> addresses =
-                    ec2Client
-                            .injectCredentialsAndInvokeV2(request, client::describeAddresses)
-                            .addresses();
-            return !addresses.isEmpty()
-                    && addresses.stream().allMatch(a -> a.privateIpAddress() != null);
+            List<Address> addresses = ec2Client
+                    .injectCredentialsAndInvokeV2(request, client::describeAddresses)
+                    .addresses();
+            return !addresses.isEmpty() && addresses.stream().allMatch(a -> a.privateIpAddress() != null);
         }
     }
 
@@ -350,11 +339,10 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     protected void updateServerEndpointDetails(
             ProxyClient<TransferClient> client, String serverId, EndpointDetails endpointDetails) {
         try (TransferClient transferClient = client.client()) {
-            UpdateServerRequest updateServerRequest =
-                    UpdateServerRequest.builder()
-                            .endpointDetails(endpointDetails)
-                            .serverId(serverId)
-                            .build();
+            UpdateServerRequest updateServerRequest = UpdateServerRequest.builder()
+                    .endpointDetails(endpointDetails)
+                    .serverId(serverId)
+                    .build();
 
             client.injectCredentialsAndInvokeV2(updateServerRequest, transferClient::updateServer);
         }

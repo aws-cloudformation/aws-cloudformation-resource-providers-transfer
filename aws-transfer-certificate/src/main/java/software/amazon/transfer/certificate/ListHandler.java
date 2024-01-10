@@ -1,5 +1,8 @@
 package software.amazon.transfer.certificate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
@@ -11,12 +14,9 @@ import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import lombok.NoArgsConstructor;
 
@@ -47,8 +47,8 @@ public class ListHandler extends BaseHandler<CallbackContext> {
                 .build();
 
         try {
-            ListCertificatesResponse response = proxy.injectCredentialsAndInvokeV2(listCertificatesRequest,
-                    client::listCertificates);
+            ListCertificatesResponse response =
+                    proxy.injectCredentialsAndInvokeV2(listCertificatesRequest, client::listCertificates);
 
             response.certificates().forEach(listedCertificate -> {
                 ResourceModel model = ResourceModel.builder()
@@ -56,12 +56,14 @@ public class ListHandler extends BaseHandler<CallbackContext> {
                         .certificateId(listedCertificate.certificateId())
                         .usage(listedCertificate.usageAsString())
                         .status(listedCertificate.statusAsString())
-                        .activeDate(listedCertificate.activeDate() != null
-                                ? listedCertificate.activeDate().toString()
-                                : null)
-                        .inactiveDate(listedCertificate.inactiveDate() != null
-                                ? listedCertificate.inactiveDate().toString()
-                                : null)
+                        .activeDate(
+                                listedCertificate.activeDate() != null
+                                        ? listedCertificate.activeDate().toString()
+                                        : null)
+                        .inactiveDate(
+                                listedCertificate.inactiveDate() != null
+                                        ? listedCertificate.inactiveDate().toString()
+                                        : null)
                         .type(listedCertificate.typeAsString())
                         .description(listedCertificate.description())
                         .build();

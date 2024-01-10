@@ -6,6 +6,7 @@ import static software.amazon.transfer.user.translators.Translator.translateToSd
 
 import java.util.List;
 import java.util.Optional;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateUserRequest;
 import software.amazon.awssdk.services.transfer.model.CreateUserResponse;
@@ -38,33 +39,11 @@ public class CreateHandler extends BaseHandlerStd {
 
         return ProgressEvent.progress(newModel, callbackContext)
                 .then(progress -> createUser(proxy, proxyClient, clientRequestToken, progress))
-                .then(
-                        progress ->
-                                importSshPublicKeys(
-                                        proxy,
-                                        proxyClient,
-                                        clientRequestToken,
-                                        CREATE,
-                                        keysToAdd,
-                                        progress))
-                .then(
-                        progress ->
-                                addTags(
-                                        progress,
-                                        request,
-                                        newModel,
-                                        proxy,
-                                        proxyClient,
-                                        callbackContext))
-                .then(
-                        progress ->
-                                new ReadHandler()
-                                        .handleRequest(
-                                                proxy,
-                                                request,
-                                                callbackContext,
-                                                proxyClient,
-                                                logger));
+                .then(progress ->
+                        importSshPublicKeys(proxy, proxyClient, clientRequestToken, CREATE, keysToAdd, progress))
+                .then(progress -> addTags(progress, request, newModel, proxy, proxyClient, callbackContext))
+                .then(progress ->
+                        new ReadHandler().handleRequest(proxy, request, callbackContext, proxyClient, logger));
     }
 
     private ProgressEvent<ResourceModel, CallbackContext> createUser(
@@ -79,16 +58,14 @@ public class CreateHandler extends BaseHandlerStd {
                         progress.getCallbackContext())
                 .translateToServiceRequest(CreateHandler::translateToCreateRequest)
                 .makeServiceCall(this::createUser)
-                .handleError(
-                        (ignored, exception, client, model, context) ->
-                                handleError(CREATE, exception, model, context, clientRequestToken))
+                .handleError((ignored, exception, client, model, context) ->
+                        handleError(CREATE, exception, model, context, clientRequestToken))
                 .progress();
     }
 
     private static CreateUserRequest translateToCreateRequest(final ResourceModel model) {
         String homeDirectoryType =
-                Optional.ofNullable(model.getHomeDirectoryType())
-                        .orElse(HomeDirectoryType.PATH.name());
+                Optional.ofNullable(model.getHomeDirectoryType()).orElse(HomeDirectoryType.PATH.name());
 
         return CreateUserRequest.builder()
                 .serverId(model.getServerId())
@@ -97,21 +74,16 @@ public class CreateHandler extends BaseHandlerStd {
                 .role(model.getRole())
                 .homeDirectoryType(homeDirectoryType)
                 .homeDirectory(model.getHomeDirectory())
-                .homeDirectoryMappings(
-                        translateToSdkHomeDirectoryMappings(model.getHomeDirectoryMappings()))
+                .homeDirectoryMappings(translateToSdkHomeDirectoryMappings(model.getHomeDirectoryMappings()))
                 .posixProfile(translateToSdkPosixProfile(model.getPosixProfile()))
                 .tags(translateToSdkTags(model.getTags()))
                 .build();
     }
 
-    private CreateUserResponse createUser(
-            CreateUserRequest request, ProxyClient<TransferClient> client) {
+    private CreateUserResponse createUser(CreateUserRequest request, ProxyClient<TransferClient> client) {
         try (TransferClient transferClient = client.client()) {
-            CreateUserResponse response =
-                    client.injectCredentialsAndInvokeV2(request, transferClient::createUser);
-            log(
-                    "user created successfully",
-                    userIdentifier(request.serverId(), request.userName()));
+            CreateUserResponse response = client.injectCredentialsAndInvokeV2(request, transferClient::createUser);
+            log("user created successfully", userIdentifier(request.serverId(), request.userName()));
             return response;
         }
     }

@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.ObjectUtils;
+
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.transfer.user.ResourceModel;
 
@@ -17,8 +19,7 @@ public final class TagHelper {
      *
      * <p>Determines whether user defined tags have been changed during update.
      */
-    public static boolean shouldUpdateTags(
-            final ResourceHandlerRequest<ResourceModel> handlerRequest) {
+    public static boolean shouldUpdateTags(final ResourceHandlerRequest<ResourceModel> handlerRequest) {
         final Map<String, String> previousTags = getPreviouslyAttachedTags(handlerRequest);
         final Map<String, String> desiredTags = getNewDesiredTags(handlerRequest);
         return ObjectUtils.notEqual(previousTags, desiredTags);
@@ -51,11 +52,9 @@ public final class TagHelper {
 
         ResourceModel model = handlerRequest.getPreviousResourceState();
         if (model != null && model.getTags() != null) {
-            model.getTags()
-                    .forEach(
-                            tag -> {
-                                previousTags.put(tag.getKey(), tag.getValue());
-                            });
+            model.getTags().forEach(tag -> {
+                previousTags.put(tag.getKey(), tag.getValue());
+            });
         }
         return previousTags;
     }
@@ -72,8 +71,7 @@ public final class TagHelper {
      * your resource. System tags can change on resource update if the resource is imported to the
      * stack.
      */
-    public static Map<String, String> getNewDesiredTags(
-            final ResourceHandlerRequest<ResourceModel> handlerRequest) {
+    public static Map<String, String> getNewDesiredTags(final ResourceHandlerRequest<ResourceModel> handlerRequest) {
         final Map<String, String> desiredTags = new HashMap<>();
 
         if (handlerRequest.getSystemTags() != null) {
@@ -86,13 +84,9 @@ public final class TagHelper {
         }
 
         if (handlerRequest.getDesiredResourceState().getTags() != null) {
-            handlerRequest
-                    .getDesiredResourceState()
-                    .getTags()
-                    .forEach(
-                            tag -> {
-                                desiredTags.put(tag.getKey(), tag.getValue());
-                            });
+            handlerRequest.getDesiredResourceState().getTags().forEach(tag -> {
+                desiredTags.put(tag.getKey(), tag.getValue());
+            });
         }
         return desiredTags;
     }
@@ -105,11 +99,8 @@ public final class TagHelper {
     public static Map<String, String> generateTagsToAdd(
             final Map<String, String> previousTags, final Map<String, String> desiredTags) {
         return desiredTags.entrySet().stream()
-                .filter(
-                        e ->
-                                !previousTags.containsKey(e.getKey())
-                                        || !Objects.equals(
-                                                previousTags.get(e.getKey()), e.getValue()))
+                .filter(e -> !previousTags.containsKey(e.getKey())
+                        || !Objects.equals(previousTags.get(e.getKey()), e.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

@@ -15,6 +15,7 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.model.CreateUserRequest;
 import software.amazon.awssdk.services.transfer.model.CreateUserResponse;
 import software.amazon.awssdk.services.transfer.model.DescribeUserRequest;
@@ -28,7 +29,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(SoftAssertionsExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
 
-    @InjectSoftAssertions private SoftAssertions softly;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     private final CreateHandler handler = new CreateHandler();
 
@@ -51,12 +53,10 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.IN_PROGRESS);
-        softly.assertThat(response.getCallbackDelaySeconds())
-                .isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
+        softly.assertThat(response.getCallbackDelaySeconds()).isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
 
         // Call again in response to ThrottleException
-        response =
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -74,12 +74,11 @@ public class CreateHandlerTest extends AbstractTestBase {
     public void fullyLoadedUserTest() {
         final ResourceModel model = fullyLoadedUserModel();
 
-        final ResourceHandlerRequest<ResourceModel> request =
-                requestBuilder()
-                        .desiredResourceState(model)
-                        .desiredResourceTags(RESOURCE_TAG_MAP)
-                        .systemTags(SYSTEM_TAG_MAP)
-                        .build();
+        final ResourceHandlerRequest<ResourceModel> request = requestBuilder()
+                .desiredResourceState(model)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
+                .build();
 
         model.setArn(generateUserArn(request));
         setupCreateUserResponse();
@@ -92,12 +91,10 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.IN_PROGRESS);
-        softly.assertThat(response.getCallbackDelaySeconds())
-                .isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
+        softly.assertThat(response.getCallbackDelaySeconds()).isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
 
         // Call again in response to ThrottleException
-        response =
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -112,8 +109,10 @@ public class CreateHandlerTest extends AbstractTestBase {
     }
 
     private void setupCreateUserResponse() {
-        CreateUserResponse createUserResponse =
-                CreateUserResponse.builder().serverId("testServerId").userName("userName").build();
+        CreateUserResponse createUserResponse = CreateUserResponse.builder()
+                .serverId("testServerId")
+                .userName("userName")
+                .build();
 
         // Add some error coverage
         doThrow(ThrottlingException.builder().build())

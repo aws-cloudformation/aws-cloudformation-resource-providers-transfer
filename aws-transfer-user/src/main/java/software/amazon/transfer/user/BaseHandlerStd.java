@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.AccessDeniedException;
@@ -93,8 +95,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
         if (isRetryableServiceException(exception)) {
             log("Retryable service exception: " + exception, model.getPrimaryIdentifier());
-            return handleRetryableServiceException(
-                    model, context, operation, clientRequestToken, exception);
+            return handleRetryableServiceException(model, context, operation, clientRequestToken, exception);
         }
 
         if (isThrottlingException(exception)) {
@@ -103,48 +104,27 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         }
 
         if (exception instanceof ResourceExistsException) {
-            return translateToFailure(
-                    operation,
-                    exception,
-                    HandlerErrorCode.AlreadyExists,
-                    model,
-                    clientRequestToken);
+            return translateToFailure(operation, exception, HandlerErrorCode.AlreadyExists, model, clientRequestToken);
         }
 
         if (exception instanceof ResourceNotFoundException) {
-            return translateToFailure(
-                    operation, exception, HandlerErrorCode.NotFound, model, clientRequestToken);
+            return translateToFailure(operation, exception, HandlerErrorCode.NotFound, model, clientRequestToken);
         }
 
         if (exception instanceof AccessDeniedException) {
-            return translateToFailure(
-                    operation, exception, HandlerErrorCode.AccessDenied, model, clientRequestToken);
+            return translateToFailure(operation, exception, HandlerErrorCode.AccessDenied, model, clientRequestToken);
         }
 
         if (exception instanceof InvalidRequestException) {
-            return translateToFailure(
-                    operation,
-                    exception,
-                    HandlerErrorCode.InvalidRequest,
-                    model,
-                    clientRequestToken);
+            return translateToFailure(operation, exception, HandlerErrorCode.InvalidRequest, model, clientRequestToken);
         }
 
         if (exception instanceof InvalidNextTokenException) {
-            return translateToFailure(
-                    operation,
-                    exception,
-                    HandlerErrorCode.InvalidRequest,
-                    model,
-                    clientRequestToken);
+            return translateToFailure(operation, exception, HandlerErrorCode.InvalidRequest, model, clientRequestToken);
         }
 
         return translateToFailure(
-                operation,
-                exception,
-                HandlerErrorCode.GeneralServiceException,
-                model,
-                clientRequestToken);
+                operation, exception, HandlerErrorCode.GeneralServiceException, model, clientRequestToken);
     }
 
     private ProgressEvent<ResourceModel, CallbackContext> translateToFailure(
@@ -153,13 +133,8 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             HandlerErrorCode errorCode,
             ResourceModel model,
             String clientRequestToken) {
-        logger.log(
-                String.format(
-                        FAILURE_LOG_MESSAGE,
-                        clientRequestToken,
-                        model.getPrimaryIdentifier(),
-                        operation,
-                        exception));
+        logger.log(String.format(
+                FAILURE_LOG_MESSAGE, clientRequestToken, model.getPrimaryIdentifier(), operation, exception));
         return ProgressEvent.defaultFailureHandler(exception, errorCode);
     }
 
@@ -170,24 +145,14 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     private ProgressEvent<ResourceModel, CallbackContext> handleRetryableServiceException(
-            ResourceModel model,
-            CallbackContext context,
-            String operation,
-            String clientRequestToken,
-            Exception e) {
+            ResourceModel model, CallbackContext context, String operation, String clientRequestToken, Exception e) {
         int currentNumThrottlingRetries = context.getNumThrottlingRetries();
         if (currentNumThrottlingRetries > 0) {
             context.setNumThrottlingRetries(currentNumThrottlingRetries - 1);
             return ProgressEvent.defaultInProgressHandler(context, getDelaySeconds(e), model);
         }
         BaseHandlerException cfnEx = new CfnGeneralServiceException(ResourceModel.TYPE_NAME, e);
-        logger.log(
-                String.format(
-                        FAILURE_LOG_MESSAGE,
-                        clientRequestToken,
-                        model.getPrimaryIdentifier(),
-                        operation,
-                        e));
+        logger.log(String.format(FAILURE_LOG_MESSAGE, clientRequestToken, model.getPrimaryIdentifier(), operation, e));
         return ProgressEvent.failed(model, context, cfnEx.getErrorCode(), cfnEx.getMessage());
     }
 
@@ -205,24 +170,14 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     private ProgressEvent<ResourceModel, CallbackContext> handleThrottling(
-            ResourceModel model,
-            CallbackContext context,
-            String operation,
-            String clientRequestToken,
-            Exception e) {
+            ResourceModel model, CallbackContext context, String operation, String clientRequestToken, Exception e) {
         int currentNumThrottlingRetries = context.getNumThrottlingRetries();
         if (currentNumThrottlingRetries > 0) {
             context.setNumThrottlingRetries(currentNumThrottlingRetries - 1);
             return ProgressEvent.defaultInProgressHandler(context, getDelaySeconds(e), model);
         }
         BaseHandlerException cfnEx = new CfnThrottlingException(e);
-        logger.log(
-                String.format(
-                        FAILURE_LOG_MESSAGE,
-                        clientRequestToken,
-                        model.getPrimaryIdentifier(),
-                        operation,
-                        e));
+        logger.log(String.format(FAILURE_LOG_MESSAGE, clientRequestToken, model.getPrimaryIdentifier(), operation, e));
         return ProgressEvent.failed(model, context, cfnEx.getErrorCode(), cfnEx.getMessage());
     }
 
@@ -230,15 +185,13 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         if (e instanceof ThrottlingException) {
             String retryAfterSeconds = ((ThrottlingException) e).retryAfterSeconds();
             return Integer.parseInt(
-                    Optional.ofNullable(retryAfterSeconds)
-                            .orElse(String.valueOf(THROTTLE_CALLBACK_DELAY_SECONDS)));
+                    Optional.ofNullable(retryAfterSeconds).orElse(String.valueOf(THROTTLE_CALLBACK_DELAY_SECONDS)));
         }
         return THROTTLE_CALLBACK_DELAY_SECONDS;
     }
 
     private String getErrorCode(Exception e) {
-        if (e instanceof AwsServiceException
-                && ((AwsServiceException) e).awsErrorDetails() != null) {
+        if (e instanceof AwsServiceException && ((AwsServiceException) e).awsErrorDetails() != null) {
             return ((AwsServiceException) e).awsErrorDetails().errorCode();
         }
         return e.getMessage();
@@ -260,24 +213,16 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         String userName = progress.getResourceModel().getUserName();
 
         for (String keyBody : keysToAdd) {
-            progress =
-                    proxy.initiate(
-                                    "AWS-Transfer-User::importSshPublicKey",
-                                    proxyClient,
-                                    progress.getResourceModel(),
-                                    progress.getCallbackContext())
-                            .translateToServiceRequest(
-                                    m -> translateToImportSshPublicKey(serverId, userName, keyBody))
-                            .makeServiceCall(this::importSshPublicKey)
-                            .handleError(
-                                    (ignored, exception, client, model, context) ->
-                                            handleError(
-                                                    operation,
-                                                    exception,
-                                                    model,
-                                                    context,
-                                                    clientRequestToken))
-                            .progress();
+            progress = proxy.initiate(
+                            "AWS-Transfer-User::importSshPublicKey",
+                            proxyClient,
+                            progress.getResourceModel(),
+                            progress.getCallbackContext())
+                    .translateToServiceRequest(m -> translateToImportSshPublicKey(serverId, userName, keyBody))
+                    .makeServiceCall(this::importSshPublicKey)
+                    .handleError((ignored, exception, client, model, context) ->
+                            handleError(operation, exception, model, context, clientRequestToken))
+                    .progress();
         }
         return progress;
     }
@@ -294,8 +239,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     private ImportSshPublicKeyResponse importSshPublicKey(
             ImportSshPublicKeyRequest awsRequest, ProxyClient<TransferClient> client) {
         try (TransferClient transferClient = client.client()) {
-            return client.injectCredentialsAndInvokeV2(
-                    awsRequest, transferClient::importSshPublicKey);
+            return client.injectCredentialsAndInvokeV2(awsRequest, transferClient::importSshPublicKey);
         }
     }
 
@@ -315,41 +259,30 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         String userName = progress.getResourceModel().getUserName();
 
         DescribeUserRequest readRequest = translateToReadRequest(progress.getResourceModel());
-        List<SshPublicKey> currentKeys = readUser(readRequest, proxyClient).user().sshPublicKeys();
+        List<SshPublicKey> currentKeys =
+                readUser(readRequest, proxyClient).user().sshPublicKeys();
 
-        List<String> keyIdsToDelete =
-                currentKeys.stream()
-                        .filter(key -> keysToDelete.contains(key.sshPublicKeyBody()))
-                        .map(SshPublicKey::sshPublicKeyId)
-                        .collect(Collectors.toList());
+        List<String> keyIdsToDelete = currentKeys.stream()
+                .filter(key -> keysToDelete.contains(key.sshPublicKeyBody()))
+                .map(SshPublicKey::sshPublicKeyId)
+                .collect(Collectors.toList());
 
         for (String sshKeyId : keyIdsToDelete) {
-            progress =
-                    proxy.initiate(
-                                    "AWS-Transfer-User::deleteSshPublicKey",
-                                    proxyClient,
-                                    progress.getResourceModel(),
-                                    progress.getCallbackContext())
-                            .translateToServiceRequest(
-                                    m ->
-                                            translateToDeleteSshPublicKey(
-                                                    serverId, userName, sshKeyId))
-                            .makeServiceCall(this::deleteSshPublicKey)
-                            .handleError(
-                                    (ignored, exception, client, model, context) ->
-                                            handleError(
-                                                    operation,
-                                                    exception,
-                                                    model,
-                                                    context,
-                                                    clientRequestToken))
-                            .progress();
+            progress = proxy.initiate(
+                            "AWS-Transfer-User::deleteSshPublicKey",
+                            proxyClient,
+                            progress.getResourceModel(),
+                            progress.getCallbackContext())
+                    .translateToServiceRequest(m -> translateToDeleteSshPublicKey(serverId, userName, sshKeyId))
+                    .makeServiceCall(this::deleteSshPublicKey)
+                    .handleError((ignored, exception, client, model, context) ->
+                            handleError(operation, exception, model, context, clientRequestToken))
+                    .progress();
         }
         return progress;
     }
 
-    private DeleteSshPublicKeyRequest translateToDeleteSshPublicKey(
-            String serverId, String userName, String sshKeyId) {
+    private DeleteSshPublicKeyRequest translateToDeleteSshPublicKey(String serverId, String userName, String sshKeyId) {
         return DeleteSshPublicKeyRequest.builder()
                 .serverId(serverId)
                 .userName(userName)
@@ -378,9 +311,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             Map<String, String> tagsToAdd = TagHelper.generateTagsToAdd(previousTags, desiredTags);
 
             if (!tagsToAdd.isEmpty()) {
-                progress =
-                        tagResource(
-                                proxy, proxyClient, newModel, request, callbackContext, tagsToAdd);
+                progress = tagResource(proxy, proxyClient, newModel, request, callbackContext, tagsToAdd);
             }
         }
         return progress;
@@ -393,25 +324,20 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             final ResourceHandlerRequest<ResourceModel> request,
             final CallbackContext callbackContext,
             final Map<String, String> addedTags) {
-        logger.log(
-                String.format(
-                        "[UPDATE][IN PROGRESS] Going to add tags for user: %s with AccountId: %s",
-                        resourceModel.getUserName(), request.getAwsAccountId()));
+        logger.log(String.format(
+                "[UPDATE][IN PROGRESS] Going to add tags for user: %s with AccountId: %s",
+                resourceModel.getUserName(), request.getAwsAccountId()));
         final String clientRequestToken = request.getClientRequestToken();
 
-        return proxy.initiate(
-                        "AWS-Transfer-User::TagOps", serviceClient, resourceModel, callbackContext)
+        return proxy.initiate("AWS-Transfer-User::TagOps", serviceClient, resourceModel, callbackContext)
                 .translateToServiceRequest(model -> Translator.tagResourceRequest(model, addedTags))
-                .makeServiceCall(
-                        (tagRequest, client) -> {
-                            try (TransferClient transferClient = client.client()) {
-                                return client.injectCredentialsAndInvokeV2(
-                                        tagRequest, transferClient::tagResource);
-                            }
-                        })
-                .handleError(
-                        (ignored, exception, proxyClient, model, context) ->
-                                handleError(UPDATE, exception, model, context, clientRequestToken))
+                .makeServiceCall((tagRequest, client) -> {
+                    try (TransferClient transferClient = client.client()) {
+                        return client.injectCredentialsAndInvokeV2(tagRequest, transferClient::tagResource);
+                    }
+                })
+                .handleError((ignored, exception, proxyClient, model, context) ->
+                        handleError(UPDATE, exception, model, context, clientRequestToken))
                 .progress();
     }
 
@@ -426,18 +352,10 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
 
             Map<String, String> previousTags = TagHelper.getPreviouslyAttachedTags(request);
             Map<String, String> desiredTags = TagHelper.getNewDesiredTags(request);
-            Set<String> tagsKeysToRemove =
-                    TagHelper.generateTagsToRemove(previousTags, desiredTags);
+            Set<String> tagsKeysToRemove = TagHelper.generateTagsToRemove(previousTags, desiredTags);
 
             if (!tagsKeysToRemove.isEmpty()) {
-                progress =
-                        untagResource(
-                                proxy,
-                                proxyClient,
-                                newModel,
-                                request,
-                                callbackContext,
-                                tagsKeysToRemove);
+                progress = untagResource(proxy, proxyClient, newModel, request, callbackContext, tagsKeysToRemove);
             }
         }
         return progress;
@@ -450,26 +368,20 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             final ResourceHandlerRequest<ResourceModel> request,
             final CallbackContext callbackContext,
             final Set<String> removedTags) {
-        logger.log(
-                String.format(
-                        "[UPDATE][IN PROGRESS] Going to remove tags for user: %s with AccountId: %s",
-                        resourceModel.getUserName(), request.getAwsAccountId()));
+        logger.log(String.format(
+                "[UPDATE][IN PROGRESS] Going to remove tags for user: %s with AccountId: %s",
+                resourceModel.getUserName(), request.getAwsAccountId()));
         final String clientRequestToken = request.getClientRequestToken();
 
-        return proxy.initiate(
-                        "AWS-Transfer-User::TagOps", serviceClient, resourceModel, callbackContext)
-                .translateToServiceRequest(
-                        model -> Translator.untagResourceRequest(model, removedTags))
-                .makeServiceCall(
-                        (untagRequest, client) -> {
-                            try (TransferClient transferClient = client.client()) {
-                                return client.injectCredentialsAndInvokeV2(
-                                        untagRequest, transferClient::untagResource);
-                            }
-                        })
-                .handleError(
-                        (ignored, exception, proxyClient, model, context) ->
-                                handleError(UPDATE, exception, model, context, clientRequestToken))
+        return proxy.initiate("AWS-Transfer-User::TagOps", serviceClient, resourceModel, callbackContext)
+                .translateToServiceRequest(model -> Translator.untagResourceRequest(model, removedTags))
+                .makeServiceCall((untagRequest, client) -> {
+                    try (TransferClient transferClient = client.client()) {
+                        return client.injectCredentialsAndInvokeV2(untagRequest, transferClient::untagResource);
+                    }
+                })
+                .handleError((ignored, exception, proxyClient, model, context) ->
+                        handleError(UPDATE, exception, model, context, clientRequestToken))
                 .progress();
     }
 
@@ -480,8 +392,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                 .build();
     }
 
-    protected DescribeUserResponse readUser(
-            DescribeUserRequest awsRequest, ProxyClient<TransferClient> client) {
+    protected DescribeUserResponse readUser(DescribeUserRequest awsRequest, ProxyClient<TransferClient> client) {
         try (TransferClient transferClient = client.client()) {
             DescribeUserResponse awsResponse =
                     client.injectCredentialsAndInvokeV2(awsRequest, transferClient::describeUser);

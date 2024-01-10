@@ -1,6 +1,5 @@
 package software.amazon.transfer.connector;
 
-import lombok.NoArgsConstructor;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.DeleteConnectorRequest;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
@@ -13,9 +12,11 @@ import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class DeleteHandler extends BaseHandler<CallbackContext> {
@@ -51,8 +52,8 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("deleteConnector", e);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
-                    model.getPrimaryIdentifier().toString());
+            throw new CfnNotFoundException(
+                    ResourceModel.TYPE_NAME, model.getPrimaryIdentifier().toString());
         } catch (TransferException e) {
             throw new CfnGeneralServiceException(e.getMessage(), e);
         }

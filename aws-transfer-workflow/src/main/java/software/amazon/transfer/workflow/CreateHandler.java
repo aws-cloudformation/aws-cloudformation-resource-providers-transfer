@@ -1,10 +1,9 @@
 package software.amazon.transfer.workflow;
 
-import java.util.stream.Collectors;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import lombok.NoArgsConstructor;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateWorkflowRequest;
 import software.amazon.awssdk.services.transfer.model.CreateWorkflowResponse;
@@ -20,11 +19,13 @@ import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorExceptio
 import software.amazon.cloudformation.exceptions.CfnThrottlingException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import com.amazonaws.util.CollectionUtils;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class CreateHandler extends BaseHandler<CallbackContext> {
@@ -41,7 +42,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
             final CallbackContext callbackContext,
             final Logger logger) {
 
-        if (this.client == null){
+        if (this.client == null) {
             this.client = ClientBuilder.getClient();
         }
 
@@ -59,21 +60,24 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         model.setTags(Converter.TagConverter.translateTagfromMap(allTags));
         CreateWorkflowRequest createWorkflowRequest = CreateWorkflowRequest.builder()
                 .description(model.getDescription())
-                .onExceptionSteps((CollectionUtils.isNullOrEmpty(model.getOnExceptionSteps())) ?
-                        null : model.getOnExceptionSteps()
-                        .stream()
-                        .map(Converter.WorkflowStepConverter::toSdk)
-                        .collect(Collectors.toList()))
-                .steps((CollectionUtils.isNullOrEmpty(model.getSteps())) ?
-                        null : model.getSteps()
-                        .stream()
-                        .map(Converter.WorkflowStepConverter::toSdk)
-                        .collect(Collectors.toList()))
-                .tags((CollectionUtils.isNullOrEmpty(model.getTags())) ?
-                        null : model.getTags()
-                        .stream()
-                        .map(Converter.TagConverter::toSdk)
-                        .collect(Collectors.toList()))
+                .onExceptionSteps(
+                        (CollectionUtils.isNullOrEmpty(model.getOnExceptionSteps()))
+                                ? null
+                                : model.getOnExceptionSteps().stream()
+                                        .map(Converter.WorkflowStepConverter::toSdk)
+                                        .collect(Collectors.toList()))
+                .steps(
+                        (CollectionUtils.isNullOrEmpty(model.getSteps()))
+                                ? null
+                                : model.getSteps().stream()
+                                        .map(Converter.WorkflowStepConverter::toSdk)
+                                        .collect(Collectors.toList()))
+                .tags(
+                        (CollectionUtils.isNullOrEmpty(model.getTags()))
+                                ? null
+                                : model.getTags().stream()
+                                        .map(Converter.TagConverter::toSdk)
+                                        .collect(Collectors.toList()))
                 .build();
         try {
             CreateWorkflowResponse response =
@@ -94,8 +98,8 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .resourceModel(model)
-            .status(OperationStatus.SUCCESS)
-            .build();
+                .resourceModel(model)
+                .status(OperationStatus.SUCCESS)
+                .build();
     }
 }

@@ -6,8 +6,7 @@ public final class IdentityProviderDetailsTranslator {
     private IdentityProviderDetailsTranslator() {}
 
     public static IdentityProviderDetails fromSdk(
-            software.amazon.awssdk.services.transfer.model.IdentityProviderDetails
-                    identityProviderDetails) {
+            software.amazon.awssdk.services.transfer.model.IdentityProviderDetails identityProviderDetails) {
         if (identityProviderDetails == null) {
             return null;
         }
@@ -16,8 +15,7 @@ public final class IdentityProviderDetailsTranslator {
                 .invocationRole(identityProviderDetails.invocationRole())
                 .directoryId(identityProviderDetails.directoryId())
                 .function(identityProviderDetails.function())
-                .sftpAuthenticationMethods(
-                        identityProviderDetails.sftpAuthenticationMethodsAsString())
+                .sftpAuthenticationMethods(identityProviderDetails.sftpAuthenticationMethodsAsString())
                 .build();
     }
 

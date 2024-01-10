@@ -1,5 +1,21 @@
 package software.amazon.transfer.connector;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static software.amazon.transfer.connector.AbstractTestBase.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateConnectorRequest;
 import software.amazon.awssdk.services.transfer.model.CreateConnectorResponse;
@@ -18,21 +34,6 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static software.amazon.transfer.connector.AbstractTestBase.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest {
@@ -71,14 +72,13 @@ public class CreateHandlerTest {
                 .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        CreateConnectorResponse createConnectorResponse = CreateConnectorResponse.builder()
-                .connectorId(TEST_CONNECTOR_ID)
-                .build();
+        CreateConnectorResponse createConnectorResponse =
+                CreateConnectorResponse.builder().connectorId(TEST_CONNECTOR_ID).build();
 
         doReturn(createConnectorResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
-        final ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null,
-                logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                handler.handleRequest(proxy, request, null, logger);
 
         ResourceModel testModel = response.getResourceModel();
         assertThat(response).isNotNull();

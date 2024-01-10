@@ -1,5 +1,19 @@
 package software.amazon.transfer.certificate;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static software.amazon.transfer.certificate.AbstractTestBase.*;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.ImportCertificateRequest;
 import software.amazon.awssdk.services.transfer.model.ImportCertificateResponse;
@@ -18,19 +32,6 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static software.amazon.transfer.certificate.AbstractTestBase.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest {
@@ -60,18 +61,18 @@ public class CreateHandlerTest {
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .desiredResourceTags(RESOURCE_TAG_MAP)
-            .systemTags(SYSTEM_TAG_MAP)
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
+                .build();
 
         ImportCertificateResponse importCertificateResponse = ImportCertificateResponse.builder()
                 .certificateId(TEST_CERTIFICATE_ID)
                 .build();
         doReturn(importCertificateResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
-        final ProgressEvent<ResourceModel, CallbackContext> response
-            = handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                handler.handleRequest(proxy, request, null, logger);
 
         ResourceModel testModel = response.getResourceModel();
         assertThat(response).isNotNull();
@@ -90,7 +91,8 @@ public class CreateHandlerTest {
         assertThat(testModel).hasFieldOrPropertyWithValue("activeDate", TEST_ACTIVE_DATE);
         assertThat(testModel).hasFieldOrPropertyWithValue("inactiveDate", TEST_INACTIVE_DATE);
 
-        ArgumentCaptor<ImportCertificateRequest> requestCaptor = ArgumentCaptor.forClass(ImportCertificateRequest.class);
+        ArgumentCaptor<ImportCertificateRequest> requestCaptor =
+                ArgumentCaptor.forClass(ImportCertificateRequest.class);
         verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
         ImportCertificateRequest actualRequest = requestCaptor.getValue();
         assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
@@ -100,9 +102,7 @@ public class CreateHandlerTest {
     public void handleRequest_InvalidRequestExceptionFailed() {
         CreateHandler handler = new CreateHandler(client);
 
-        doThrow(InvalidRequestException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InvalidRequestException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -112,7 +112,7 @@ public class CreateHandlerTest {
 
         assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -131,7 +131,7 @@ public class CreateHandlerTest {
 
         assertThrows(CfnServiceInternalErrorException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -152,7 +152,7 @@ public class CreateHandlerTest {
 
         assertThrows(CfnAlreadyExistsException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -171,7 +171,7 @@ public class CreateHandlerTest {
 
         assertThrows(CfnThrottlingException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -190,6 +190,6 @@ public class CreateHandlerTest {
 
         assertThrows(CfnGeneralServiceException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 }

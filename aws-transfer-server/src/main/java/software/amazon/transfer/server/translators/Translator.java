@@ -7,7 +7,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.commons.lang3.StringUtils;
+
 import software.amazon.awssdk.services.transfer.model.DescribeServerRequest;
 import software.amazon.awssdk.services.transfer.model.Protocol;
 import software.amazon.awssdk.services.transfer.model.TagResourceRequest;
@@ -26,15 +28,12 @@ public final class Translator {
         return streamOfOrEmpty(protocols).map(Protocol::fromValue).collect(Collectors.toList());
     }
 
-    public static List<software.amazon.awssdk.services.transfer.model.Tag> translateToSdkTags(
-            List<Tag> tags) {
+    public static List<software.amazon.awssdk.services.transfer.model.Tag> translateToSdkTags(List<Tag> tags) {
         return streamOfOrEmpty(tags)
-                .map(
-                        tag ->
-                                software.amazon.awssdk.services.transfer.model.Tag.builder()
-                                        .key(tag.getKey())
-                                        .value(tag.getValue())
-                                        .build())
+                .map(tag -> software.amazon.awssdk.services.transfer.model.Tag.builder()
+                        .key(tag.getKey())
+                        .value(tag.getValue())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -44,12 +43,10 @@ public final class Translator {
             return null;
         }
         return tags.entrySet().stream()
-                .map(
-                        tag ->
-                                software.amazon.awssdk.services.transfer.model.Tag.builder()
-                                        .key(tag.getKey())
-                                        .value(tag.getValue())
-                                        .build())
+                .map(tag -> software.amazon.awssdk.services.transfer.model.Tag.builder()
+                        .key(tag.getKey())
+                        .value(tag.getValue())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -63,8 +60,7 @@ public final class Translator {
         return DescribeServerRequest.builder().serverId(model.getServerId()).build();
     }
 
-    public static List<Tag> translateFromSdkTags(
-            List<software.amazon.awssdk.services.transfer.model.Tag> tags) {
+    public static List<Tag> translateFromSdkTags(List<software.amazon.awssdk.services.transfer.model.Tag> tags) {
         if (tags == null) {
             return null;
         }
@@ -78,7 +74,10 @@ public final class Translator {
             return null;
         }
         return tagMap.entrySet().stream()
-                .map(entry -> Tag.builder().key(entry.getKey()).value(entry.getValue()).build())
+                .map(entry -> Tag.builder()
+                        .key(entry.getKey())
+                        .value(entry.getValue())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -101,8 +100,7 @@ public final class Translator {
      */
     public static TagResourceRequest tagResourceRequest(
             final ResourceModel model, final Map<String, String> addedTags) {
-        List<software.amazon.awssdk.services.transfer.model.Tag> tagsToAdd =
-                translateToSdkTags(addedTags);
+        List<software.amazon.awssdk.services.transfer.model.Tag> tagsToAdd = translateToSdkTags(addedTags);
         return TagResourceRequest.builder().arn(model.getArn()).tags(tagsToAdd).build();
     }
 
@@ -112,9 +110,11 @@ public final class Translator {
      * @param model resource model
      * @return awsRequest the aws service request to create a resource
      */
-    public static UntagResourceRequest untagResourceRequest(
-            final ResourceModel model, final Set<String> removedTags) {
-        return UntagResourceRequest.builder().arn(model.getArn()).tagKeys(removedTags).build();
+    public static UntagResourceRequest untagResourceRequest(final ResourceModel model, final Set<String> removedTags) {
+        return UntagResourceRequest.builder()
+                .arn(model.getArn())
+                .tagKeys(removedTags)
+                .build();
     }
 
     public static void ensureServerIdInModel(ResourceModel model) {

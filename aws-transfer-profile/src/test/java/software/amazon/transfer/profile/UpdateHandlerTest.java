@@ -1,5 +1,19 @@
 package software.amazon.transfer.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static software.amazon.transfer.profile.AbstractTestBase.*;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
@@ -17,19 +31,6 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static software.amazon.transfer.profile.AbstractTestBase.*;
-
-import java.util.stream.Collectors;
-import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 public class UpdateHandlerTest {
@@ -49,16 +50,14 @@ public class UpdateHandlerTest {
     public void handleRequest_SimpleSuccess() {
         final UpdateHandler handler = new UpdateHandler(client);
 
-        final ResourceModel model = ResourceModel.builder()
-                .profileId("testId")
-                .build();
+        final ResourceModel model = ResourceModel.builder().profileId("testId").build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .build();
+                .desiredResourceState(model)
+                .build();
 
-        final ProgressEvent<ResourceModel, CallbackContext> response
-            = handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                handler.handleRequest(proxy, request, null, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -73,11 +72,9 @@ public class UpdateHandlerTest {
     @Test
     public void handleRequest_AddTagInvoked() {
         UpdateHandler handler = new UpdateHandler(client);
-        Set<Tag> desiredTags = TEST_TAG_MAP.entrySet()
-                .stream()
-                .map(
-                        tag -> Tag.builder().key(tag.getKey()).value(tag.getValue()).build()
-                )
+        Set<Tag> desiredTags = TEST_TAG_MAP.entrySet().stream()
+                .map(tag ->
+                        Tag.builder().key(tag.getKey()).value(tag.getValue()).build())
                 .collect(Collectors.toSet());
 
         ResourceModel model = ResourceModel.builder().build();
@@ -88,8 +85,7 @@ public class UpdateHandlerTest {
                 .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        ProgressEvent<ResourceModel, CallbackContext> response
-                = handler.handleRequest(proxy, request, null, logger);
+        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -107,13 +103,10 @@ public class UpdateHandlerTest {
     @Test
     public void handleRequest_RemoveTagInvoked() {
         UpdateHandler handler = new UpdateHandler(client);
-        Set<Tag> systemTags = SYSTEM_TAG_MAP.entrySet()
-                .stream()
-                .map(
-                        tag -> Tag.builder().key(tag.getKey()).value(tag.getValue()).build()
-                )
+        Set<Tag> systemTags = SYSTEM_TAG_MAP.entrySet().stream()
+                .map(tag ->
+                        Tag.builder().key(tag.getKey()).value(tag.getValue()).build())
                 .collect(Collectors.toSet());
-
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -123,8 +116,7 @@ public class UpdateHandlerTest {
                 .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        ProgressEvent<ResourceModel, CallbackContext> response
-                = handler.handleRequest(proxy, request, null, logger);
+        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -157,7 +149,7 @@ public class UpdateHandlerTest {
 
         assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -178,7 +170,7 @@ public class UpdateHandlerTest {
 
         assertThrows(CfnServiceInternalErrorException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -199,7 +191,7 @@ public class UpdateHandlerTest {
 
         assertThrows(CfnNotFoundException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -220,6 +212,6 @@ public class UpdateHandlerTest {
 
         assertThrows(CfnGeneralServiceException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 }

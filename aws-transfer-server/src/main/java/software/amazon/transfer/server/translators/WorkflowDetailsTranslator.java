@@ -3,6 +3,7 @@ package software.amazon.transfer.server.translators;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import software.amazon.transfer.server.WorkflowDetail;
 import software.amazon.transfer.server.WorkflowDetails;
 
@@ -35,13 +36,10 @@ public final class WorkflowDetailsTranslator {
             return null;
         }
         return details.stream()
-                .map(
-                        detail ->
-                                software.amazon.awssdk.services.transfer.model.WorkflowDetail
-                                        .builder()
-                                        .workflowId(detail.getWorkflowId())
-                                        .executionRole(detail.getExecutionRole())
-                                        .build())
+                .map(detail -> software.amazon.awssdk.services.transfer.model.WorkflowDetail.builder()
+                        .workflowId(detail.getWorkflowId())
+                        .executionRole(detail.getExecutionRole())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -67,12 +65,10 @@ public final class WorkflowDetailsTranslator {
             return null;
         }
         return details.stream()
-                .map(
-                        detail ->
-                                WorkflowDetail.builder()
-                                        .workflowId(detail.workflowId())
-                                        .executionRole(detail.executionRole())
-                                        .build())
+                .map(detail -> WorkflowDetail.builder()
+                        .workflowId(detail.workflowId())
+                        .executionRole(detail.executionRole())
+                        .build())
                 .collect(Collectors.toList());
     }
 }

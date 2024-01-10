@@ -4,6 +4,7 @@ import static software.amazon.transfer.server.translators.Translator.translateFr
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.SecurityGroupIdentifier;
 import software.amazon.awssdk.services.transfer.TransferClient;
@@ -38,10 +39,7 @@ public class ReadHandler extends BaseHandlerStd {
         Translator.ensureServerIdInModel(request.getDesiredResourceState());
 
         return proxy.initiate(
-                        "AWS-Transfer-Server::Read",
-                        proxyClient,
-                        request.getDesiredResourceState(),
-                        callbackContext)
+                        "AWS-Transfer-Server::Read", proxyClient, request.getDesiredResourceState(), callbackContext)
                 .translateToServiceRequest(Translator::translateToReadRequest)
                 .makeServiceCall((r, c) -> readServer(r, c, proxyEc2Client))
                 .handleError((_i, e, c, m, ctx) -> handleError(READ, e, m, ctx, clientRequestToken))
@@ -58,8 +56,7 @@ public class ReadHandler extends BaseHandlerStd {
                 .endpointType(server.endpointTypeAsString())
                 .endpointDetails(EndpointDetailsTranslator.fromSdk(server.endpointDetails()))
                 .identityProviderType(server.identityProviderTypeAsString())
-                .identityProviderDetails(
-                        IdentityProviderDetailsTranslator.fromSdk(server.identityProviderDetails()))
+                .identityProviderDetails(IdentityProviderDetailsTranslator.fromSdk(server.identityProviderDetails()))
                 .loggingRole(server.loggingRole())
                 .structuredLogDestinations(server.structuredLogDestinations())
                 .preAuthenticationLoginBanner(server.preAuthenticationLoginBanner())
@@ -74,9 +71,7 @@ public class ReadHandler extends BaseHandlerStd {
     }
 
     private DescribeServerResponse readServer(
-            DescribeServerRequest request,
-            ProxyClient<TransferClient> client,
-            ProxyClient<Ec2Client> ec2Client) {
+            DescribeServerRequest request, ProxyClient<TransferClient> client, ProxyClient<Ec2Client> ec2Client) {
         DescribeServerResponse response;
         try (TransferClient transferClient = client.client()) {
             response = client.injectCredentialsAndInvokeV2(request, transferClient::describeServer);
@@ -93,14 +88,14 @@ public class ReadHandler extends BaseHandlerStd {
     private DescribeServerResponse readSecurityGroups(
             ProxyClient<Ec2Client> ec2Client, DescribeServerResponse response) {
         String vpceId = response.server().endpointDetails().vpcEndpointId();
-        List<String> sgIds =
-                getVpcEndpoint(vpceId, ec2Client).groups().stream()
-                        .map(SecurityGroupIdentifier::groupId)
-                        .collect(Collectors.toList());
+        List<String> sgIds = getVpcEndpoint(vpceId, ec2Client).groups().stream()
+                .map(SecurityGroupIdentifier::groupId)
+                .collect(Collectors.toList());
         log(String.format("security group IDs read successfully: %s", sgIds), vpceId);
 
-        EndpointDetails endpointDetails =
-                response.server().endpointDetails().toBuilder().securityGroupIds(sgIds).build();
+        EndpointDetails endpointDetails = response.server().endpointDetails().toBuilder()
+                .securityGroupIds(sgIds)
+                .build();
         DescribedServer server =
                 response.server().toBuilder().endpointDetails(endpointDetails).build();
         return DescribeServerResponse.builder().server(server).build();

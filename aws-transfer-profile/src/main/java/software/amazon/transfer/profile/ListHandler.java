@@ -1,6 +1,8 @@
 package software.amazon.transfer.profile;
 
-import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
@@ -14,12 +16,11 @@ import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorExceptio
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class ListHandler extends BaseHandler<CallbackContext> {
@@ -37,7 +38,7 @@ public class ListHandler extends BaseHandler<CallbackContext> {
             final CallbackContext callbackContext,
             final Logger logger) {
 
-        if (this.client == null){
+        if (this.client == null) {
             this.client = ClientBuilder.getClient();
         }
 
@@ -74,8 +75,8 @@ public class ListHandler extends BaseHandler<CallbackContext> {
         } catch (TransferException e) {
             throw new CfnGeneralServiceException(e.getMessage(), e);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
-                    request.getDesiredResourceState().getProfileType());
+            throw new CfnNotFoundException(
+                    ResourceModel.TYPE_NAME, request.getDesiredResourceState().getProfileType());
         }
     }
 }

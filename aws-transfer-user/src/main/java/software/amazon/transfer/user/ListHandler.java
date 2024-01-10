@@ -2,6 +2,7 @@ package software.amazon.transfer.user;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.ListUsersRequest;
 import software.amazon.awssdk.services.transfer.model.ListUsersResponse;
@@ -29,24 +30,15 @@ public class ListHandler extends BaseHandlerStd {
         final String serverId = model.getServerId();
 
         return proxy.initiate("AWS-Transfer-User::List", proxyClient, model, callbackContext)
-                .translateToServiceRequest(
-                        ignored -> translateToListRequest(serverId, request.getNextToken()))
+                .translateToServiceRequest(ignored -> translateToListRequest(serverId, request.getNextToken()))
                 .makeServiceCall(this::listUsers)
-                .handleError(
-                        (ignored, exception, proxyClient1, model1, callbackContext1) ->
-                                handleError(
-                                        LIST,
-                                        exception,
-                                        model1,
-                                        callbackContext1,
-                                        clientRequestToken))
-                .done(
-                        response ->
-                                ProgressEvent.<ResourceModel, CallbackContext>builder()
-                                        .resourceModels(translateFromListResponse(response))
-                                        .nextToken(response.nextToken())
-                                        .status(OperationStatus.SUCCESS)
-                                        .build());
+                .handleError((ignored, exception, proxyClient1, model1, callbackContext1) ->
+                        handleError(LIST, exception, model1, callbackContext1, clientRequestToken))
+                .done(response -> ProgressEvent.<ResourceModel, CallbackContext>builder()
+                        .resourceModels(translateFromListResponse(response))
+                        .nextToken(response.nextToken())
+                        .status(OperationStatus.SUCCESS)
+                        .build());
     }
 
     private ListUsersRequest translateToListRequest(final String serverId, final String nextToken) {
@@ -59,18 +51,15 @@ public class ListHandler extends BaseHandlerStd {
 
     private List<ResourceModel> translateFromListResponse(final ListUsersResponse response) {
         return Translator.streamOfOrEmpty(response.users())
-                .map(
-                        user ->
-                                ResourceModel.builder()
-                                        .arn(user.arn())
-                                        .serverId(response.serverId())
-                                        .userName(user.userName())
-                                        .build())
+                .map(user -> ResourceModel.builder()
+                        .arn(user.arn())
+                        .serverId(response.serverId())
+                        .userName(user.userName())
+                        .build())
                 .collect(Collectors.toList());
     }
 
-    private ListUsersResponse listUsers(
-            ListUsersRequest awsRequest, ProxyClient<TransferClient> client) {
+    private ListUsersResponse listUsers(ListUsersRequest awsRequest, ProxyClient<TransferClient> client) {
         try (TransferClient transferClient = client.client()) {
             return client.injectCredentialsAndInvokeV2(awsRequest, transferClient::listUsers);
         }

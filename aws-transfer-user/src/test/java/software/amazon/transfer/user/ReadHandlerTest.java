@@ -13,6 +13,7 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.model.DescribeUserRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeUserResponse;
 import software.amazon.awssdk.services.transfer.model.ThrottlingException;
@@ -24,7 +25,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(SoftAssertionsExtension.class)
 public class ReadHandlerTest extends AbstractTestBase {
 
-    @InjectSoftAssertions private SoftAssertions softly;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     private final ReadHandler handler = new ReadHandler();
 
@@ -47,12 +49,10 @@ public class ReadHandlerTest extends AbstractTestBase {
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.IN_PROGRESS);
-        softly.assertThat(response.getCallbackDelaySeconds())
-                .isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
+        softly.assertThat(response.getCallbackDelaySeconds()).isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
 
         // Call again in response to ThrottleException
-        response =
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);

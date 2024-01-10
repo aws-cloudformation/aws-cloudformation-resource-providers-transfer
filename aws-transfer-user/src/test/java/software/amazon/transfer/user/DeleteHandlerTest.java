@@ -7,14 +7,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static software.amazon.transfer.user.BaseHandlerStd.THROTTLE_CALLBACK_DELAY_SECONDS;
 
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.model.DeleteUserRequest;
 import software.amazon.awssdk.services.transfer.model.DeleteUserResponse;
 import software.amazon.awssdk.services.transfer.model.ThrottlingException;
@@ -23,11 +22,15 @@ import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.transfer.user.translators.UserArn;
 
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
 public class DeleteHandlerTest extends AbstractTestBase {
 
-    @InjectSoftAssertions private SoftAssertions softly;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     private final DeleteHandler handler = new DeleteHandler();
 
@@ -36,7 +39,8 @@ public class DeleteHandlerTest extends AbstractTestBase {
 
         Region region = Region.getRegion(Regions.US_EAST_1);
         final UserArn userArn = new UserArn(region, "123456789012", "testServerId", "testUserName");
-        final ResourceModel model = ResourceModel.builder().arn(userArn.getArn()).build();
+        final ResourceModel model =
+                ResourceModel.builder().arn(userArn.getArn()).build();
 
         final ResourceHandlerRequest<ResourceModel> request =
                 requestBuilder().desiredResourceState(model).build();
@@ -53,12 +57,10 @@ public class DeleteHandlerTest extends AbstractTestBase {
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.IN_PROGRESS);
-        softly.assertThat(response.getCallbackDelaySeconds())
-                .isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
+        softly.assertThat(response.getCallbackDelaySeconds()).isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
 
         // Call again in response to ThrottleException
-        response =
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
