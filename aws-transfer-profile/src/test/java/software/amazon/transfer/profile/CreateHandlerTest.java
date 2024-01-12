@@ -1,5 +1,17 @@
 package software.amazon.transfer.profile;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static software.amazon.transfer.profile.AbstractTestBase.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateProfileRequest;
 import software.amazon.awssdk.services.transfer.model.CreateProfileResponse;
@@ -16,17 +28,6 @@ import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static software.amazon.transfer.profile.AbstractTestBase.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest {
@@ -53,17 +54,18 @@ public class CreateHandlerTest {
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
-            .desiredResourceState(model)
-            .desiredResourceTags(RESOURCE_TAG_MAP)
-            .systemTags(SYSTEM_TAG_MAP)
-            .build();
+                .desiredResourceState(model)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
+                .build();
 
-        CreateProfileResponse createProfileResponse = CreateProfileResponse.builder().profileId("p-123456").build();
+        CreateProfileResponse createProfileResponse =
+                CreateProfileResponse.builder().profileId("p-123456").build();
 
         doReturn(createProfileResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
-        final ProgressEvent<ResourceModel, CallbackContext> response
-            = handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response =
+                handler.handleRequest(proxy, request, null, logger);
 
         ResourceModel testModel = response.getResourceModel();
         assertThat(response).isNotNull();
@@ -100,7 +102,7 @@ public class CreateHandlerTest {
 
         assertThrows(CfnInvalidRequestException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -119,7 +121,7 @@ public class CreateHandlerTest {
 
         assertThrows(CfnServiceInternalErrorException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -138,7 +140,7 @@ public class CreateHandlerTest {
 
         assertThrows(CfnGeneralServiceException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 
     @Test
@@ -157,6 +159,6 @@ public class CreateHandlerTest {
 
         assertThrows(CfnNotFoundException.class, () -> {
             handler.handleRequest(proxy, request, null, logger);
-        } );
+        });
     }
 }

@@ -2,6 +2,7 @@ package software.amazon.transfer.server.translators;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import software.amazon.awssdk.services.transfer.model.As2Transport;
 import software.amazon.transfer.server.ProtocolDetails;
 

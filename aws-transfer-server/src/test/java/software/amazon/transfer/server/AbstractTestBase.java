@@ -9,9 +9,6 @@ import static software.amazon.transfer.server.translators.ResourceModelAdapter.D
 import static software.amazon.transfer.server.translators.ResourceModelAdapter.DEFAULT_SECURITY_POLICY;
 import static software.amazon.transfer.server.translators.Translator.streamOfOrEmpty;
 
-import com.amazonaws.regions.Regions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,8 +17,13 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
+
 import software.amazon.awssdk.awscore.AwsRequest;
 import software.amazon.awssdk.awscore.AwsResponse;
 import software.amazon.awssdk.core.ResponseBytes;
@@ -60,13 +62,14 @@ import software.amazon.transfer.server.translators.ServerArn;
 import software.amazon.transfer.server.translators.Translator;
 import software.amazon.transfer.server.translators.WorkflowDetailsTranslator;
 
+import com.amazonaws.regions.Regions;
+
 public class AbstractTestBase {
 
     protected static final List<Tag> MODEL_TAGS =
             ImmutableList.of(Tag.builder().key("key").value("value").build());
 
-    protected static final Map<String, String> EXTRA_MODEL_TAGS =
-            ImmutableMap.of("keyAdded", "value1");
+    protected static final Map<String, String> EXTRA_MODEL_TAGS = ImmutableMap.of("keyAdded", "value1");
 
     protected static final Credentials MOCK_CREDENTIALS;
     protected static final LoggerProxy logger;
@@ -80,38 +83,36 @@ public class AbstractTestBase {
 
     protected ProxyClient<TransferClient> proxyClient;
 
-    @Mock protected TransferClient sdkClient;
+    @Mock
+    protected TransferClient sdkClient;
 
     protected ProxyClient<Ec2Client> proxyEc2Client;
 
-    @Mock protected Ec2Client sdkEc2Client;
+    @Mock
+    protected Ec2Client sdkEc2Client;
 
     @BeforeEach
     public void setup() {
-        proxy =
-                new AmazonWebServicesClientProxy(
-                        logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
+        proxy = new AmazonWebServicesClientProxy(
+                logger, MOCK_CREDENTIALS, () -> Duration.ofSeconds(600).toMillis());
         sdkClient = mock(TransferClient.class);
         proxyClient = MOCK_PROXY(proxy, sdkClient);
         sdkEc2Client = mock(Ec2Client.class);
         proxyEc2Client = MOCK_PROXY(proxy, sdkEc2Client);
     }
 
-    static <T> ProxyClient<T> MOCK_PROXY(
-            final AmazonWebServicesClientProxy proxy, final T sdkClient) {
+    static <T> ProxyClient<T> MOCK_PROXY(final AmazonWebServicesClientProxy proxy, final T sdkClient) {
         return new ProxyClient<T>() {
             @Override
-            public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
-                    ResponseT injectCredentialsAndInvokeV2(
-                            RequestT request, Function<RequestT, ResponseT> requestFunction) {
+            public <RequestT extends AwsRequest, ResponseT extends AwsResponse> ResponseT injectCredentialsAndInvokeV2(
+                    RequestT request, Function<RequestT, ResponseT> requestFunction) {
                 return proxy.injectCredentialsAndInvokeV2(request, requestFunction);
             }
 
             @Override
             public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
                     CompletableFuture<ResponseT> injectCredentialsAndInvokeV2Async(
-                            RequestT request,
-                            Function<RequestT, CompletableFuture<ResponseT>> requestFunction) {
+                            RequestT request, Function<RequestT, CompletableFuture<ResponseT>> requestFunction) {
                 throw new UnsupportedOperationException();
             }
 
@@ -128,16 +129,14 @@ public class AbstractTestBase {
             @Override
             public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
                     ResponseInputStream<ResponseT> injectCredentialsAndInvokeV2InputStream(
-                            RequestT requestT,
-                            Function<RequestT, ResponseInputStream<ResponseT>> function) {
+                            RequestT requestT, Function<RequestT, ResponseInputStream<ResponseT>> function) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
             public <RequestT extends AwsRequest, ResponseT extends AwsResponse>
                     ResponseBytes<ResponseT> injectCredentialsAndInvokeV2Bytes(
-                            RequestT requestT,
-                            Function<RequestT, ResponseBytes<ResponseT>> function) {
+                            RequestT requestT, Function<RequestT, ResponseBytes<ResponseT>> function) {
                 throw new UnsupportedOperationException();
             }
 
@@ -151,41 +150,29 @@ public class AbstractTestBase {
     protected static DescribeServerResponse describeServerFromModel(
             String serverId, String state, ResourceModel model) {
         return DescribeServerResponse.builder()
-                .server(
-                        DescribedServer.builder()
-                                .arn(getTestServerArn(serverId))
-                                .serverId(serverId)
-                                .state(state)
-                                .domain(model.getDomain())
-                                .endpointType(EndpointType.valueOf(model.getEndpointType()))
-                                .identityProviderType(
-                                        IdentityProviderType.valueOf(
-                                                model.getIdentityProviderType()))
-                                .securityPolicyName(model.getSecurityPolicyName())
-                                .protocols(
-                                        model.getProtocols().stream()
-                                                .map(Protocol::fromValue)
-                                                .collect(Collectors.toList()))
-                                .tags(Translator.translateToSdkTags(model.getTags()))
-                                .structuredLogDestinations(model.getStructuredLogDestinations())
-                                .loggingRole(model.getLoggingRole())
-                                .preAuthenticationLoginBanner(
-                                        model.getPreAuthenticationLoginBanner())
-                                .postAuthenticationLoginBanner(
-                                        model.getPostAuthenticationLoginBanner())
-                                .protocolDetails(
-                                        ProtocolDetailsTranslator.toSdk(model.getProtocolDetails()))
-                                .certificate(model.getCertificate())
-                                .identityProviderDetails(
-                                        IdentityProviderDetailsTranslator.toSdk(
-                                                model.getIdentityProviderDetails()))
-                                .workflowDetails(
-                                        WorkflowDetailsTranslator.toSdk(
-                                                model.getWorkflowDetails(), false))
-                                .endpointDetails(
-                                        EndpointDetailsTranslator.toSdk(
-                                                model.getEndpointDetails(), false, false))
-                                .build())
+                .server(DescribedServer.builder()
+                        .arn(getTestServerArn(serverId))
+                        .serverId(serverId)
+                        .state(state)
+                        .domain(model.getDomain())
+                        .endpointType(EndpointType.valueOf(model.getEndpointType()))
+                        .identityProviderType(IdentityProviderType.valueOf(model.getIdentityProviderType()))
+                        .securityPolicyName(model.getSecurityPolicyName())
+                        .protocols(model.getProtocols().stream()
+                                .map(Protocol::fromValue)
+                                .collect(Collectors.toList()))
+                        .tags(Translator.translateToSdkTags(model.getTags()))
+                        .structuredLogDestinations(model.getStructuredLogDestinations())
+                        .loggingRole(model.getLoggingRole())
+                        .preAuthenticationLoginBanner(model.getPreAuthenticationLoginBanner())
+                        .postAuthenticationLoginBanner(model.getPostAuthenticationLoginBanner())
+                        .protocolDetails(ProtocolDetailsTranslator.toSdk(model.getProtocolDetails()))
+                        .certificate(model.getCertificate())
+                        .identityProviderDetails(
+                                IdentityProviderDetailsTranslator.toSdk(model.getIdentityProviderDetails()))
+                        .workflowDetails(WorkflowDetailsTranslator.toSdk(model.getWorkflowDetails(), false))
+                        .endpointDetails(EndpointDetailsTranslator.toSdk(model.getEndpointDetails(), false, false))
+                        .build())
                 .build();
     }
 
@@ -206,39 +193,31 @@ public class AbstractTestBase {
     }
 
     protected static ResourceModel fullyLoadedServerModel() {
-        ProtocolDetails protocolDetails =
-                ProtocolDetails.builder()
-                        .as2Transports(Collections.singletonList("HTTP"))
-                        .passiveIp("1.1.1.1")
-                        .setStatOption(SetStatOption.ENABLE_NO_OP.name())
-                        .tlsSessionResumptionMode(TlsSessionResumptionMode.ENFORCED.name())
-                        .build();
+        ProtocolDetails protocolDetails = ProtocolDetails.builder()
+                .as2Transports(Collections.singletonList("HTTP"))
+                .passiveIp("1.1.1.1")
+                .setStatOption(SetStatOption.ENABLE_NO_OP.name())
+                .tlsSessionResumptionMode(TlsSessionResumptionMode.ENFORCED.name())
+                .build();
 
-        IdentityProviderDetails identityProviderDetails =
-                IdentityProviderDetails.builder()
-                        .sftpAuthenticationMethods(
-                                SftpAuthenticationMethods.PUBLIC_KEY_AND_PASSWORD.name())
-                        .directoryId("dir")
-                        .function("func")
-                        .url("url")
-                        .invocationRole("role")
-                        .build();
+        IdentityProviderDetails identityProviderDetails = IdentityProviderDetails.builder()
+                .sftpAuthenticationMethods(SftpAuthenticationMethods.PUBLIC_KEY_AND_PASSWORD.name())
+                .directoryId("dir")
+                .function("func")
+                .url("url")
+                .invocationRole("role")
+                .build();
 
-        WorkflowDetails workflowDetails =
-                WorkflowDetails.builder()
-                        .onUpload(
-                                Collections.singletonList(
-                                        WorkflowDetail.builder()
-                                                .workflowId("workflowId")
-                                                .executionRole("executionRole")
-                                                .build()))
-                        .onPartialUpload(
-                                Collections.singletonList(
-                                        WorkflowDetail.builder()
-                                                .workflowId("workflowId")
-                                                .executionRole("executionRole")
-                                                .build()))
-                        .build();
+        WorkflowDetails workflowDetails = WorkflowDetails.builder()
+                .onUpload(Collections.singletonList(WorkflowDetail.builder()
+                        .workflowId("workflowId")
+                        .executionRole("executionRole")
+                        .build()))
+                .onPartialUpload(Collections.singletonList(WorkflowDetail.builder()
+                        .workflowId("workflowId")
+                        .executionRole("executionRole")
+                        .build()))
+                .build();
 
         EndpointDetails endpointDetails = getEndpointDetails(Arrays.asList("addr1", "addr2"));
 
@@ -284,20 +263,18 @@ public class AbstractTestBase {
                 .describeVpcEndpoints(any(DescribeVpcEndpointsRequest.class));
     }
 
-    protected static DescribeVpcEndpointsResponse vpcEndpointResponse(
-            ResourceModel model, State state) {
-        List<SecurityGroupIdentifier> securityGroupIdentifiers =
-                streamOfOrEmpty(model.getEndpointDetails().getSecurityGroupIds())
-                        .map(AbstractTestBase::sgFromId)
-                        .collect(Collectors.toList());
+    protected static DescribeVpcEndpointsResponse vpcEndpointResponse(ResourceModel model, State state) {
+        List<SecurityGroupIdentifier> securityGroupIdentifiers = streamOfOrEmpty(
+                        model.getEndpointDetails().getSecurityGroupIds())
+                .map(AbstractTestBase::sgFromId)
+                .collect(Collectors.toList());
 
         return DescribeVpcEndpointsResponse.builder()
-                .vpcEndpoints(
-                        VpcEndpoint.builder()
-                                .vpcEndpointId(model.getEndpointDetails().getVpcEndpointId())
-                                .groups(securityGroupIdentifiers)
-                                .state(state)
-                                .build())
+                .vpcEndpoints(VpcEndpoint.builder()
+                        .vpcEndpointId(model.getEndpointDetails().getVpcEndpointId())
+                        .groups(securityGroupIdentifiers)
+                        .state(state)
+                        .build())
                 .build();
     }
 
@@ -305,23 +282,20 @@ public class AbstractTestBase {
         return SecurityGroupIdentifier.builder().groupId(id).groupName(id).build();
     }
 
-    protected static DescribeServerResponse newStateResponse(
-            DescribeServerResponse template, String state) {
+    protected static DescribeServerResponse newStateResponse(DescribeServerResponse template, String state) {
         return DescribeServerResponse.builder()
                 .server(template.server().toBuilder().state(state).build())
                 .build();
     }
 
     protected void setupPrivateIpsStates() {
-        DescribeAddressesResponse noAddress = DescribeAddressesResponse.builder().build();
-        DescribeAddressesResponse oneAddress =
-                DescribeAddressesResponse.builder()
-                        .addresses(Address.builder().privateIpAddress("10.0.0.1").build())
-                        .build();
+        DescribeAddressesResponse noAddress =
+                DescribeAddressesResponse.builder().build();
+        DescribeAddressesResponse oneAddress = DescribeAddressesResponse.builder()
+                .addresses(Address.builder().privateIpAddress("10.0.0.1").build())
+                .build();
 
-        doReturn(noAddress, oneAddress)
-                .when(sdkEc2Client)
-                .describeAddresses(any(DescribeAddressesRequest.class));
+        doReturn(noAddress, oneAddress).when(sdkEc2Client).describeAddresses(any(DescribeAddressesRequest.class));
     }
 
     protected static ResourceHandlerRequest.ResourceHandlerRequestBuilder<ResourceModel>

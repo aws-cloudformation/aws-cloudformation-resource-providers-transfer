@@ -11,12 +11,14 @@ import static software.amazon.transfer.user.BaseHandlerStd.THROTTLE_CALLBACK_DEL
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
+
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.model.DescribeUserRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeUserResponse;
 import software.amazon.awssdk.services.transfer.model.TagResourceRequest;
@@ -34,7 +36,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(SoftAssertionsExtension.class)
 public class UpdateHandlerTest extends AbstractTestBase {
 
-    @InjectSoftAssertions private SoftAssertions softly;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     final UpdateHandler handler = new UpdateHandler();
 
@@ -101,11 +104,10 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     private void updateAndAssertSuccess(ResourceModel current, ResourceModel desired) {
-        final ResourceHandlerRequest<ResourceModel> request =
-                requestBuilder()
-                        .previousResourceState(current)
-                        .desiredResourceState(desired)
-                        .build();
+        final ResourceHandlerRequest<ResourceModel> request = requestBuilder()
+                .previousResourceState(current)
+                .desiredResourceState(desired)
+                .build();
 
         setupUserUpdateResponse();
 
@@ -125,23 +127,19 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         final ResourceModel currentState = simpleUserModel();
         final ResourceModel desiredState = simpleUserModel();
-        desiredState.setTags(
-                TEST_TAG_MAP.entrySet().stream()
-                        .map(
-                                entry ->
-                                        Tag.builder()
-                                                .key(entry.getKey())
-                                                .value(entry.getValue())
-                                                .build())
-                        .collect(Collectors.toList()));
+        desiredState.setTags(TEST_TAG_MAP.entrySet().stream()
+                .map(entry -> Tag.builder()
+                        .key(entry.getKey())
+                        .value(entry.getValue())
+                        .build())
+                .collect(Collectors.toList()));
 
-        final ResourceHandlerRequest<ResourceModel> request =
-                requestBuilder()
-                        .previousResourceState(currentState)
-                        .desiredResourceState(desiredState)
-                        .previousResourceTags(RESOURCE_TAG_MAP)
-                        .desiredResourceTags(TEST_TAG_MAP)
-                        .build();
+        final ResourceHandlerRequest<ResourceModel> request = requestBuilder()
+                .previousResourceState(currentState)
+                .desiredResourceState(desiredState)
+                .previousResourceTags(RESOURCE_TAG_MAP)
+                .desiredResourceTags(TEST_TAG_MAP)
+                .build();
 
         setupUserUpdateResponse();
 
@@ -186,30 +184,26 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.IN_PROGRESS);
-        softly.assertThat(response.getCallbackDelaySeconds())
-                .isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
+        softly.assertThat(response.getCallbackDelaySeconds()).isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
     }
 
     @Test
     public void fullyLoadedUserUpdate() {
         ResourceModel currentState = simpleUserModel();
-        currentState.setTags(
-                Collections.singletonList(
-                        Tag.builder().key("someTagToRemove").value("someValue").build()));
+        currentState.setTags(Collections.singletonList(
+                Tag.builder().key("someTagToRemove").value("someValue").build()));
         ResourceModel desiredState = fullyLoadedUserModel();
-        desiredState.setTags(
-                Collections.singletonList(
-                        Tag.builder().key("someTagToAdd").value("someValue").build()));
+        desiredState.setTags(Collections.singletonList(
+                Tag.builder().key("someTagToAdd").value("someValue").build()));
 
-        final ResourceHandlerRequest<ResourceModel> request =
-                requestBuilder()
-                        .previousResourceState(currentState)
-                        .desiredResourceState(desiredState)
-                        .previousResourceTags(RESOURCE_TAG_MAP)
-                        .desiredResourceTags(RESOURCE_TAG_MAP)
-                        .previousSystemTags(SYSTEM_TAG_MAP)
-                        .systemTags(SYSTEM_TAG_MAP)
-                        .build();
+        final ResourceHandlerRequest<ResourceModel> request = requestBuilder()
+                .previousResourceState(currentState)
+                .desiredResourceState(desiredState)
+                .previousResourceTags(RESOURCE_TAG_MAP)
+                .desiredResourceTags(RESOURCE_TAG_MAP)
+                .previousSystemTags(SYSTEM_TAG_MAP)
+                .systemTags(SYSTEM_TAG_MAP)
+                .build();
 
         setupUserUpdateResponse();
 
@@ -220,19 +214,17 @@ public class UpdateHandlerTest extends AbstractTestBase {
         ProgressEvent<ResourceModel, CallbackContext> response;
 
         // Call again in response to ThrottleException
-        response =
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
     }
 
     private void setupUserUpdateResponse() {
-        UpdateUserResponse updateUserResponse =
-                UpdateUserResponse.builder()
-                        .serverId("testServerId")
-                        .userName("testUserId")
-                        .build();
+        UpdateUserResponse updateUserResponse = UpdateUserResponse.builder()
+                .serverId("testServerId")
+                .userName("testUserId")
+                .build();
 
         // Add some error coverage
         doThrow(ThrottlingException.builder().build())

@@ -12,6 +12,7 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.model.ListServersRequest;
 import software.amazon.awssdk.services.transfer.model.ListServersResponse;
 import software.amazon.awssdk.services.transfer.model.ListedServer;
@@ -23,7 +24,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(SoftAssertionsExtension.class)
 public class ListHandlerTest extends AbstractTestBase {
 
-    @InjectSoftAssertions private SoftAssertions softly;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     @Test
     public void handleRequest_SimpleSuccess() {
@@ -35,15 +37,14 @@ public class ListHandlerTest extends AbstractTestBase {
                 getResourceHandlerRequestBuilder().desiredResourceState(model).build();
 
         String arn = getTestServerArn("testServerId");
-        ListServersResponse listServersResponse =
-                ListServersResponse.builder()
-                        .servers(ListedServer.builder().arn(arn).serverId("testServerId").build())
-                        .build();
+        ListServersResponse listServersResponse = ListServersResponse.builder()
+                .servers(
+                        ListedServer.builder().arn(arn).serverId("testServerId").build())
+                .build();
         doReturn(listServersResponse).when(sdkClient).listServers(any(ListServersRequest.class));
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(
-                        proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getResourceModels()).isNotNull();

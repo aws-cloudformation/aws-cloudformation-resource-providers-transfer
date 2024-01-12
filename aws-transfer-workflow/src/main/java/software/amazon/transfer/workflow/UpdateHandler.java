@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
-import lombok.NoArgsConstructor;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
@@ -25,6 +25,8 @@ import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
+import lombok.NoArgsConstructor;
+
 @NoArgsConstructor
 public class UpdateHandler extends BaseHandler<CallbackContext> {
     private TransferClient client;
@@ -40,16 +42,14 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             CallbackContext callbackContext,
             Logger logger) {
 
-        if (this.client == null){
+        if (this.client == null) {
             this.client = ClientBuilder.getClient();
         }
 
         ResourceModel model = request.getDesiredResourceState();
-        String arn = String.format("arn:%s:transfer:%s:%s:workflow/%s",
-                request.getAwsPartition(),
-                request.getRegion(),
-                request.getAwsAccountId(),
-                model.getWorkflowId());
+        String arn = String.format(
+                "arn:%s:transfer:%s:%s:workflow/%s",
+                request.getAwsPartition(), request.getRegion(), request.getAwsAccountId(), model.getWorkflowId());
 
         Map<String, String> allDesiredTagsMap = new HashMap<>();
         if (request.getDesiredResourceTags() != null) {
@@ -62,7 +62,7 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         model.setTags(Converter.TagConverter.translateTagfromMap(allDesiredTagsMap));
 
         Set<Tag> previousTags = Converter.TagConverter.translateTagfromMap(request.getPreviousResourceTags());
-        Set<Tag> desiredTags =  model.getTags();
+        Set<Tag> desiredTags = model.getTags();
 
         Set<Tag> tagsToAdd = Sets.difference(new HashSet<>(desiredTags), new HashSet<>(previousTags));
         Set<Tag> tagsToRemove = Sets.difference(new HashSet<>(previousTags), new HashSet<>(desiredTags));
@@ -71,7 +71,9 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             if (!tagsToAdd.isEmpty()) {
                 TagResourceRequest tagResourceRequest = TagResourceRequest.builder()
                         .arn(arn)
-                        .tags(tagsToAdd.stream().map(Converter.TagConverter::toSdk).collect(Collectors.toList()))
+                        .tags(tagsToAdd.stream()
+                                .map(Converter.TagConverter::toSdk)
+                                .collect(Collectors.toList()))
                         .build();
                 proxy.injectCredentialsAndInvokeV2(tagResourceRequest, client::tagResource);
             }
@@ -84,9 +86,8 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
                 proxy.injectCredentialsAndInvokeV2(unTagResourceRequest, client::untagResource);
             }
 
-            logger.log(String.format("%s %s updated tags successfully",
-                    ResourceModel.TYPE_NAME,
-                    model.getPrimaryIdentifier()));
+            logger.log(String.format(
+                    "%s %s updated tags successfully", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier()));
 
             return ProgressEvent.<ResourceModel, CallbackContext>builder()
                     .resourceModel(model)

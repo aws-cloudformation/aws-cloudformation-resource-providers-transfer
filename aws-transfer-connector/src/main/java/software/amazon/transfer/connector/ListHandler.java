@@ -1,6 +1,8 @@
 package software.amazon.transfer.connector;
 
-import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
@@ -12,12 +14,11 @@ import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class ListHandler extends BaseHandler<CallbackContext> {
@@ -46,8 +47,8 @@ public class ListHandler extends BaseHandler<CallbackContext> {
                 .build();
 
         try {
-            ListConnectorsResponse response = proxy.injectCredentialsAndInvokeV2(listConnectorsRequest,
-                    client::listConnectors);
+            ListConnectorsResponse response =
+                    proxy.injectCredentialsAndInvokeV2(listConnectorsRequest, client::listConnectors);
 
             response.connectors().forEach(listedConnector -> {
                 ResourceModel model = ResourceModel.builder()

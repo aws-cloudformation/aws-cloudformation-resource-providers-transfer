@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.amazonaws.util.CollectionUtils;
-
-import lombok.NoArgsConstructor;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.ImportCertificateRequest;
 import software.amazon.awssdk.services.transfer.model.ImportCertificateResponse;
@@ -23,9 +20,13 @@ import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorExceptio
 import software.amazon.cloudformation.exceptions.CfnThrottlingException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import com.amazonaws.util.CollectionUtils;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class CreateHandler extends BaseHandler<CallbackContext> {
@@ -63,21 +64,24 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
                 .description(model.getDescription())
                 .usage(model.getUsage())
                 .privateKey(model.getPrivateKey())
-                .activeDate(model.getActiveDate() != null
-                        ? Instant.parse(model.getActiveDate().toString())
-                        : null)
-                .inactiveDate(model.getInactiveDate() != null
-                        ? Instant.parse(model.getInactiveDate().toString())
-                        : null)
-                .tags((CollectionUtils.isNullOrEmpty(model.getTags())) ? null
-                        : model.getTags()
-                                .stream()
-                                .map(Converter.TagConverter::toSdk)
-                                .collect(Collectors.toList()))
+                .activeDate(
+                        model.getActiveDate() != null
+                                ? Instant.parse(model.getActiveDate().toString())
+                                : null)
+                .inactiveDate(
+                        model.getInactiveDate() != null
+                                ? Instant.parse(model.getInactiveDate().toString())
+                                : null)
+                .tags(
+                        (CollectionUtils.isNullOrEmpty(model.getTags()))
+                                ? null
+                                : model.getTags().stream()
+                                        .map(Converter.TagConverter::toSdk)
+                                        .collect(Collectors.toList()))
                 .build();
         try {
-            ImportCertificateResponse response = proxy.injectCredentialsAndInvokeV2(importCertificateRequest,
-                    client::importCertificate);
+            ImportCertificateResponse response =
+                    proxy.injectCredentialsAndInvokeV2(importCertificateRequest, client::importCertificate);
             model.setCertificateId(response.certificateId());
             logger.log(String.format("%s created successfully", ResourceModel.TYPE_NAME));
         } catch (InvalidRequestException e) {

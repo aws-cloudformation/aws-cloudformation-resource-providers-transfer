@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static software.amazon.transfer.server.translators.ResourceModelAdapter.DEFAULT_ENDPOINT_TYPE;
 
 import java.util.Collection;
+
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.model.CreateServerRequest;
 import software.amazon.awssdk.services.transfer.model.CreateServerResponse;
 import software.amazon.awssdk.services.transfer.model.DescribeServerRequest;
@@ -34,7 +36,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(SoftAssertionsExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
 
-    @InjectSoftAssertions private SoftAssertions softly;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     private CreateHandler handler;
 
@@ -83,16 +86,12 @@ public class CreateHandlerTest extends AbstractTestBase {
             OperationStatus operationStatus) {
         setupCreateServerResponse();
 
-        DescribeServerResponse describeServerResponse =
-                describeServerFromModel("testServerId", postCreateState, model);
+        DescribeServerResponse describeServerResponse = describeServerFromModel("testServerId", postCreateState, model);
 
-        doReturn(describeServerResponse)
-                .when(sdkClient)
-                .describeServer(any(DescribeServerRequest.class));
+        doReturn(describeServerResponse).when(sdkClient).describeServer(any(DescribeServerRequest.class));
 
         ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(
-                        proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(operationStatus);
@@ -109,15 +108,11 @@ public class CreateHandlerTest extends AbstractTestBase {
                 getResourceHandlerRequestBuilder().desiredResourceState(model).build();
 
         softly.assertThatThrownBy(
-                        () ->
-                                createServerAndAssertStatus(
-                                        model, request, "START_FAILED", OperationStatus.FAILED))
+                        () -> createServerAndAssertStatus(model, request, "START_FAILED", OperationStatus.FAILED))
                 .isInstanceOf(CfnNotStabilizedException.class);
 
         softly.assertThatThrownBy(
-                        () ->
-                                createServerAndAssertStatus(
-                                        model, request, "STOP_FAILED", OperationStatus.FAILED))
+                        () -> createServerAndAssertStatus(model, request, "STOP_FAILED", OperationStatus.FAILED))
                 .isInstanceOf(CfnNotStabilizedException.class);
 
         verify(sdkClient, atLeastOnce()).createServer(any(CreateServerRequest.class));
@@ -141,26 +136,21 @@ public class CreateHandlerTest extends AbstractTestBase {
         DescribedServer initialServerState =
                 describeServerFromModel(model.getServerId(), "ONLINE", model).server();
 
-        EndpointDetails noAddrAllocIds =
-                initialServerState
-                        .endpointDetails()
-                        .toBuilder()
-                        .addressAllocationIds((Collection<String>) null)
-                        .build();
+        EndpointDetails noAddrAllocIds = initialServerState.endpointDetails().toBuilder()
+                .addressAllocationIds((Collection<String>) null)
+                .build();
 
-        initialServerState = initialServerState.toBuilder().endpointDetails(noAddrAllocIds).build();
+        initialServerState =
+                initialServerState.toBuilder().endpointDetails(noAddrAllocIds).build();
 
         DescribeServerResponse initialState =
                 DescribeServerResponse.builder().server(initialServerState).build();
-        DescribeServerResponse finalStateResponse =
-                describeServerFromModel(model.getServerId(), "ONLINE", model);
+        DescribeServerResponse finalStateResponse = describeServerFromModel(model.getServerId(), "ONLINE", model);
 
         DescribeServerResponse stoppingServerResponse = newStateResponse(initialState, "STOPPING");
         DescribeServerResponse offlineServerResponse = newStateResponse(initialState, "OFFLINE");
-        DescribeServerResponse updatedServerResponse =
-                newStateResponse(finalStateResponse, "OFFLINE");
-        DescribeServerResponse startingServerResponse =
-                newStateResponse(finalStateResponse, "STARTING");
+        DescribeServerResponse updatedServerResponse = newStateResponse(finalStateResponse, "OFFLINE");
+        DescribeServerResponse startingServerResponse = newStateResponse(finalStateResponse, "STARTING");
 
         doReturn(
                         initialState,
@@ -174,8 +164,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .describeServer(any(DescribeServerRequest.class));
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(
-                        proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -204,16 +193,13 @@ public class CreateHandlerTest extends AbstractTestBase {
         doThrow(ex1).doThrow(ex2).when(sdkClient).describeServer(any(DescribeServerRequest.class));
 
         ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(
-                        proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
 
         // We expect the throttling exception to be retried, the result should be IN_PROGRESS
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.IN_PROGRESS);
 
-        response =
-                handler.handleRequest(
-                        proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
+        response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
 
         // Then the InvalidRequest happens
         assertThat(response).isNotNull();

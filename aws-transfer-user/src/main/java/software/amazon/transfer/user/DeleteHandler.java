@@ -26,25 +26,16 @@ public class DeleteHandler extends BaseHandlerStd {
         Translator.ensureServerIdAndUserNameInModel(newModel);
 
         return ProgressEvent.progress(newModel, callbackContext)
-                .then(
-                        progress ->
-                                proxy.initiate(
-                                                "AWS-Transfer-User::Delete",
-                                                proxyClient,
-                                                progress.getResourceModel(),
-                                                progress.getCallbackContext())
-                                        .translateToServiceRequest(
-                                                DeleteHandler::translateToDeleteRequest)
-                                        .makeServiceCall(this::deleteUser)
-                                        .handleError(
-                                                (ignored, exception, client, model, context) ->
-                                                        handleError(
-                                                                DELETE,
-                                                                exception,
-                                                                model,
-                                                                context,
-                                                                clientRequestToken))
-                                        .progress())
+                .then(progress -> proxy.initiate(
+                                "AWS-Transfer-User::Delete",
+                                proxyClient,
+                                progress.getResourceModel(),
+                                progress.getCallbackContext())
+                        .translateToServiceRequest(DeleteHandler::translateToDeleteRequest)
+                        .makeServiceCall(this::deleteUser)
+                        .handleError((ignored, exception, client, model, context) ->
+                                handleError(DELETE, exception, model, context, clientRequestToken))
+                        .progress())
                 .then(progress -> ProgressEvent.defaultSuccessHandler(null));
     }
 
@@ -55,11 +46,9 @@ public class DeleteHandler extends BaseHandlerStd {
                 .build();
     }
 
-    private DeleteUserResponse deleteUser(
-            DeleteUserRequest request, ProxyClient<TransferClient> client) {
+    private DeleteUserResponse deleteUser(DeleteUserRequest request, ProxyClient<TransferClient> client) {
         try (TransferClient transferClient = client.client()) {
-            DeleteUserResponse response =
-                    client.injectCredentialsAndInvokeV2(request, transferClient::deleteUser);
+            DeleteUserResponse response = client.injectCredentialsAndInvokeV2(request, transferClient::deleteUser);
             log("successfully deleted.", userIdentifier(request.serverId(), request.userName()));
             return response;
         }

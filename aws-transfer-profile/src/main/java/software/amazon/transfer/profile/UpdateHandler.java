@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
 
-import lombok.NoArgsConstructor;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
@@ -23,9 +22,11 @@ import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class UpdateHandler extends BaseHandler<CallbackContext> {
@@ -52,11 +53,9 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
                 .certificateIds(model.getCertificateIds())
                 .build();
 
-        String arn = String.format("arn:%s:transfer:%s:%s:profile/%s",
-                request.getAwsPartition(),
-                request.getRegion(),
-                request.getAwsAccountId(),
-                model.getProfileId());
+        String arn = String.format(
+                "arn:%s:transfer:%s:%s:profile/%s",
+                request.getAwsPartition(), request.getRegion(), request.getAwsAccountId(), model.getProfileId());
 
         Map<String, String> allDesiredTagsMap = new HashMap<>();
         if (request.getDesiredResourceTags() != null) {
@@ -80,7 +79,9 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
             if (!tagsToAdd.isEmpty()) {
                 TagResourceRequest tagResourceRequest = TagResourceRequest.builder()
                         .arn(arn)
-                        .tags(tagsToAdd.stream().map(Converter.TagConverter::toSdk).collect(Collectors.toList()))
+                        .tags(tagsToAdd.stream()
+                                .map(Converter.TagConverter::toSdk)
+                                .collect(Collectors.toList()))
                         .build();
                 proxy.injectCredentialsAndInvokeV2(tagResourceRequest, client::tagResource);
             }
@@ -93,9 +94,8 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
                 proxy.injectCredentialsAndInvokeV2(unTagResourceRequest, client::untagResource);
             }
 
-            logger.log(String.format("%s %s updated tags successfully",
-                    ResourceModel.TYPE_NAME,
-                    model.getPrimaryIdentifier()));
+            logger.log(String.format(
+                    "%s %s updated tags successfully", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier()));
 
         } catch (InvalidRequestException e) {
             throw new CfnInvalidRequestException(e.getMessage() + " " + request.toString(), e);
@@ -109,8 +109,8 @@ public class UpdateHandler extends BaseHandler<CallbackContext> {
         }
 
         return ProgressEvent.<ResourceModel, CallbackContext>builder()
-            .resourceModel(model)
-            .status(OperationStatus.SUCCESS)
-            .build();
+                .resourceModel(model)
+                .status(OperationStatus.SUCCESS)
+                .build();
     }
 }

@@ -4,10 +4,9 @@ import static software.amazon.transfer.server.translators.ResourceModelAdapter.p
 import static software.amazon.transfer.server.translators.Translator.translateToSdkProtocols;
 import static software.amazon.transfer.server.translators.Translator.translateToSdkTags;
 
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
 import java.util.List;
 import java.util.Objects;
+
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateServerRequest;
@@ -27,6 +26,9 @@ import software.amazon.transfer.server.translators.ProtocolDetailsTranslator;
 import software.amazon.transfer.server.translators.ServerArn;
 import software.amazon.transfer.server.translators.WorkflowDetailsTranslator;
 
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+
 public class CreateHandler extends BaseHandlerStd {
 
     @Override
@@ -45,53 +47,25 @@ public class CreateHandler extends BaseHandlerStd {
         prepareDesiredResourceModel(request, newModel);
 
         return ProgressEvent.progress(newModel, callbackContext)
-                .then(
-                        progress ->
-                                proxy.initiate(
-                                                "AWS-Transfer-Server::Create",
-                                                proxyClient,
-                                                progress.getResourceModel(),
-                                                progress.getCallbackContext())
-                                        .translateToServiceRequest(this::translateToCreateRequest)
-                                        .makeServiceCall(this::createServer)
-                                        .stabilize(
-                                                (createRequest,
-                                                        createResponse,
-                                                        client,
-                                                        model,
-                                                        context) ->
-                                                        stabilizeAfterCreate(
-                                                                request,
-                                                                createResponse,
-                                                                client,
-                                                                proxyEc2Client,
-                                                                model,
-                                                                context))
-                                        .handleError(
-                                                (ignored, exception, client, model, context) ->
-                                                        handleError(
-                                                                CREATE,
-                                                                exception,
-                                                                model,
-                                                                context,
-                                                                clientRequestToken))
-                                        .progress())
-                .then(
-                        progress ->
-                                new ReadHandler()
-                                        .handleRequest(
-                                                proxy,
-                                                request,
-                                                callbackContext,
-                                                proxyClient,
-                                                proxyEc2Client,
-                                                logger));
+                .then(progress -> proxy.initiate(
+                                "AWS-Transfer-Server::Create",
+                                proxyClient,
+                                progress.getResourceModel(),
+                                progress.getCallbackContext())
+                        .translateToServiceRequest(this::translateToCreateRequest)
+                        .makeServiceCall(this::createServer)
+                        .stabilize((createRequest, createResponse, client, model, context) ->
+                                stabilizeAfterCreate(request, createResponse, client, proxyEc2Client, model, context))
+                        .handleError((ignored, exception, client, model, context) ->
+                                handleError(CREATE, exception, model, context, clientRequestToken))
+                        .progress())
+                .then(progress -> new ReadHandler()
+                        .handleRequest(proxy, request, callbackContext, proxyClient, proxyEc2Client, logger));
     }
 
     private CreateServerRequest translateToCreateRequest(final ResourceModel model) {
 
-        EndpointDetails endpointDetails =
-                EndpointDetailsTranslator.toSdk(model.getEndpointDetails(), true, false);
+        EndpointDetails endpointDetails = EndpointDetailsTranslator.toSdk(model.getEndpointDetails(), true, false);
 
         return CreateServerRequest.builder()
                 .certificate(model.getCertificate())
@@ -99,8 +73,7 @@ public class CreateHandler extends BaseHandlerStd {
                 .endpointType(model.getEndpointType())
                 .endpointDetails(endpointDetails)
                 .identityProviderType(model.getIdentityProviderType())
-                .identityProviderDetails(
-                        IdentityProviderDetailsTranslator.toSdk(model.getIdentityProviderDetails()))
+                .identityProviderDetails(IdentityProviderDetailsTranslator.toSdk(model.getIdentityProviderDetails()))
                 .loggingRole(model.getLoggingRole())
                 .preAuthenticationLoginBanner(model.getPreAuthenticationLoginBanner())
                 .postAuthenticationLoginBanner(model.getPostAuthenticationLoginBanner())
@@ -113,8 +86,7 @@ public class CreateHandler extends BaseHandlerStd {
                 .build();
     }
 
-    private CreateServerResponse createServer(
-            CreateServerRequest awsRequest, ProxyClient<TransferClient> client) {
+    private CreateServerResponse createServer(CreateServerRequest awsRequest, ProxyClient<TransferClient> client) {
         try (TransferClient transferClient = client.client()) {
             CreateServerResponse awsResponse =
                     client.injectCredentialsAndInvokeV2(awsRequest, transferClient::createServer);
@@ -184,15 +156,13 @@ public class CreateHandler extends BaseHandlerStd {
 
     private void updateServerWithAddressAllocationIds(
             ProxyClient<TransferClient> client, String serverId, ResourceModel model) {
-        EndpointDetails endpointDetails =
-                EndpointDetailsTranslator.toSdk(model.getEndpointDetails(), false, true);
+        EndpointDetails endpointDetails = EndpointDetailsTranslator.toSdk(model.getEndpointDetails(), false, true);
         updateServerEndpointDetails(client, serverId, endpointDetails);
     }
 
     private boolean addressAllocationIdAssociationRequested(ResourceModel model) {
         return isVpcServerEndpoint(model)
                 && model.getEndpointDetails() != null
-                && !CollectionUtils.isNullOrEmpty(
-                        model.getEndpointDetails().getAddressAllocationIds());
+                && !CollectionUtils.isNullOrEmpty(model.getEndpointDetails().getAddressAllocationIds());
     }
 }

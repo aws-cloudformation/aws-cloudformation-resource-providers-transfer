@@ -11,8 +11,8 @@ import software.amazon.awssdk.services.transfer.model.DecryptStepDetails;
 import software.amazon.awssdk.services.transfer.model.DeleteStepDetails;
 import software.amazon.awssdk.services.transfer.model.EfsFileLocation;
 import software.amazon.awssdk.services.transfer.model.InputFileLocation;
-import software.amazon.awssdk.services.transfer.model.S3Tag;
 import software.amazon.awssdk.services.transfer.model.S3InputFileLocation;
+import software.amazon.awssdk.services.transfer.model.S3Tag;
 import software.amazon.awssdk.services.transfer.model.Tag;
 import software.amazon.awssdk.services.transfer.model.TagStepDetails;
 import software.amazon.awssdk.services.transfer.model.WorkflowStep;
@@ -20,15 +20,11 @@ import software.amazon.awssdk.services.transfer.model.WorkflowStepType;
 
 public class Converter {
     static class TagConverter {
-        static Tag toSdk(
-                software.amazon.transfer.workflow.Tag tag) {
+        static Tag toSdk(software.amazon.transfer.workflow.Tag tag) {
             if (tag == null) {
                 return null;
             }
-            return Tag.builder()
-                    .key(tag.getKey())
-                    .value(tag.getValue())
-                    .build();
+            return Tag.builder().key(tag.getKey()).value(tag.getValue()).build();
         }
 
         static Set<software.amazon.transfer.workflow.Tag> translateTagfromMap(Map<String, String> tags) {
@@ -36,8 +32,7 @@ public class Converter {
                 return Collections.emptySet();
             }
 
-            return tags.entrySet()
-                    .stream()
+            return tags.entrySet().stream()
                     .map(tag -> software.amazon.transfer.workflow.Tag.builder()
                             .key(tag.getKey())
                             .value(tag.getValue())
@@ -57,8 +52,7 @@ public class Converter {
     }
 
     static class WorkflowStepConverter {
-        static WorkflowStep toSdk(
-                software.amazon.transfer.workflow.WorkflowStep workflowStep) {
+        static WorkflowStep toSdk(software.amazon.transfer.workflow.WorkflowStep workflowStep) {
             if (workflowStep == null) {
                 return null;
             }
@@ -71,17 +65,29 @@ public class Converter {
                 sdkWorkflowStep.copyStepDetails(CopyStepDetails.builder()
                         .name(workflowStep.getCopyStepDetails().getName())
                         .destinationFileLocation(
-                                (workflowStep.getCopyStepDetails().getDestinationFileLocation() == null) ?
-                                        null : InputFileLocation.builder()
-                                        .s3FileLocation((workflowStep.getCopyStepDetails()
-                                                .getDestinationFileLocation().getS3FileLocation() == null) ?
-                                                null : S3InputFileLocation.builder()
-                                                .bucket(workflowStep.getCopyStepDetails().getDestinationFileLocation()
-                                                        .getS3FileLocation().getBucket())
-                                                .key(workflowStep.getCopyStepDetails().getDestinationFileLocation()
-                                                        .getS3FileLocation().getKey())
+                                (workflowStep.getCopyStepDetails().getDestinationFileLocation() == null)
+                                        ? null
+                                        : InputFileLocation.builder()
+                                                .s3FileLocation(
+                                                        (workflowStep
+                                                                                .getCopyStepDetails()
+                                                                                .getDestinationFileLocation()
+                                                                                .getS3FileLocation()
+                                                                        == null)
+                                                                ? null
+                                                                : S3InputFileLocation.builder()
+                                                                        .bucket(workflowStep
+                                                                                .getCopyStepDetails()
+                                                                                .getDestinationFileLocation()
+                                                                                .getS3FileLocation()
+                                                                                .getBucket())
+                                                                        .key(workflowStep
+                                                                                .getCopyStepDetails()
+                                                                                .getDestinationFileLocation()
+                                                                                .getS3FileLocation()
+                                                                                .getKey())
+                                                                        .build())
                                                 .build())
-                                        .build())
                         .overwriteExisting(workflowStep.getCopyStepDetails().getOverwriteExisting())
                         .sourceFileLocation(workflowStep.getCopyStepDetails().getSourceFileLocation())
                         .build());
@@ -91,32 +97,60 @@ public class Converter {
                 EfsFileLocation efsFileLocation = null;
 
                 if (workflowStep.getDecryptStepDetails().getDestinationFileLocation() != null
-                        && workflowStep.getDecryptStepDetails().getDestinationFileLocation().getS3FileLocation() != null) {
-                        s3InputFileLocation = (workflowStep.getDecryptStepDetails()
-                                .getDestinationFileLocation().getS3FileLocation() == null) ?
-                                null : S3InputFileLocation.builder()
-                                .bucket(workflowStep.getDecryptStepDetails().getDestinationFileLocation()
-                                        .getS3FileLocation().getBucket())
-                                .key(workflowStep.getDecryptStepDetails().getDestinationFileLocation()
-                                        .getS3FileLocation().getKey())
-                                .build();
+                        && workflowStep
+                                        .getDecryptStepDetails()
+                                        .getDestinationFileLocation()
+                                        .getS3FileLocation()
+                                != null) {
+                    s3InputFileLocation = (workflowStep
+                                            .getDecryptStepDetails()
+                                            .getDestinationFileLocation()
+                                            .getS3FileLocation()
+                                    == null)
+                            ? null
+                            : S3InputFileLocation.builder()
+                                    .bucket(workflowStep
+                                            .getDecryptStepDetails()
+                                            .getDestinationFileLocation()
+                                            .getS3FileLocation()
+                                            .getBucket())
+                                    .key(workflowStep
+                                            .getDecryptStepDetails()
+                                            .getDestinationFileLocation()
+                                            .getS3FileLocation()
+                                            .getKey())
+                                    .build();
                 }
 
                 if (workflowStep.getDecryptStepDetails().getDestinationFileLocation() != null
-                        && workflowStep.getDecryptStepDetails().getDestinationFileLocation().getEfsFileLocation() != null) {
-                        efsFileLocation = (workflowStep.getDecryptStepDetails()
-                                .getDestinationFileLocation().getEfsFileLocation() == null) ?
-                                null : EfsFileLocation.builder()
-                                .fileSystemId(workflowStep.getDecryptStepDetails().getDestinationFileLocation()
-                                        .getEfsFileLocation().getFileSystemId())
-                                .path(workflowStep.getDecryptStepDetails().getDestinationFileLocation()
-                                        .getEfsFileLocation().getPath())
-                                .build();
+                        && workflowStep
+                                        .getDecryptStepDetails()
+                                        .getDestinationFileLocation()
+                                        .getEfsFileLocation()
+                                != null) {
+                    efsFileLocation = (workflowStep
+                                            .getDecryptStepDetails()
+                                            .getDestinationFileLocation()
+                                            .getEfsFileLocation()
+                                    == null)
+                            ? null
+                            : EfsFileLocation.builder()
+                                    .fileSystemId(workflowStep
+                                            .getDecryptStepDetails()
+                                            .getDestinationFileLocation()
+                                            .getEfsFileLocation()
+                                            .getFileSystemId())
+                                    .path(workflowStep
+                                            .getDecryptStepDetails()
+                                            .getDestinationFileLocation()
+                                            .getEfsFileLocation()
+                                            .getPath())
+                                    .build();
                 }
                 InputFileLocation inputFileLocation = InputFileLocation.builder()
-                                .s3FileLocation(s3InputFileLocation)
-                                .efsFileLocation(efsFileLocation)
-                                .build();
+                        .s3FileLocation(s3InputFileLocation)
+                        .efsFileLocation(efsFileLocation)
+                        .build();
 
                 sdkWorkflowStep.decryptStepDetails(DecryptStepDetails.builder()
                         .name(workflowStep.getDecryptStepDetails().getName())
@@ -126,7 +160,7 @@ public class Converter {
                         .sourceFileLocation(workflowStep.getDecryptStepDetails().getSourceFileLocation())
                         .build());
             }
-            if (WorkflowStepType.CUSTOM.toString().equals(type) && workflowStep.getCustomStepDetails() !=null) {
+            if (WorkflowStepType.CUSTOM.toString().equals(type) && workflowStep.getCustomStepDetails() != null) {
                 sdkWorkflowStep.customStepDetails(CustomStepDetails.builder()
                         .name(workflowStep.getCustomStepDetails().getName())
                         .target(workflowStep.getCustomStepDetails().getTarget())
@@ -143,11 +177,12 @@ public class Converter {
             if (WorkflowStepType.TAG.toString().equals(type) && workflowStep.getTagStepDetails() != null) {
                 sdkWorkflowStep.tagStepDetails(TagStepDetails.builder()
                         .name(workflowStep.getTagStepDetails().getName())
-                        .tags((workflowStep.getTagStepDetails().getTags() == null) ?
-                                null : workflowStep.getTagStepDetails().getTags()
-                                .stream()
-                                .map(S3TagConverter::toSdk)
-                                .collect(Collectors.toList()))
+                        .tags(
+                                (workflowStep.getTagStepDetails().getTags() == null)
+                                        ? null
+                                        : workflowStep.getTagStepDetails().getTags().stream()
+                                                .map(S3TagConverter::toSdk)
+                                                .collect(Collectors.toList()))
                         .sourceFileLocation(workflowStep.getTagStepDetails().getSourceFileLocation())
                         .build());
             }
@@ -170,20 +205,30 @@ public class Converter {
                 software.amazon.transfer.workflow.CopyStepDetails copyStepDetails =
                         software.amazon.transfer.workflow.CopyStepDetails.builder()
                                 .name(workflowStep.copyStepDetails().name())
-                                .overwriteExisting(workflowStep.copyStepDetails().overwriteExisting().toString())
-                                .sourceFileLocation(workflowStep.copyStepDetails().sourceFileLocation())
+                                .overwriteExisting(workflowStep
+                                        .copyStepDetails()
+                                        .overwriteExisting()
+                                        .toString())
+                                .sourceFileLocation(
+                                        workflowStep.copyStepDetails().sourceFileLocation())
                                 .build();
                 if (workflowStep.copyStepDetails().destinationFileLocation() != null) {
                     software.amazon.transfer.workflow.S3FileLocation s3FileLocation =
-                            software.amazon.transfer.workflow.S3FileLocation.builder().build();
+                            software.amazon.transfer.workflow.S3FileLocation.builder()
+                                    .build();
                     if (workflowStep.copyStepDetails().destinationFileLocation().s3FileLocation() != null) {
-                        s3FileLocation.setS3FileLocation(
-                                software.amazon.transfer.workflow.S3InputFileLocation.builder()
-                                        .bucket(workflowStep.copyStepDetails().destinationFileLocation()
-                                                .s3FileLocation().bucket())
-                                        .key(workflowStep.copyStepDetails().destinationFileLocation()
-                                                .s3FileLocation().key())
-                                        .build());
+                        s3FileLocation.setS3FileLocation(software.amazon.transfer.workflow.S3InputFileLocation.builder()
+                                .bucket(workflowStep
+                                        .copyStepDetails()
+                                        .destinationFileLocation()
+                                        .s3FileLocation()
+                                        .bucket())
+                                .key(workflowStep
+                                        .copyStepDetails()
+                                        .destinationFileLocation()
+                                        .s3FileLocation()
+                                        .key())
+                                .build());
                     }
                     copyStepDetails.setDestinationFileLocation(s3FileLocation);
                 }
@@ -194,35 +239,60 @@ public class Converter {
                         software.amazon.transfer.workflow.DecryptStepDetails.builder()
                                 .name(workflowStep.decryptStepDetails().name())
                                 .type(workflowStep.decryptStepDetails().type().toString())
-                                .overwriteExisting(workflowStep.decryptStepDetails().overwriteExisting().toString())
-                                .sourceFileLocation(workflowStep.decryptStepDetails().sourceFileLocation())
+                                .overwriteExisting(workflowStep
+                                        .decryptStepDetails()
+                                        .overwriteExisting()
+                                        .toString())
+                                .sourceFileLocation(
+                                        workflowStep.decryptStepDetails().sourceFileLocation())
                                 .build();
                 if (workflowStep.decryptStepDetails().destinationFileLocation() != null) {
                     software.amazon.transfer.workflow.InputFileLocation inputFileLocation =
-                            software.amazon.transfer.workflow.InputFileLocation.builder().build();
-                    if (workflowStep.decryptStepDetails().destinationFileLocation().s3FileLocation() != null) {
+                            software.amazon.transfer.workflow.InputFileLocation.builder()
+                                    .build();
+                    if (workflowStep
+                                    .decryptStepDetails()
+                                    .destinationFileLocation()
+                                    .s3FileLocation()
+                            != null) {
                         inputFileLocation.setS3FileLocation(
                                 software.amazon.transfer.workflow.S3InputFileLocation.builder()
-                                        .bucket(workflowStep.decryptStepDetails().destinationFileLocation()
-                                                .s3FileLocation().bucket())
-                                        .key(workflowStep.decryptStepDetails().destinationFileLocation()
-                                                .s3FileLocation().key())
+                                        .bucket(workflowStep
+                                                .decryptStepDetails()
+                                                .destinationFileLocation()
+                                                .s3FileLocation()
+                                                .bucket())
+                                        .key(workflowStep
+                                                .decryptStepDetails()
+                                                .destinationFileLocation()
+                                                .s3FileLocation()
+                                                .key())
                                         .build());
                     }
-                    if (workflowStep.decryptStepDetails().destinationFileLocation().efsFileLocation() != null) {
+                    if (workflowStep
+                                    .decryptStepDetails()
+                                    .destinationFileLocation()
+                                    .efsFileLocation()
+                            != null) {
                         inputFileLocation.setEfsFileLocation(
                                 software.amazon.transfer.workflow.EfsInputFileLocation.builder()
-                                        .fileSystemId(workflowStep.decryptStepDetails().destinationFileLocation()
-                                                .efsFileLocation().fileSystemId())
-                                        .path(workflowStep.decryptStepDetails().destinationFileLocation()
-                                                .efsFileLocation().path())
+                                        .fileSystemId(workflowStep
+                                                .decryptStepDetails()
+                                                .destinationFileLocation()
+                                                .efsFileLocation()
+                                                .fileSystemId())
+                                        .path(workflowStep
+                                                .decryptStepDetails()
+                                                .destinationFileLocation()
+                                                .efsFileLocation()
+                                                .path())
                                         .build());
                     }
                     decryptStepDetails.setDestinationFileLocation(inputFileLocation);
                 }
                 modelWorkflowStep.setDecryptStepDetails(decryptStepDetails);
             }
-            if (workflowStep.customStepDetails() !=null) {
+            if (workflowStep.customStepDetails() != null) {
                 modelWorkflowStep.setCustomStepDetails(software.amazon.transfer.workflow.CustomStepDetails.builder()
                         .name(workflowStep.customStepDetails().name())
                         .target(workflowStep.customStepDetails().target())
@@ -239,8 +309,7 @@ public class Converter {
             if (workflowStep.tagStepDetails() != null) {
                 modelWorkflowStep.setTagStepDetails(software.amazon.transfer.workflow.TagStepDetails.builder()
                         .name(workflowStep.tagStepDetails().name())
-                        .tags(workflowStep.tagStepDetails().tags()
-                                .stream()
+                        .tags(workflowStep.tagStepDetails().tags().stream()
                                 .map(S3TagConverter::fromSdk)
                                 .collect(Collectors.toSet()))
                         .sourceFileLocation(workflowStep.tagStepDetails().sourceFileLocation())
@@ -251,15 +320,11 @@ public class Converter {
     }
 
     private static class S3TagConverter {
-        static S3Tag toSdk(
-                software.amazon.transfer.workflow.S3Tag s3tag) {
+        static S3Tag toSdk(software.amazon.transfer.workflow.S3Tag s3tag) {
             if (s3tag == null) {
                 return null;
             }
-            return S3Tag.builder()
-                    .key(s3tag.getKey())
-                    .value(s3tag.getValue())
-                    .build();
+            return S3Tag.builder().key(s3tag.getKey()).value(s3tag.getValue()).build();
         }
 
         static software.amazon.transfer.workflow.S3Tag fromSdk(S3Tag s3tag) {

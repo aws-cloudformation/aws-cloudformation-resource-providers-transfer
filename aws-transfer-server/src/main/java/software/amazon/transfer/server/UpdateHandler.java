@@ -12,7 +12,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
+
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.ModifyVpcEndpointRequest;
 import software.amazon.awssdk.services.ec2.model.ModifyVpcEndpointResponse;
@@ -59,56 +61,28 @@ public class UpdateHandler extends BaseHandlerStd {
         preparePreviousResourceModel(request, oldModel);
 
         return ProgressEvent.progress(request.getDesiredResourceState(), callbackContext)
-                .then(
-                        progress ->
-                                initialUpdate(
-                                        progress,
-                                        oldModel,
-                                        newModel,
-                                        proxy,
-                                        proxyClient,
-                                        proxyEc2Client,
-                                        callbackContext,
-                                        clientRequestToken))
-                .then(
-                        progress ->
-                                updateSecurityGroups(
-                                        progress,
-                                        oldModel,
-                                        newModel,
-                                        proxy,
-                                        proxyClient,
-                                        proxyEc2Client,
-                                        callbackContext,
-                                        clientRequestToken))
-                .then(
-                        progress ->
-                                addTags(
-                                        progress,
-                                        request,
-                                        newModel,
-                                        proxy,
-                                        proxyClient,
-                                        callbackContext))
-                .then(
-                        progress ->
-                                removeTags(
-                                        progress,
-                                        request,
-                                        newModel,
-                                        proxy,
-                                        proxyClient,
-                                        callbackContext))
-                .then(
-                        progress ->
-                                new ReadHandler()
-                                        .handleRequest(
-                                                proxy,
-                                                request,
-                                                callbackContext,
-                                                proxyClient,
-                                                proxyEc2Client,
-                                                logger));
+                .then(progress -> initialUpdate(
+                        progress,
+                        oldModel,
+                        newModel,
+                        proxy,
+                        proxyClient,
+                        proxyEc2Client,
+                        callbackContext,
+                        clientRequestToken))
+                .then(progress -> updateSecurityGroups(
+                        progress,
+                        oldModel,
+                        newModel,
+                        proxy,
+                        proxyClient,
+                        proxyEc2Client,
+                        callbackContext,
+                        clientRequestToken))
+                .then(progress -> addTags(progress, request, newModel, proxy, proxyClient, callbackContext))
+                .then(progress -> removeTags(progress, request, newModel, proxy, proxyClient, callbackContext))
+                .then(progress -> new ReadHandler()
+                        .handleRequest(proxy, request, callbackContext, proxyClient, proxyEc2Client, logger));
     }
 
     private ProgressEvent<ResourceModel, CallbackContext> initialUpdate(
@@ -128,18 +102,10 @@ public class UpdateHandler extends BaseHandlerStd {
                         progress.getCallbackContext())
                 .translateToServiceRequest(m -> translateToFirstUpdateRequest(oldModel, newModel))
                 .makeServiceCall(this::updateServer)
-                .stabilize(
-                        (awsRequest, awsResponse, client, model, context) ->
-                                stabilizeAfterUpdate(
-                                        awsResponse,
-                                        client,
-                                        proxyEc2Client,
-                                        model,
-                                        oldModel,
-                                        context))
-                .handleError(
-                        (ignored, exception, client, model, context) ->
-                                handleError(UPDATE, exception, model, context, clientRequestToken))
+                .stabilize((awsRequest, awsResponse, client, model, context) ->
+                        stabilizeAfterUpdate(awsResponse, client, proxyEc2Client, model, oldModel, context))
+                .handleError((ignored, exception, client, model, context) ->
+                        handleError(UPDATE, exception, model, context, clientRequestToken))
                 .progress();
     }
 
@@ -160,12 +126,11 @@ public class UpdateHandler extends BaseHandlerStd {
         DescribedServer describedServer = describeServer(client, model);
 
         List<String> proposedSubnetIds =
-                Optional.ofNullable(model.getEndpointDetails().getSubnetIds())
-                        .orElse(Collections.emptyList());
+                Optional.ofNullable(model.getEndpointDetails().getSubnetIds()).orElse(Collections.emptyList());
         List<String> currentSubnetIds = describedServer.endpointDetails().subnetIds();
-        List<String> proposedAddressAllocationIds =
-                Optional.ofNullable(model.getEndpointDetails().getAddressAllocationIds())
-                        .orElse(Collections.emptyList());
+        List<String> proposedAddressAllocationIds = Optional.ofNullable(
+                        model.getEndpointDetails().getAddressAllocationIds())
+                .orElse(Collections.emptyList());
         List<String> currentAddressAllocationIds =
                 describedServer.endpointDetails().addressAllocationIds();
 
@@ -173,25 +138,24 @@ public class UpdateHandler extends BaseHandlerStd {
         switch (state) {
             case OFFLINE:
                 if (!Objects.equals(proposedSubnetIds, currentSubnetIds)) {
-                    EndpointDetails removeAddressAllocationIds =
-                            EndpointDetails.builder()
-                                    .addressAllocationIds(Collections.emptyList())
-                                    .build();
+                    EndpointDetails removeAddressAllocationIds = EndpointDetails.builder()
+                            .addressAllocationIds(Collections.emptyList())
+                            .build();
                     updateServerEndpointDetails(client, serverId, removeAddressAllocationIds);
 
-                    EndpointDetails updateSubnets =
-                            EndpointDetails.builder().subnetIds(proposedSubnetIds).build();
+                    EndpointDetails updateSubnets = EndpointDetails.builder()
+                            .subnetIds(proposedSubnetIds)
+                            .build();
                     log("VPC endpoint subnetIds are being updated.", serverId);
                     updateServerEndpointDetails(client, serverId, updateSubnets);
                     return false;
                 }
 
                 if (!Objects.equals(proposedAddressAllocationIds, currentAddressAllocationIds)) {
-                    EndpointDetails endpointDetails =
-                            EndpointDetails.builder()
-                                    .addressAllocationIds(proposedAddressAllocationIds)
-                                    .subnetIds(proposedSubnetIds)
-                                    .build();
+                    EndpointDetails endpointDetails = EndpointDetails.builder()
+                            .addressAllocationIds(proposedAddressAllocationIds)
+                            .subnetIds(proposedSubnetIds)
+                            .build();
                     log("EIP address allocation IDs are being updated.", serverId);
                     updateServerEndpointDetails(client, serverId, endpointDetails);
                     return false;
@@ -248,16 +212,14 @@ public class UpdateHandler extends BaseHandlerStd {
         Set<String> sgIdSet = new HashSet<>();
         Set<String> prevSgIdSet = new HashSet<>();
         if (isVpcServerEndpoint(oldModel)) {
-            prevSgIdSet =
-                    new HashSet<>(
-                            Optional.ofNullable(oldModel.getEndpointDetails().getSecurityGroupIds())
-                                    .orElse(Collections.emptyList()));
+            prevSgIdSet = new HashSet<>(
+                    Optional.ofNullable(oldModel.getEndpointDetails().getSecurityGroupIds())
+                            .orElse(Collections.emptyList()));
         }
         if (isVpcServerEndpoint(newModel)) {
-            sgIdSet =
-                    new HashSet<>(
-                            Optional.ofNullable(newModel.getEndpointDetails().getSecurityGroupIds())
-                                    .orElse(Collections.emptyList()));
+            sgIdSet = new HashSet<>(
+                    Optional.ofNullable(newModel.getEndpointDetails().getSecurityGroupIds())
+                            .orElse(Collections.emptyList()));
             ;
         }
 
@@ -275,28 +237,19 @@ public class UpdateHandler extends BaseHandlerStd {
                         proxyEc2Client,
                         progress.getResourceModel(),
                         progress.getCallbackContext())
-                .translateToServiceRequest(
-                        m -> modifyVpcEndpointRequest(vpcEndpointId, sgIdsToAdd, sgIdsToRemove))
-                .makeServiceCall(
-                        (awsRequest, client) -> {
-                            try (Ec2Client ec2Client = client.client()) {
-                                ModifyVpcEndpointResponse awsResponse =
-                                        client.injectCredentialsAndInvokeV2(
-                                                awsRequest, ec2Client::modifyVpcEndpoint);
-                                log(
-                                        "VPC Endpoint has successfully been updated.",
-                                        progress.getResourceModel().getServerId());
-                                return awsResponse;
-                            }
-                        })
-                .handleError(
-                        (ignored, exception, proxyClient1, model1, callbackContext1) ->
-                                handleError(
-                                        UPDATE,
-                                        exception,
-                                        model1,
-                                        callbackContext1,
-                                        clientRequestToken))
+                .translateToServiceRequest(m -> modifyVpcEndpointRequest(vpcEndpointId, sgIdsToAdd, sgIdsToRemove))
+                .makeServiceCall((awsRequest, client) -> {
+                    try (Ec2Client ec2Client = client.client()) {
+                        ModifyVpcEndpointResponse awsResponse =
+                                client.injectCredentialsAndInvokeV2(awsRequest, ec2Client::modifyVpcEndpoint);
+                        log(
+                                "VPC Endpoint has successfully been updated.",
+                                progress.getResourceModel().getServerId());
+                        return awsResponse;
+                    }
+                })
+                .handleError((ignored, exception, proxyClient1, model1, callbackContext1) ->
+                        handleError(UPDATE, exception, model1, callbackContext1, clientRequestToken))
                 .progress();
     }
 
@@ -316,27 +269,24 @@ public class UpdateHandler extends BaseHandlerStd {
      * @param newModel updated server model
      * @return awsRequest the aws service request to modify a resource
      */
-    private UpdateServerRequest translateToFirstUpdateRequest(
-            final ResourceModel oldModel, ResourceModel newModel) {
+    private UpdateServerRequest translateToFirstUpdateRequest(final ResourceModel oldModel, ResourceModel newModel) {
         EndpointType endpointType = EndpointType.valueOf(newModel.getEndpointType());
-        EndpointDetails endpointDetails =
-                EndpointDetailsTranslator.toSdk(newModel.getEndpointDetails(), false, true);
+        EndpointDetails endpointDetails = EndpointDetailsTranslator.toSdk(newModel.getEndpointDetails(), false, true);
 
         IdentityProviderDetails identityProviderDetails =
                 IdentityProviderDetailsTranslator.toSdk(newModel.getIdentityProviderDetails());
 
         if (isVpcServerEndpoint(oldModel) && isVpcServerEndpoint(newModel)) {
-            endpointDetails =
-                    endpointDetails.toBuilder().securityGroupIds((Collection<String>) null).build();
+            endpointDetails = endpointDetails.toBuilder()
+                    .securityGroupIds((Collection<String>) null)
+                    .build();
         }
 
         if (addressAllocationIdAssociationRequested(oldModel, newModel)) {
-            endpointDetails =
-                    endpointDetails
-                            .toBuilder()
-                            .addressAllocationIds((Collection<String>) null)
-                            .subnetIds((Collection<String>) null)
-                            .build();
+            endpointDetails = endpointDetails.toBuilder()
+                    .addressAllocationIds((Collection<String>) null)
+                    .subnetIds((Collection<String>) null)
+                    .build();
         }
 
         return UpdateServerRequest.builder()
@@ -352,20 +302,17 @@ public class UpdateHandler extends BaseHandlerStd {
                 .securityPolicyName(newModel.getSecurityPolicyName())
                 .serverId(newModel.getServerId())
                 .structuredLogDestinations(newModel.getStructuredLogDestinations())
-                .workflowDetails(
-                        WorkflowDetailsTranslator.toSdk(newModel.getWorkflowDetails(), true))
+                .workflowDetails(WorkflowDetailsTranslator.toSdk(newModel.getWorkflowDetails(), true))
                 .build();
     }
 
-    private boolean addressAllocationIdAssociationRequested(
-            ResourceModel oldModel, ResourceModel newModel) {
+    private boolean addressAllocationIdAssociationRequested(ResourceModel oldModel, ResourceModel newModel) {
         if (!isVpcServerEndpoint(newModel)) {
             return false;
         }
 
         if (!isVpcServerEndpoint(oldModel)) {
-            return !CollectionUtils.isNullOrEmpty(
-                    newModel.getEndpointDetails().getAddressAllocationIds());
+            return !CollectionUtils.isNullOrEmpty(newModel.getEndpointDetails().getAddressAllocationIds());
         }
 
         return !Objects.equals(
@@ -373,8 +320,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 oldModel.getEndpointDetails().getAddressAllocationIds());
     }
 
-    private UpdateServerResponse updateServer(
-            UpdateServerRequest awsRequest, ProxyClient<TransferClient> client) {
+    private UpdateServerResponse updateServer(UpdateServerRequest awsRequest, ProxyClient<TransferClient> client) {
         try (TransferClient transferClient = client.client()) {
             UpdateServerResponse awsResponse =
                     client.injectCredentialsAndInvokeV2(awsRequest, transferClient::updateServer);
@@ -406,9 +352,7 @@ public class UpdateHandler extends BaseHandlerStd {
             Map<String, String> tagsToAdd = TagHelper.generateTagsToAdd(previousTags, desiredTags);
 
             if (!tagsToAdd.isEmpty()) {
-                progress =
-                        tagResource(
-                                proxy, proxyClient, newModel, request, callbackContext, tagsToAdd);
+                progress = tagResource(proxy, proxyClient, newModel, request, callbackContext, tagsToAdd);
             }
         }
         return progress;
@@ -421,28 +365,20 @@ public class UpdateHandler extends BaseHandlerStd {
             final ResourceHandlerRequest<ResourceModel> request,
             final CallbackContext callbackContext,
             final Map<String, String> addedTags) {
-        logger.log(
-                String.format(
-                        "[UPDATE][IN PROGRESS] Going to add tags for Transfer server: %s with AccountId: %s",
-                        resourceModel.getServerId(), request.getAwsAccountId()));
+        logger.log(String.format(
+                "[UPDATE][IN PROGRESS] Going to add tags for Transfer server: %s with AccountId: %s",
+                resourceModel.getServerId(), request.getAwsAccountId()));
         final String clientRequestToken = request.getClientRequestToken();
 
-        return proxy.initiate(
-                        "AWS-Transfer-Server::TagOps",
-                        serviceClient,
-                        resourceModel,
-                        callbackContext)
+        return proxy.initiate("AWS-Transfer-Server::TagOps", serviceClient, resourceModel, callbackContext)
                 .translateToServiceRequest(model -> Translator.tagResourceRequest(model, addedTags))
-                .makeServiceCall(
-                        (tagRequest, client) -> {
-                            try (TransferClient transferClient = client.client()) {
-                                return client.injectCredentialsAndInvokeV2(
-                                        tagRequest, transferClient::tagResource);
-                            }
-                        })
-                .handleError(
-                        (ignored, exception, proxyClient, model, context) ->
-                                handleError(UPDATE, exception, model, context, clientRequestToken))
+                .makeServiceCall((tagRequest, client) -> {
+                    try (TransferClient transferClient = client.client()) {
+                        return client.injectCredentialsAndInvokeV2(tagRequest, transferClient::tagResource);
+                    }
+                })
+                .handleError((ignored, exception, proxyClient, model, context) ->
+                        handleError(UPDATE, exception, model, context, clientRequestToken))
                 .progress();
     }
 
@@ -457,18 +393,10 @@ public class UpdateHandler extends BaseHandlerStd {
 
             Map<String, String> previousTags = TagHelper.getPreviouslyAttachedTags(request);
             Map<String, String> desiredTags = TagHelper.getNewDesiredTags(request);
-            Set<String> tagsKeysToRemove =
-                    TagHelper.generateTagsToRemove(previousTags, desiredTags);
+            Set<String> tagsKeysToRemove = TagHelper.generateTagsToRemove(previousTags, desiredTags);
 
             if (!tagsKeysToRemove.isEmpty()) {
-                progress =
-                        untagResource(
-                                proxy,
-                                proxyClient,
-                                newModel,
-                                request,
-                                callbackContext,
-                                tagsKeysToRemove);
+                progress = untagResource(proxy, proxyClient, newModel, request, callbackContext, tagsKeysToRemove);
             }
         }
         return progress;
@@ -481,29 +409,20 @@ public class UpdateHandler extends BaseHandlerStd {
             final ResourceHandlerRequest<ResourceModel> request,
             final CallbackContext callbackContext,
             final Set<String> removedTags) {
-        logger.log(
-                String.format(
-                        "[UPDATE][IN PROGRESS] Going to remove tags for Transfer server: %s with AccountId: %s",
-                        resourceModel.getServerId(), request.getAwsAccountId()));
+        logger.log(String.format(
+                "[UPDATE][IN PROGRESS] Going to remove tags for Transfer server: %s with AccountId: %s",
+                resourceModel.getServerId(), request.getAwsAccountId()));
         final String clientRequestToken = request.getClientRequestToken();
 
-        return proxy.initiate(
-                        "AWS-Transfer-Server::TagOps",
-                        serviceClient,
-                        resourceModel,
-                        callbackContext)
-                .translateToServiceRequest(
-                        model -> Translator.untagResourceRequest(model, removedTags))
-                .makeServiceCall(
-                        (untagRequest, client) -> {
-                            try (TransferClient transferClient = client.client()) {
-                                return client.injectCredentialsAndInvokeV2(
-                                        untagRequest, transferClient::untagResource);
-                            }
-                        })
-                .handleError(
-                        (ignored, exception, proxyClient, model, context) ->
-                                handleError(UPDATE, exception, model, context, clientRequestToken))
+        return proxy.initiate("AWS-Transfer-Server::TagOps", serviceClient, resourceModel, callbackContext)
+                .translateToServiceRequest(model -> Translator.untagResourceRequest(model, removedTags))
+                .makeServiceCall((untagRequest, client) -> {
+                    try (TransferClient transferClient = client.client()) {
+                        return client.injectCredentialsAndInvokeV2(untagRequest, transferClient::untagResource);
+                    }
+                })
+                .handleError((ignored, exception, proxyClient, model, context) ->
+                        handleError(UPDATE, exception, model, context, clientRequestToken))
                 .progress();
     }
 }

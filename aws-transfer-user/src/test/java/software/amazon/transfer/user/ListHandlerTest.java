@@ -11,6 +11,7 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.transfer.model.HomeDirectoryType;
 import software.amazon.awssdk.services.transfer.model.ListUsersRequest;
 import software.amazon.awssdk.services.transfer.model.ListUsersResponse;
@@ -24,7 +25,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(SoftAssertionsExtension.class)
 public class ListHandlerTest extends AbstractTestBase {
 
-    @InjectSoftAssertions private SoftAssertions softly;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     private final ListHandler handler = new ListHandler();
 
@@ -36,19 +38,17 @@ public class ListHandlerTest extends AbstractTestBase {
         final ResourceHandlerRequest<ResourceModel> request =
                 requestBuilder().desiredResourceState(model).build();
 
-        ListUsersResponse listUsersResponse =
-                ListUsersResponse.builder()
-                        .serverId(model.getServerId())
-                        .users(
-                                ListedUser.builder()
-                                        .arn(model.getArn())
-                                        .userName(model.getUserName())
-                                        .homeDirectoryType(HomeDirectoryType.PATH)
-                                        .homeDirectory("/")
-                                        .sshPublicKeyCount(1)
-                                        .role("role")
-                                        .build())
-                        .build();
+        ListUsersResponse listUsersResponse = ListUsersResponse.builder()
+                .serverId(model.getServerId())
+                .users(ListedUser.builder()
+                        .arn(model.getArn())
+                        .userName(model.getUserName())
+                        .homeDirectoryType(HomeDirectoryType.PATH)
+                        .homeDirectory("/")
+                        .sshPublicKeyCount(1)
+                        .role("role")
+                        .build())
+                .build();
         doThrow(ThrottlingException.builder().build())
                 .doReturn(listUsersResponse)
                 .when(sdkClient)
@@ -59,12 +59,10 @@ public class ListHandlerTest extends AbstractTestBase {
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.IN_PROGRESS);
-        softly.assertThat(response.getCallbackDelaySeconds())
-                .isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
+        softly.assertThat(response.getCallbackDelaySeconds()).isEqualTo(THROTTLE_CALLBACK_DELAY_SECONDS);
 
         // Call again in response to ThrottleException
-        response =
-                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
+        response = handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getResourceModels()).size().isEqualTo(1);

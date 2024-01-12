@@ -10,8 +10,7 @@ import software.amazon.awssdk.services.transfer.model.SftpConnectorConfig;
 
 public class Converter {
     static class TagConverter {
-        static software.amazon.awssdk.services.transfer.model.Tag toSdk(
-                software.amazon.transfer.connector.Tag tag) {
+        static software.amazon.awssdk.services.transfer.model.Tag toSdk(software.amazon.transfer.connector.Tag tag) {
             if (tag == null) {
                 return null;
             }
@@ -26,8 +25,7 @@ public class Converter {
                 return Collections.emptySet();
             }
 
-            return tags.entrySet()
-                    .stream()
+            return tags.entrySet().stream()
                     .map(tag -> software.amazon.transfer.connector.Tag.builder()
                             .key(tag.getKey())
                             .value(tag.getValue())
@@ -47,8 +45,7 @@ public class Converter {
     }
 
     static class As2ConfigConverter {
-        static As2ConnectorConfig toSdk(
-                software.amazon.transfer.connector.As2Config as2Config) {
+        static As2ConnectorConfig toSdk(software.amazon.transfer.connector.As2Config as2Config) {
             if (as2Config == null) {
                 return null;
             }
@@ -64,14 +61,14 @@ public class Converter {
                     .mdnResponse(as2Config.getMdnResponse())
                     .basicAuthSecretId(as2Config.getBasicAuthSecretId())
                     .build();
-
         }
 
         static software.amazon.transfer.connector.As2Config fromSdk(As2ConnectorConfig as2ConnectorConfig) {
             if (as2ConnectorConfig == null) {
                 return null;
             }
-            software.amazon.transfer.connector.As2Config modelAs2Config = new software.amazon.transfer.connector.As2Config();
+            software.amazon.transfer.connector.As2Config modelAs2Config =
+                    new software.amazon.transfer.connector.As2Config();
 
             modelAs2Config.setLocalProfileId(as2ConnectorConfig.localProfileId());
             modelAs2Config.setPartnerProfileId(as2ConnectorConfig.partnerProfileId());
@@ -88,8 +85,7 @@ public class Converter {
     }
 
     static class SftpConfigConverter {
-        static SftpConnectorConfig toSdk(
-                software.amazon.transfer.connector.SftpConfig sftpConfig) {
+        static SftpConnectorConfig toSdk(software.amazon.transfer.connector.SftpConfig sftpConfig) {
             if (sftpConfig == null) {
                 return null;
             }
@@ -98,14 +94,14 @@ public class Converter {
                     .userSecretId(sftpConfig.getUserSecretId())
                     .trustedHostKeys(sftpConfig.getTrustedHostKeys())
                     .build();
-
         }
 
         static software.amazon.transfer.connector.SftpConfig fromSdk(SftpConnectorConfig sftpConnectorConfig) {
             if (sftpConnectorConfig == null) {
                 return null;
             }
-            software.amazon.transfer.connector.SftpConfig modelSftpConfig = new software.amazon.transfer.connector.SftpConfig();
+            software.amazon.transfer.connector.SftpConfig modelSftpConfig =
+                    new software.amazon.transfer.connector.SftpConfig();
 
             modelSftpConfig.setUserSecretId(sftpConnectorConfig.userSecretId());
             modelSftpConfig.setTrustedHostKeys(sftpConnectorConfig.trustedHostKeys());

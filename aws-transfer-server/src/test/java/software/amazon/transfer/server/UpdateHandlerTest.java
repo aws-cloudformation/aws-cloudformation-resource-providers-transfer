@@ -8,13 +8,13 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static software.amazon.transfer.server.translators.ResourceModelAdapter.DEFAULT_ENDPOINT_TYPE;
 
-import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
-import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
+
+import com.google.common.collect.ImmutableList;
+
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.InjectSoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
@@ -25,6 +25,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Stubber;
+
 import software.amazon.awssdk.services.transfer.model.DescribeServerRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeServerResponse;
 import software.amazon.awssdk.services.transfer.model.EndpointType;
@@ -42,11 +43,15 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.transfer.server.translators.ServerArn;
 import software.amazon.transfer.server.translators.Translator;
 
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
+
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(SoftAssertionsExtension.class)
 public class UpdateHandlerTest extends AbstractTestBase {
 
-    @InjectSoftAssertions private SoftAssertions softly;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     private final UpdateHandler handler = new UpdateHandler();
 
@@ -55,11 +60,10 @@ public class UpdateHandlerTest extends AbstractTestBase {
         ResourceModel model = setupSimpleServerModel(DEFAULT_ENDPOINT_TYPE);
         setServerId(model, "testServer");
 
-        final ResourceHandlerRequest<ResourceModel> request =
-                getResourceHandlerRequestBuilder()
-                        .previousResourceState(model)
-                        .desiredResourceState(model)
-                        .build();
+        final ResourceHandlerRequest<ResourceModel> request = getResourceHandlerRequestBuilder()
+                .previousResourceState(model)
+                .desiredResourceState(model)
+                .build();
 
         ProgressEvent<ResourceModel, CallbackContext> response =
                 updateServerAndAssertStatus(request, "ONLINE", OperationStatus.SUCCESS);
@@ -84,21 +88,18 @@ public class UpdateHandlerTest extends AbstractTestBase {
         setServerId(postUpdateState, "testServerId");
         postUpdateState.setTags(Translator.translateTagMapToTagList(EXTRA_MODEL_TAGS));
 
-        final ResourceHandlerRequest<ResourceModel> request =
-                getResourceHandlerRequestBuilder()
-                        .previousResourceState(currentState)
-                        .desiredResourceState(postUpdateState)
-                        .previousResourceTags(Translator.translateTagListToTagMap(MODEL_TAGS))
-                        .desiredResourceTags(EXTRA_MODEL_TAGS)
-                        .build();
+        final ResourceHandlerRequest<ResourceModel> request = getResourceHandlerRequestBuilder()
+                .previousResourceState(currentState)
+                .desiredResourceState(postUpdateState)
+                .previousResourceTags(Translator.translateTagListToTagMap(MODEL_TAGS))
+                .desiredResourceTags(EXTRA_MODEL_TAGS)
+                .build();
         setupUpdateServerResponse(ex);
 
         DescribeServerResponse stabilizeFirstResponse =
                 describeServerFromModel(currentState.getServerId(), "ONLINE", postUpdateState);
 
-        doReturn(stabilizeFirstResponse)
-                .when(sdkClient)
-                .describeServer(any(DescribeServerRequest.class));
+        doReturn(stabilizeFirstResponse).when(sdkClient).describeServer(any(DescribeServerRequest.class));
 
         doThrow(ex)
                 .doReturn(TagResourceResponse.builder().build())
@@ -120,8 +121,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
     private void callAndAssertInProgress(ResourceHandlerRequest<ResourceModel> request) {
         ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(
-                        proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.IN_PROGRESS);
@@ -182,31 +182,21 @@ public class UpdateHandlerTest extends AbstractTestBase {
         ResourceModel currentState = setupSimpleServerModel(EndpointType.VPC.name());
         setServerId(currentState, "testServerId");
 
-        ResourceModel desiredState =
-                currentState
-                        .toBuilder()
-                        .endpointDetails(
-                                EndpointDetails.builder()
-                                        .addressAllocationIds(Arrays.asList("addr1", "addr2"))
-                                        .build())
-                        .build();
+        ResourceModel desiredState = currentState.toBuilder()
+                .endpointDetails(EndpointDetails.builder()
+                        .addressAllocationIds(Arrays.asList("addr1", "addr2"))
+                        .build())
+                .build();
 
-        ResourceHandlerRequest<ResourceModel> request =
-                getResourceHandlerRequestBuilder()
-                        .previousResourceState(currentState)
-                        .desiredResourceState(desiredState)
-                        .build();
+        ResourceHandlerRequest<ResourceModel> request = getResourceHandlerRequestBuilder()
+                .previousResourceState(currentState)
+                .desiredResourceState(desiredState)
+                .build();
 
-        softly.assertThatThrownBy(
-                        () ->
-                                updateServerAndAssertStatus(
-                                        request, "START_FAILED", OperationStatus.FAILED))
+        softly.assertThatThrownBy(() -> updateServerAndAssertStatus(request, "START_FAILED", OperationStatus.FAILED))
                 .isInstanceOf(CfnNotStabilizedException.class);
 
-        softly.assertThatThrownBy(
-                        () ->
-                                updateServerAndAssertStatus(
-                                        request, "STOP_FAILED", OperationStatus.FAILED))
+        softly.assertThatThrownBy(() -> updateServerAndAssertStatus(request, "STOP_FAILED", OperationStatus.FAILED))
                 .isInstanceOf(CfnNotStabilizedException.class);
 
         verify(sdkClient, atLeastOnce()).updateServer(any(UpdateServerRequest.class));
@@ -214,9 +204,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     private ProgressEvent<ResourceModel, CallbackContext> updateServerAndAssertStatus(
-            ResourceHandlerRequest<ResourceModel> request,
-            String postUpdateState,
-            OperationStatus operationStatus) {
+            ResourceHandlerRequest<ResourceModel> request, String postUpdateState, OperationStatus operationStatus) {
 
         ResourceModel currentState = request.getPreviousResourceState();
         ResourceModel desiredState = request.getDesiredResourceState();
@@ -234,8 +222,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
                 .describeServer(any(DescribeServerRequest.class));
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(
-                        proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(operationStatus);
@@ -251,18 +238,16 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         ResourceModel currentState = fullyLoadedServerModel();
         setServerId(currentState, "testServerId");
-        currentState.setTags(
-                Collections.singletonList(
-                        Tag.builder().key("newTag").value("newValue").build())); // trigger tagging
+        currentState.setTags(Collections.singletonList(
+                Tag.builder().key("newTag").value("newValue").build())); // trigger tagging
         currentState.getEndpointDetails().setSubnetIds((List<String>) null);
         currentState.getEndpointDetails().setSecurityGroupIds((List<String>) null);
         currentState.getEndpointDetails().setAddressAllocationIds((List<String>) null);
 
-        final ResourceHandlerRequest<ResourceModel> request =
-                getResourceHandlerRequestBuilder()
-                        .previousResourceState(currentState)
-                        .desiredResourceState(model)
-                        .build();
+        final ResourceHandlerRequest<ResourceModel> request = getResourceHandlerRequestBuilder()
+                .previousResourceState(currentState)
+                .desiredResourceState(model)
+                .build();
 
         setupUpdateServerResponse(null);
 
@@ -275,36 +260,23 @@ public class UpdateHandlerTest extends AbstractTestBase {
         // 4. The server is STARTING.
         // 5. The server reached the final state and can be finalized
         //    by applying the new security groups and tags.
-        DescribeServerResponse initialState =
-                describeServerFromModel(model.getServerId(), "ONLINE", currentState);
-        DescribeServerResponse finalStateResponse =
-                describeServerFromModel(model.getServerId(), "ONLINE", model);
+        DescribeServerResponse initialState = describeServerFromModel(model.getServerId(), "ONLINE", currentState);
+        DescribeServerResponse finalStateResponse = describeServerFromModel(model.getServerId(), "ONLINE", model);
 
         DescribeServerResponse stoppingServerResponse = newStateResponse(initialState, "STOPPING");
         DescribeServerResponse offlineServerResponse = newStateResponse(initialState, "OFFLINE");
 
         // Adding the expected subnets
-        DescribeServerResponse offlineWithSubnets =
-                DescribeServerResponse.builder()
-                        .server(
-                                offlineServerResponse
-                                        .server()
-                                        .toBuilder()
-                                        .endpointDetails(
-                                                offlineServerResponse
-                                                        .server()
-                                                        .endpointDetails()
-                                                        .toBuilder()
-                                                        .subnetIds(
-                                                                model.getEndpointDetails()
-                                                                        .getSubnetIds())
-                                                        .build())
-                                        .build())
-                        .build();
+        DescribeServerResponse offlineWithSubnets = DescribeServerResponse.builder()
+                .server(offlineServerResponse.server().toBuilder()
+                        .endpointDetails(offlineServerResponse.server().endpointDetails().toBuilder()
+                                .subnetIds(model.getEndpointDetails().getSubnetIds())
+                                .build())
+                        .build())
+                .build();
 
         DescribeServerResponse offlineCompleted = newStateResponse(finalStateResponse, "OFFLINE");
-        DescribeServerResponse startingServerResponse =
-                newStateResponse(finalStateResponse, "STARTING");
+        DescribeServerResponse startingServerResponse = newStateResponse(finalStateResponse, "STARTING");
 
         doReturn(
                         initialState,
@@ -328,8 +300,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
     private void callAndAssertSuccess(ResourceHandlerRequest<ResourceModel> request) {
         ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(
-                        proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);

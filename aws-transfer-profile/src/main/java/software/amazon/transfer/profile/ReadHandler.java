@@ -1,7 +1,7 @@
 package software.amazon.transfer.profile;
 
-import com.amazonaws.util.CollectionUtils;
-import lombok.NoArgsConstructor;
+import java.util.stream.Collectors;
+
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.DescribeProfileRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeProfileResponse;
@@ -16,11 +16,13 @@ import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
-import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.OperationStatus;
+import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
-import java.util.stream.Collectors;
+import com.amazonaws.util.CollectionUtils;
+
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class ReadHandler extends BaseHandler<CallbackContext> {
@@ -37,20 +39,19 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
             final CallbackContext callbackContext,
             final Logger logger) {
 
-        if (this.client == null){
+        if (this.client == null) {
             this.client = ClientBuilder.getClient();
         }
 
         final ResourceModel model = request.getDesiredResourceState();
-        DescribeProfileRequest describeProfileRequest = DescribeProfileRequest.builder()
-                .profileId(model.getProfileId())
-                .build();
+        DescribeProfileRequest describeProfileRequest =
+                DescribeProfileRequest.builder().profileId(model.getProfileId()).build();
 
         try {
-            DescribeProfileResponse describeProfileResponse = proxy
-                    .injectCredentialsAndInvokeV2(describeProfileRequest, client::describeProfile);
-            logger.log(String.format("%s %s described successfully",
-                    ResourceModel.TYPE_NAME, model.getPrimaryIdentifier()));
+            DescribeProfileResponse describeProfileResponse =
+                    proxy.injectCredentialsAndInvokeV2(describeProfileRequest, client::describeProfile);
+            logger.log(String.format(
+                    "%s %s described successfully", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier()));
             DescribedProfile describedProfile = describeProfileResponse.profile();
 
             ResourceModel resourceModel = ResourceModel.builder()
@@ -58,11 +59,12 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                     .as2Id(describedProfile.as2Id())
                     .certificateIds(describedProfile.certificateIds())
                     .arn(describedProfile.arn())
-                    .tags((CollectionUtils.isNullOrEmpty(describedProfile.tags())) ?
-                            null : describedProfile.tags()
-                            .stream()
-                            .map(Converter.TagConverter::fromSdk)
-                            .collect(Collectors.toSet()))
+                    .tags(
+                            (CollectionUtils.isNullOrEmpty(describedProfile.tags()))
+                                    ? null
+                                    : describedProfile.tags().stream()
+                                            .map(Converter.TagConverter::fromSdk)
+                                            .collect(Collectors.toSet()))
                     .profileType(describedProfile.profileTypeAsString())
                     .build();
 
@@ -75,12 +77,10 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("describeProfile", e);
         } catch (ResourceNotFoundException e) {
-            throw new CfnNotFoundException(ResourceModel.TYPE_NAME,
-                    model.getPrimaryIdentifier().toString());
+            throw new CfnNotFoundException(
+                    ResourceModel.TYPE_NAME, model.getPrimaryIdentifier().toString());
         } catch (TransferException e) {
             throw new CfnGeneralServiceException(e.getMessage(), e);
         }
-
-
     }
 }

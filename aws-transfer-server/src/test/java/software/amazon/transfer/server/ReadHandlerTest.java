@@ -10,6 +10,7 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import software.amazon.awssdk.services.ec2.model.DescribeVpcEndpointsRequest;
 import software.amazon.awssdk.services.ec2.model.DescribeVpcEndpointsResponse;
 import software.amazon.awssdk.services.ec2.model.State;
@@ -23,7 +24,8 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 @ExtendWith(SoftAssertionsExtension.class)
 public class ReadHandlerTest extends AbstractTestBase {
 
-    @InjectSoftAssertions private SoftAssertions softly;
+    @InjectSoftAssertions
+    private SoftAssertions softly;
 
     @Test
     public void handleRequest_SimpleSuccess() {
@@ -36,23 +38,18 @@ public class ReadHandlerTest extends AbstractTestBase {
         final ResourceHandlerRequest<ResourceModel> request =
                 getResourceHandlerRequestBuilder().desiredResourceState(model).build();
 
-        DescribeServerResponse describeServerResponse =
-                describeServerFromModel("testServer", "OFFLINE", model);
+        DescribeServerResponse describeServerResponse = describeServerFromModel("testServer", "OFFLINE", model);
 
-        doReturn(describeServerResponse)
-                .when(sdkClient)
-                .describeServer(any(DescribeServerRequest.class));
+        doReturn(describeServerResponse).when(sdkClient).describeServer(any(DescribeServerRequest.class));
 
-        DescribeVpcEndpointsResponse describeVpcEndpointsResponse =
-                vpcEndpointResponse(model, State.AVAILABLE);
+        DescribeVpcEndpointsResponse describeVpcEndpointsResponse = vpcEndpointResponse(model, State.AVAILABLE);
 
         doReturn(describeVpcEndpointsResponse)
                 .when(sdkEc2Client)
                 .describeVpcEndpoints(any(DescribeVpcEndpointsRequest.class));
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(
-                        proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
+                handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, proxyEc2Client, logger);
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);

@@ -1,10 +1,10 @@
 package software.amazon.transfer.profile;
 
-import com.amazonaws.util.CollectionUtils;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import com.amazonaws.util.CollectionUtils;
 
 class Configuration extends BaseConfiguration {
 
@@ -17,8 +17,7 @@ class Configuration extends BaseConfiguration {
             return Collections.emptyMap();
         }
 
-        return resourceModel.getTags()
-                .stream()
+        return resourceModel.getTags().stream()
                 .collect(Collectors.toMap(Tag::getKey, Tag::getValue, (value1, value2) -> value2));
     }
 }

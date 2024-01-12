@@ -8,8 +8,7 @@ import java.util.stream.Collectors;
 public class Converter {
 
     static class TagConverter {
-        static software.amazon.awssdk.services.transfer.model.Tag toSdk(
-                software.amazon.transfer.agreement.Tag tag) {
+        static software.amazon.awssdk.services.transfer.model.Tag toSdk(software.amazon.transfer.agreement.Tag tag) {
             if (tag == null) {
                 return null;
             }
@@ -24,8 +23,7 @@ public class Converter {
                 return Collections.emptySet();
             }
 
-            return tags.entrySet()
-                    .stream()
+            return tags.entrySet().stream()
                     .map(tag -> software.amazon.transfer.agreement.Tag.builder()
                             .key(tag.getKey())
                             .value(tag.getValue())
