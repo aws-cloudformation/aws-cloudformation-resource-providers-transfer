@@ -152,6 +152,7 @@ public class AbstractTestBase {
         return DescribeServerResponse.builder()
                 .server(DescribedServer.builder()
                         .arn(getTestServerArn(serverId))
+                        .as2ServiceManagedEgressIpAddresses(model.getAs2ServiceManagedEgressIpAddresses())
                         .serverId(serverId)
                         .state(state)
                         .domain(model.getDomain())
@@ -182,6 +183,7 @@ public class AbstractTestBase {
             endpointDetails = getEndpointDetails(Collections.emptyList());
         }
         return ResourceModel.builder()
+                .as2ServiceManagedEgressIpAddresses(Collections.emptyList())
                 .domain(Domain.S3.name())
                 .endpointType(endpointType)
                 .endpointDetails(endpointDetails)
@@ -189,6 +191,7 @@ public class AbstractTestBase {
                 .securityPolicyName(DEFAULT_SECURITY_POLICY)
                 .protocols(DEFAULT_PROTOCOLS)
                 .structuredLogDestinations(Collections.emptyList())
+                .tags(Collections.emptyList())
                 .build();
     }
 
@@ -222,6 +225,7 @@ public class AbstractTestBase {
         EndpointDetails endpointDetails = getEndpointDetails(Arrays.asList("addr1", "addr2"));
 
         return ResourceModel.builder()
+                .as2ServiceManagedEgressIpAddresses(List.of("0.0.0.0", "1.1.1.1", "2.2.2.2"))
                 .certificate("certificate")
                 .domain(Domain.S3.name())
                 .endpointType(EndpointType.VPC.name())

@@ -68,6 +68,7 @@ public class ReadHandler extends BaseHandler<CallbackContext> {
                                     : null)
                     .connectorId(describedConnector.connectorId())
                     .loggingRole(describedConnector.loggingRole())
+                    .serviceManagedEgressIpAddresses(describedConnector.serviceManagedEgressIpAddresses())
                     .tags(
                             (CollectionUtils.isNullOrEmpty(describedConnector.tags()))
                                     ? null

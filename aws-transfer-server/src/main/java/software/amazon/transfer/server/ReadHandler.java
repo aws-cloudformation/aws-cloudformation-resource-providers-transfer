@@ -50,6 +50,11 @@ public class ReadHandler extends BaseHandlerStd {
         DescribedServer server = response.server();
         return ResourceModel.builder()
                 .arn(server.arn())
+                // For non AS2-servers, our API returns null for this property.
+                // However, the AWS SDK will never return null for a map or collection property in a response.
+                // Contract tests require all read-only properties to be returned by a READ request,
+                // so we cannot mimic our API's behaviour here. Thus, we return an empty list instead of null.
+                .as2ServiceManagedEgressIpAddresses(server.as2ServiceManagedEgressIpAddresses())
                 .serverId(server.serverId())
                 .certificate(server.certificate())
                 .domain(server.domainAsString())

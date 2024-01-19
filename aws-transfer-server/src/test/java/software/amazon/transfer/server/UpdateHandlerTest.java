@@ -205,6 +205,13 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
     private ProgressEvent<ResourceModel, CallbackContext> updateServerAndAssertStatus(
             ResourceHandlerRequest<ResourceModel> request, String postUpdateState, OperationStatus operationStatus) {
+        // Create a copy to avoid the update handler mutating the original.
+        request = request.toBuilder()
+                .previousResourceState(
+                        request.getPreviousResourceState().toBuilder().build())
+                .desiredResourceState(
+                        request.getDesiredResourceState().toBuilder().build())
+                .build();
 
         ResourceModel currentState = request.getPreviousResourceState();
         ResourceModel desiredState = request.getDesiredResourceState();
