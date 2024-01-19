@@ -132,3 +132,7 @@ Specifies the unique Amazon Resource Name (ARN) for the connector.
 
 A unique identifier for the connector.
 
+#### ServiceManagedEgressIpAddresses
+
+The list of egress IP addresses of this connector. These IP addresses are assigned automatically when you create the connector.
+

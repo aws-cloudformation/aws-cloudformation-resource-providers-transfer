@@ -8,6 +8,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static software.amazon.transfer.connector.AbstractTestBase.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,8 +57,13 @@ public class ReadHandlerTest {
     public void handleRequest_SimpleSuccess() {
         final ReadHandler handler = new ReadHandler(client);
 
-        final ResourceModel model =
-                ResourceModel.builder().connectorId(TEST_CONNECTOR_ID).build();
+        final List<String> addresses = List.of("0.0.0.0", "1.1.1.1", "2.2.2.2");
+        final ResourceModel model = ResourceModel.builder()
+                .accessRole(TEST_ACCESS_ROLE)
+                .connectorId(TEST_CONNECTOR_ID)
+                .loggingRole(TEST_LOGGING_ROLE)
+                .serviceManagedEgressIpAddresses(addresses)
+                .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
@@ -65,21 +72,21 @@ public class ReadHandlerTest {
         DescribeConnectorResponse describeConnectorResponse = DescribeConnectorResponse.builder()
                 .connector(DescribedConnector.builder()
                         .accessRole(TEST_ACCESS_ROLE)
+                        .connectorId(TEST_CONNECTOR_ID)
                         .loggingRole(TEST_LOGGING_ROLE)
+                        .serviceManagedEgressIpAddresses(addresses)
                         .build())
                 .build();
         doReturn(describeConnectorResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
 
         final ProgressEvent<ResourceModel, CallbackContext> response =
                 handler.handleRequest(proxy, request, null, logger);
-        ResourceModel testModel = response.getResourceModel();
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
-        assertThat(testModel).hasFieldOrPropertyWithValue("accessRole", TEST_ACCESS_ROLE);
-        assertThat(testModel).hasFieldOrPropertyWithValue("loggingRole", TEST_LOGGING_ROLE);
+        assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
