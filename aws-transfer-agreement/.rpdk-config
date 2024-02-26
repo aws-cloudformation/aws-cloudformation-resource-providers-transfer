@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "AWS::Transfer::Agreement",
     "language": "java",
-    "runtime": "java11",
+    "runtime": "java17",
     "entrypoint": "software.amazon.transfer.agreement.HandlerWrapper::handleRequest",
     "testEntrypoint": "software.amazon.transfer.agreement.HandlerWrapper::testEntrypoint",
     "settings": {

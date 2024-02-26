@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "AWS::Transfer::Server",
     "language": "java",
-    "runtime": "java11",
+    "runtime": "java17",
     "entrypoint": "software.amazon.transfer.server.HandlerWrapper::handleRequest",
     "testEntrypoint": "software.amazon.transfer.server.HandlerWrapper::testEntrypoint",
     "settings": {

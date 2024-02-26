@@ -2,7 +2,7 @@
     "artifact_type": "RESOURCE",
     "typeName": "AWS::Transfer::User",
     "language": "java",
-    "runtime": "java11",
+    "runtime": "java17",
     "entrypoint": "software.amazon.transfer.user.HandlerWrapper::handleRequest",
     "testEntrypoint": "software.amazon.transfer.user.HandlerWrapper::testEntrypoint",
     "settings": {
