@@ -210,12 +210,14 @@
     },
     "list": {
       "handlerSchema": {
-        "properties":{
-          "ServerId" :{
+        "properties": {
+          "ServerId": {
             "$ref": "resource-schema.json#/properties/ServerId"
           }
         },
-        "required": ["ServerId"]
+        "required": [
+          "ServerId"
+        ]
       },
       "permissions": [
         "transfer:ListUsers"

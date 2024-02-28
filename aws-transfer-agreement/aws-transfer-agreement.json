@@ -161,7 +161,9 @@
             "$ref": "resource-schema.json#/properties/ServerId"
           }
         },
-        "required": ["ServerId"]
+        "required": [
+          "ServerId"
+        ]
       },
       "permissions": [
         "transfer:ListAgreements"
