@@ -1,0 +1,59 @@
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    name: Verify
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - aws-transfer-agreement
+          - aws-transfer-certificate
+          - aws-transfer-connector
+          - aws-transfer-profile
+          - aws-transfer-server
+          - aws-transfer-user
+          - aws-transfer-workflow
+    env:
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_REGION: us-east-1
+      PIP_DISABLE_PIP_VERSION_CHECK: 1
+
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/${{ matrix.package }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin  # This is the only distribution cached on GitHub Hosted Runners
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: ${{ github.workspace }}/${{ matrix.package }}/pom.xml
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install CloudFormation CLI Java plugin
+        run: pip install -U -r ${{ github.workspace }}/requirements.txt
+
+      - name: Run mvn verify
+        run: mvn --batch-mode --no-transfer-progress clean verify
+
+      - name: Show RPDK log
+        if: always()
+        run: |
+          if [ -f 'rpdk.log' ]; then
+            cat 'rpdk.log'
+          else
+            echo 'No RPDK log found'
+          fi

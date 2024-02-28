@@ -1,0 +1,3 @@
+cloudformation-cli
+cloudformation-cli-java-plugin
+setuptools

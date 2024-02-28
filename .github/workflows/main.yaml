@@ -1,0 +1,15 @@
+name: main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yaml
+
+  verify:
+    uses: ./.github/workflows/verify.yaml
