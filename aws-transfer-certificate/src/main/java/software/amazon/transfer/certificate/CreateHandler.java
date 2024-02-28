@@ -89,8 +89,8 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
         } catch (InternalServiceErrorException e) {
             throw new CfnServiceInternalErrorException("ImportCertificate", e);
         } catch (ResourceExistsException e) {
-            throw new CfnAlreadyExistsException(ResourceModel.TYPE_NAME,
-                    model.getPrimaryIdentifier().toString());
+            throw new CfnAlreadyExistsException(
+                    ResourceModel.TYPE_NAME, model.getPrimaryIdentifier().toString());
         } catch (ThrottlingException e) {
             throw new CfnThrottlingException("ImportCertificate", e);
         } catch (TransferException e) {

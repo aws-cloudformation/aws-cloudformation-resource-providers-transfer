@@ -1,6 +1,6 @@
 {
   "CreateInputs": {
-    "Description": "Cfn Local Test",
+    "Description": "aws-transfer-ct",
     "OnExceptionSteps": [
       {
         "Type": "DELETE",

@@ -357,13 +357,7 @@
   "primaryIdentifier": [
     "/properties/WorkflowId"
   ],
-  "tagging": {
-    "taggable": true,
-    "tagOnCreate": true,
-    "tagUpdatable": true,
-    "cloudFormationSystemTags": true,
-    "tagProperty": "/properties/Tags"
-  },
+  "taggable": true,
   "handlers": {
     "create": {
       "permissions": [

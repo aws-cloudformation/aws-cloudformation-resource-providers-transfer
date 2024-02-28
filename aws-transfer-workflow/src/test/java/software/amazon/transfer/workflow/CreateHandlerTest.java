@@ -176,9 +176,7 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(CreateWorkflowRequest.class), any());
 
-        ResourceModel model = ResourceModel.builder()
-                .workflowId("testId")
-                .build();
+        ResourceModel model = ResourceModel.builder().workflowId("testId").build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)

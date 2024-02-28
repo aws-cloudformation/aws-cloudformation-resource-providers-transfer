@@ -147,9 +147,8 @@ public class CreateHandlerTest {
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(CreateConnectorRequest.class), any());
 
-        ResourceModel model = ResourceModel.builder()
-                .connectorId(TEST_CONNECTOR_ID)
-                .build();
+        ResourceModel model =
+                ResourceModel.builder().connectorId(TEST_CONNECTOR_ID).build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)

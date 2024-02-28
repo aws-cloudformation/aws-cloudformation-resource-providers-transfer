@@ -239,27 +239,28 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.theoryinpractise</groupId>
-                <artifactId>googleformatter-maven-plugin</artifactId>
-                <version>1.7.5</version>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version>
                 <executions>
                     <execution>
-                        <id>reformat-sources</id>
-                        <configuration>
-                            <includeStale>false</includeStale>
-                            <style>AOSP</style>
-                            <formatMain>true</formatMain>
-                            <formatTest>true</formatTest>
-                            <filterModified>false</filterModified>
-                            <skip>false</skip>
-                            <fixImports>true</fixImports>
-                        </configuration>
                         <goals>
-                            <goal>format</goal>
+                            <goal>check</goal>
                         </goals>
-                        <phase>process-sources</phase>
                     </execution>
                 </executions>
+                <configuration>
+                    <java>
+                        <palantirJavaFormat>
+                            <style>PALANTIR</style>
+                        </palantirJavaFormat>
+                        <importOrder>
+                            <order>java,javax,com,org,amazon,software.amazon,com.amazon,com.amazonaws</order>
+                        </importOrder>
+                        <trimTrailingWhitespace/>
+                        <endWithNewline/>
+                    </java>
+                </configuration>
             </plugin>
         </plugins>
         <resources>
