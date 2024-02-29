@@ -142,9 +142,7 @@ public class CreateHandlerTest {
                 .when(proxy)
                 .injectCredentialsAndInvokeV2(any(ImportCertificateRequest.class), any());
 
-        ResourceModel model = ResourceModel.builder()
-                .certificateId("testId")
-                .build();
+        ResourceModel model = ResourceModel.builder().certificateId("testId").build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)

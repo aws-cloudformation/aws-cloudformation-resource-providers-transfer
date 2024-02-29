@@ -27,7 +27,7 @@ Resources:
       Handler: index.handler
       Role:
         Fn::GetAtt: WorkflowsLambdaExecutionRole.Arn
-      Runtime: python3.8
+      Runtime: python3.11
 Outputs:
   WorkflowsCustomStepLambda:
     Value:
