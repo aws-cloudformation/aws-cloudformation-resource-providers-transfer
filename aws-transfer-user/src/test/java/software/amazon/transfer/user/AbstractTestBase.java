@@ -26,6 +26,7 @@ import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.DescribeUserResponse;
 import software.amazon.awssdk.services.transfer.model.DescribedUser;
+import software.amazon.awssdk.services.transfer.model.MapType;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
 import software.amazon.cloudformation.proxy.LoggerProxy;
@@ -164,10 +165,22 @@ public class AbstractTestBase {
                         HomeDirectoryMapEntry.builder()
                                 .entry("/bucket1")
                                 .target("/my-bucket")
+                                .type(MapType.DIRECTORY.name())
                                 .build(),
                         HomeDirectoryMapEntry.builder()
                                 .entry("/bucket2")
                                 .target("/my-other-bucket")
+                                .type(MapType.DIRECTORY.name())
+                                .build(),
+                        HomeDirectoryMapEntry.builder()
+                                .entry("/bucket3/file1")
+                                .target("/my-bucket3/file1")
+                                .type(MapType.FILE.name())
+                                .build(),
+                        HomeDirectoryMapEntry.builder()
+                                .entry("/bucket3/file2")
+                                .target("/my-bucket3/file2")
+                                .type(MapType.FILE.name())
                                 .build()))
                 .sshPublicKeys(Arrays.asList("ssh-rsa abcdefgh", "ssh-rsa foobar", "ssh-rsa nullkeydate"))
                 .tags(MODEL_TAGS)

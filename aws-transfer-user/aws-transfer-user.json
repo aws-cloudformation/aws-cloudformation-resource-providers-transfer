@@ -1,7 +1,6 @@
 {
   "typeName": "AWS::Transfer::User",
-  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-transfer",
-  "description": "Resource Type definition for AWS::Transfer::User",
+  "description": "Definition of AWS::Transfer::User Resource Type",
   "definitions": {
     "HomeDirectoryMapEntry": {
       "type": "object",
@@ -10,13 +9,16 @@
           "type": "string",
           "maxLength": 1024,
           "minLength": 0,
-          "pattern": "^/"
+          "pattern": "^/.*$"
         },
         "Target": {
           "type": "string",
           "maxLength": 1024,
           "minLength": 0,
-          "pattern": "^/"
+          "pattern": "^/.*$"
+        },
+        "Type": {
+          "$ref": "#/definitions/MapType"
         }
       },
       "required": [
@@ -30,6 +32,13 @@
       "enum": [
         "PATH",
         "LOGICAL"
+      ]
+    },
+    "MapType": {
+      "type": "string",
+      "enum": [
+        "FILE",
+        "DIRECTORY"
       ]
     },
     "PosixProfile": {
@@ -93,20 +102,20 @@
       "type": "string",
       "maxLength": 1600,
       "minLength": 20,
-      "pattern": "^arn:"
+      "pattern": "^arn:\\S+$"
     },
     "HomeDirectory": {
       "type": "string",
       "maxLength": 1024,
       "minLength": 0,
-      "pattern": "^$|/"
+      "pattern": "^(|/.*)$"
     },
     "HomeDirectoryMappings": {
       "type": "array",
       "items": {
         "$ref": "#/definitions/HomeDirectoryMapEntry"
       },
-      "maxItems": 50,
+      "maxItems": 50000,
       "minItems": 1
     },
     "HomeDirectoryType": {
@@ -124,7 +133,7 @@
       "type": "string",
       "maxLength": 2048,
       "minLength": 20,
-      "pattern": "^arn:.*role/"
+      "pattern": "^arn:.*role/\\S+$"
     },
     "ServerId": {
       "type": "string",
@@ -160,7 +169,13 @@
     "ServerId",
     "UserName"
   ],
-  "additionalProperties": false,
+  "readOnlyProperties": [
+    "/properties/Arn"
+  ],
+  "createOnlyProperties": [
+    "/properties/ServerId",
+    "/properties/UserName"
+  ],
   "primaryIdentifier": [
     "/properties/Arn"
   ],
@@ -169,13 +184,6 @@
       "/properties/ServerId",
       "/properties/UserName"
     ]
-  ],
-  "createOnlyProperties": [
-    "/properties/ServerId",
-    "/properties/UserName"
-  ],
-  "readOnlyProperties": [
-    "/properties/Arn"
   ],
   "handlers": {
     "create": {
@@ -209,6 +217,9 @@
       ]
     },
     "list": {
+      "permissions": [
+        "transfer:ListUsers"
+      ],
       "handlerSchema": {
         "properties": {
           "ServerId": {
@@ -218,10 +229,7 @@
         "required": [
           "ServerId"
         ]
-      },
-      "permissions": [
-        "transfer:ListUsers"
-      ]
+      }
     }
   },
   "tagging": {
@@ -230,5 +238,7 @@
     "tagProperty": "/properties/Tags",
     "tagUpdatable": true,
     "taggable": true
-  }
+  },
+  "additionalProperties": false,
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-transfer"
 }

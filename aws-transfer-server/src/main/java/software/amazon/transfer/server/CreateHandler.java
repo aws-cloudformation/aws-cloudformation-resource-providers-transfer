@@ -23,6 +23,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.transfer.server.translators.EndpointDetailsTranslator;
 import software.amazon.transfer.server.translators.IdentityProviderDetailsTranslator;
 import software.amazon.transfer.server.translators.ProtocolDetailsTranslator;
+import software.amazon.transfer.server.translators.S3StorageOptionsTranslator;
 import software.amazon.transfer.server.translators.ServerArn;
 import software.amazon.transfer.server.translators.WorkflowDetailsTranslator;
 
@@ -83,6 +84,7 @@ public class CreateHandler extends BaseHandlerStd {
                 .tags(translateToSdkTags(model.getTags()))
                 .workflowDetails(WorkflowDetailsTranslator.toSdk(model.getWorkflowDetails(), false))
                 .structuredLogDestinations(model.getStructuredLogDestinations())
+                .s3StorageOptions(S3StorageOptionsTranslator.toSdk(model.getS3StorageOptions()))
                 .build();
     }
 

@@ -9,7 +9,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 {
     "<a href="#entry" title="Entry">Entry</a>" : <i>String</i>,
-    "<a href="#target" title="Target">Target</a>" : <i>String</i>
+    "<a href="#target" title="Target">Target</a>" : <i>String</i>,
+    "<a href="#type" title="Type">Type</a>" : <i>String</i>
 }
 </pre>
 
@@ -18,6 +19,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 <a href="#entry" title="Entry">Entry</a>: <i>String</i>
 <a href="#target" title="Target">Target</a>: <i>String</i>
+<a href="#type" title="Type">Type</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -30,7 +32,7 @@ _Type_: String
 
 _Maximum Length_: <code>1024</code>
 
-_Pattern_: <code>^/</code>
+_Pattern_: <code>^/.*$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -42,7 +44,17 @@ _Type_: String
 
 _Maximum Length_: <code>1024</code>
 
-_Pattern_: <code>^/</code>
+_Pattern_: <code>^/.*$</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### Type
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>FILE</code> | <code>DIRECTORY</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

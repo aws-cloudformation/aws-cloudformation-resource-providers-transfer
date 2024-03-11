@@ -1,6 +1,6 @@
 # AWS::Transfer::Server
 
-Resource Type definition for AWS::Transfer::Server
+Definition of AWS::Transfer::Server Resource Type
 
 ## Syntax
 
@@ -23,6 +23,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#preauthenticationloginbanner" title="PreAuthenticationLoginBanner">PreAuthenticationLoginBanner</a>" : <i>String</i>,
         "<a href="#protocoldetails" title="ProtocolDetails">ProtocolDetails</a>" : <i><a href="protocoldetails.md">ProtocolDetails</a></i>,
         "<a href="#protocols" title="Protocols">Protocols</a>" : <i>[ String, ... ]</i>,
+        "<a href="#s3storageoptions" title="S3StorageOptions">S3StorageOptions</a>" : <i><a href="s3storageoptions.md">S3StorageOptions</a></i>,
         "<a href="#securitypolicyname" title="SecurityPolicyName">SecurityPolicyName</a>" : <i>String</i>,
         "<a href="#structuredlogdestinations" title="StructuredLogDestinations">StructuredLogDestinations</a>" : <i>[ String, ... ]</i>,
         "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
@@ -48,6 +49,7 @@ Properties:
     <a href="#protocoldetails" title="ProtocolDetails">ProtocolDetails</a>: <i><a href="protocoldetails.md">ProtocolDetails</a></i>
     <a href="#protocols" title="Protocols">Protocols</a>: <i>
       - String</i>
+    <a href="#s3storageoptions" title="S3StorageOptions">S3StorageOptions</a>: <i><a href="s3storageoptions.md">S3StorageOptions</a></i>
     <a href="#securitypolicyname" title="SecurityPolicyName">SecurityPolicyName</a>: <i>String</i>
     <a href="#structuredlogdestinations" title="StructuredLogDestinations">StructuredLogDestinations</a>: <i>
       - String</i>
@@ -122,7 +124,7 @@ _Type_: String
 
 _Maximum Length_: <code>2048</code>
 
-_Pattern_: <code>^$|arn:.*role/</code>
+_Pattern_: <code>^(|arn:.*role/\S+)$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -132,7 +134,7 @@ _Required_: No
 
 _Type_: String
 
-_Maximum Length_: <code>512</code>
+_Maximum Length_: <code>4096</code>
 
 _Pattern_: <code>^[\x09-\x0D\x20-\x7E]*$</code>
 
@@ -144,7 +146,7 @@ _Required_: No
 
 _Type_: String
 
-_Maximum Length_: <code>512</code>
+_Maximum Length_: <code>4096</code>
 
 _Pattern_: <code>^[\x09-\x0D\x20-\x7E]*$</code>
 
@@ -163,6 +165,14 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 _Required_: No
 
 _Type_: List of String
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### S3StorageOptions
+
+_Required_: No
+
+_Type_: <a href="s3storageoptions.md">S3StorageOptions</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -218,11 +228,11 @@ For more information about using the `Fn::GetAtt` intrinsic function, see [Fn::G
 
 Returns the <code>Arn</code> value.
 
-#### ServerId
-
-Returns the <code>ServerId</code> value.
-
 #### As2ServiceManagedEgressIpAddresses
 
 The list of egress IP addresses of this server. These IP addresses are only relevant for servers that use the AS2 protocol. They are used for sending asynchronous MDNs. These IP addresses are assigned automatically when you create an AS2 server. Additionally, if you update an existing server and add the AS2 protocol, static IP addresses are assigned as well.
+
+#### ServerId
+
+Returns the <code>ServerId</code> value.
 

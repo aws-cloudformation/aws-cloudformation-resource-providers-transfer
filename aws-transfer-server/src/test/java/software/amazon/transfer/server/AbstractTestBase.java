@@ -43,6 +43,7 @@ import software.amazon.awssdk.services.ec2.model.VpcEndpoint;
 import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.DescribeServerResponse;
 import software.amazon.awssdk.services.transfer.model.DescribedServer;
+import software.amazon.awssdk.services.transfer.model.DirectoryListingOptimization;
 import software.amazon.awssdk.services.transfer.model.Domain;
 import software.amazon.awssdk.services.transfer.model.EndpointType;
 import software.amazon.awssdk.services.transfer.model.IdentityProviderType;
@@ -58,6 +59,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.transfer.server.translators.EndpointDetailsTranslator;
 import software.amazon.transfer.server.translators.IdentityProviderDetailsTranslator;
 import software.amazon.transfer.server.translators.ProtocolDetailsTranslator;
+import software.amazon.transfer.server.translators.S3StorageOptionsTranslator;
 import software.amazon.transfer.server.translators.ServerArn;
 import software.amazon.transfer.server.translators.Translator;
 import software.amazon.transfer.server.translators.WorkflowDetailsTranslator;
@@ -173,6 +175,7 @@ public class AbstractTestBase {
                                 IdentityProviderDetailsTranslator.toSdk(model.getIdentityProviderDetails()))
                         .workflowDetails(WorkflowDetailsTranslator.toSdk(model.getWorkflowDetails(), false))
                         .endpointDetails(EndpointDetailsTranslator.toSdk(model.getEndpointDetails(), false, false))
+                        .s3StorageOptions(S3StorageOptionsTranslator.toSdk(model.getS3StorageOptions()))
                         .build())
                 .build();
     }
@@ -224,6 +227,10 @@ public class AbstractTestBase {
 
         EndpointDetails endpointDetails = getEndpointDetails(Arrays.asList("addr1", "addr2"));
 
+        S3StorageOptions s3StorageOptions = S3StorageOptions.builder()
+                .directoryListingOptimization(DirectoryListingOptimization.ENABLED.name())
+                .build();
+
         return ResourceModel.builder()
                 .as2ServiceManagedEgressIpAddresses(List.of("0.0.0.0", "1.1.1.1", "2.2.2.2"))
                 .certificate("certificate")
@@ -242,6 +249,7 @@ public class AbstractTestBase {
                 .identityProviderDetails(identityProviderDetails)
                 .workflowDetails(workflowDetails)
                 .endpointDetails(endpointDetails)
+                .s3StorageOptions(s3StorageOptions)
                 .build();
     }
 
