@@ -21,6 +21,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.transfer.server.translators.EndpointDetailsTranslator;
 import software.amazon.transfer.server.translators.IdentityProviderDetailsTranslator;
 import software.amazon.transfer.server.translators.ProtocolDetailsTranslator;
+import software.amazon.transfer.server.translators.S3StorageOptionsTranslator;
 import software.amazon.transfer.server.translators.Translator;
 import software.amazon.transfer.server.translators.WorkflowDetailsTranslator;
 
@@ -72,6 +73,7 @@ public class ReadHandler extends BaseHandlerStd {
                 .tags(translateFromSdkTags(server.tags()))
                 .workflowDetails(WorkflowDetailsTranslator.fromSdk(server.workflowDetails()))
                 .structuredLogDestinations(server.structuredLogDestinations())
+                .s3StorageOptions(S3StorageOptionsTranslator.fromSdk(server.s3StorageOptions()))
                 .build();
     }
 

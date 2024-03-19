@@ -1,6 +1,6 @@
 # AWS::Transfer::User
 
-Resource Type definition for AWS::Transfer::User
+Definition of AWS::Transfer::User Resource Type
 
 ## Syntax
 
@@ -56,7 +56,7 @@ _Type_: String
 
 _Maximum Length_: <code>1024</code>
 
-_Pattern_: <code>^$|/</code>
+_Pattern_: <code>^(|/.*)$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
@@ -106,7 +106,7 @@ _Minimum Length_: <code>20</code>
 
 _Maximum Length_: <code>2048</code>
 
-_Pattern_: <code>^arn:.*role/</code>
+_Pattern_: <code>^arn:.*role/\S+$</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

@@ -35,6 +35,7 @@ import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 import software.amazon.transfer.server.translators.EndpointDetailsTranslator;
 import software.amazon.transfer.server.translators.IdentityProviderDetailsTranslator;
 import software.amazon.transfer.server.translators.ProtocolDetailsTranslator;
+import software.amazon.transfer.server.translators.S3StorageOptionsTranslator;
 import software.amazon.transfer.server.translators.TagHelper;
 import software.amazon.transfer.server.translators.Translator;
 import software.amazon.transfer.server.translators.WorkflowDetailsTranslator;
@@ -303,6 +304,7 @@ public class UpdateHandler extends BaseHandlerStd {
                 .serverId(newModel.getServerId())
                 .structuredLogDestinations(newModel.getStructuredLogDestinations())
                 .workflowDetails(WorkflowDetailsTranslator.toSdk(newModel.getWorkflowDetails(), true))
+                .s3StorageOptions(S3StorageOptionsTranslator.toSdk(newModel.getS3StorageOptions()))
                 .build();
     }
 

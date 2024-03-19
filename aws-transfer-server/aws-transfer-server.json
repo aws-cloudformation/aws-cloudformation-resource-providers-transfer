@@ -1,11 +1,19 @@
 {
   "typeName": "AWS::Transfer::Server",
-  "description": "Resource Type definition for AWS::Transfer::Server",
+  "description": "Definition of AWS::Transfer::Server Resource Type",
   "definitions": {
     "As2Transport": {
       "type": "string",
       "enum": [
         "HTTP"
+      ]
+    },
+    "DirectoryListingOptimization": {
+      "type": "string",
+      "description": "Indicates whether optimization to directory listing on S3 servers is used. Disabled by default for compatibility.",
+      "enum": [
+        "ENABLED",
+        "DISABLED"
       ]
     },
     "Domain": {
@@ -25,15 +33,6 @@
             "maxLength": 26,
             "minLength": 0,
             "pattern": "^eipalloc-([0-9a-f]{8,17})$"
-          }
-        },
-        "SecurityGroupIds": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxLength": 20,
-            "minLength": 11,
-            "pattern": "^sg-[0-9a-f]{8,17}$"
           }
         },
         "SubnetIds": {
@@ -56,6 +55,15 @@
           "maxLength": 21,
           "minLength": 0,
           "pattern": "^vpc-[0-9a-f]{8,17}$"
+        },
+        "SecurityGroupIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 20,
+            "minLength": 11,
+            "pattern": "^sg-[0-9a-f]{8,17}$"
+          }
         }
       },
       "additionalProperties": false
@@ -71,6 +79,17 @@
     "IdentityProviderDetails": {
       "type": "object",
       "properties": {
+        "Url": {
+          "type": "string",
+          "maxLength": 255,
+          "minLength": 0
+        },
+        "InvocationRole": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 20,
+          "pattern": "^arn:.*role/\\S+$"
+        },
         "DirectoryId": {
           "type": "string",
           "maxLength": 12,
@@ -83,19 +102,8 @@
           "minLength": 1,
           "pattern": "^arn:[a-z-]+:lambda:.*$"
         },
-        "InvocationRole": {
-          "type": "string",
-          "maxLength": 2048,
-          "minLength": 20,
-          "pattern": "^arn:.*role/"
-        },
         "SftpAuthenticationMethods": {
           "$ref": "#/definitions/SftpAuthenticationMethods"
-        },
-        "Url": {
-          "type": "string",
-          "maxLength": 255,
-          "minLength": 0
         }
       },
       "additionalProperties": false
@@ -121,6 +129,17 @@
     "ProtocolDetails": {
       "type": "object",
       "properties": {
+        "PassiveIp": {
+          "type": "string",
+          "maxLength": 15,
+          "minLength": 0
+        },
+        "TlsSessionResumptionMode": {
+          "$ref": "#/definitions/TlsSessionResumptionMode"
+        },
+        "SetStatOption": {
+          "$ref": "#/definitions/SetStatOption"
+        },
         "As2Transports": {
           "type": "array",
           "items": {
@@ -128,17 +147,15 @@
           },
           "maxItems": 1,
           "minItems": 1
-        },
-        "PassiveIp": {
-          "type": "string",
-          "maxLength": 15,
-          "minLength": 0
-        },
-        "SetStatOption": {
-          "$ref": "#/definitions/SetStatOption"
-        },
-        "TlsSessionResumptionMode": {
-          "$ref": "#/definitions/TlsSessionResumptionMode"
+        }
+      },
+      "additionalProperties": false
+    },
+    "S3StorageOptions": {
+      "type": "object",
+      "properties": {
+        "DirectoryListingOptimization": {
+          "$ref": "#/definitions/DirectoryListingOptimization"
         }
       },
       "additionalProperties": false
@@ -190,17 +207,17 @@
     "WorkflowDetail": {
       "type": "object",
       "properties": {
-        "ExecutionRole": {
-          "type": "string",
-          "maxLength": 2048,
-          "minLength": 20,
-          "pattern": "^arn:.*role/"
-        },
         "WorkflowId": {
           "type": "string",
           "maxLength": 19,
           "minLength": 19,
           "pattern": "^w-([a-z0-9]{17})$"
+        },
+        "ExecutionRole": {
+          "type": "string",
+          "maxLength": 2048,
+          "minLength": 20,
+          "pattern": "^arn:.*role/\\S+$"
         }
       },
       "required": [
@@ -212,7 +229,7 @@
     "WorkflowDetails": {
       "type": "object",
       "properties": {
-        "OnPartialUpload": {
+        "OnUpload": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/WorkflowDetail"
@@ -220,7 +237,7 @@
           "maxItems": 1,
           "minItems": 0
         },
-        "OnUpload": {
+        "OnPartialUpload": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/WorkflowDetail"
@@ -237,15 +254,15 @@
       "type": "string",
       "maxLength": 1600,
       "minLength": 20,
-      "pattern": "^arn:"
+      "pattern": "^arn:\\S+$"
     },
     "As2ServiceManagedEgressIpAddresses": {
-      "description": "The list of egress IP addresses of this server. These IP addresses are only relevant for servers that use the AS2 protocol. They are used for sending asynchronous MDNs. These IP addresses are assigned automatically when you create an AS2 server. Additionally, if you update an existing server and add the AS2 protocol, static IP addresses are assigned as well.",
       "type": "array",
       "items": {
         "type": "string",
         "pattern": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$"
-      }
+      },
+      "description": "The list of egress IP addresses of this server. These IP addresses are only relevant for servers that use the AS2 protocol. They are used for sending asynchronous MDNs. These IP addresses are assigned automatically when you create an AS2 server. Additionally, if you update an existing server and add the AS2 protocol, static IP addresses are assigned as well."
     },
     "Certificate": {
       "type": "string",
@@ -271,17 +288,17 @@
       "type": "string",
       "maxLength": 2048,
       "minLength": 0,
-      "pattern": "^$|arn:.*role/"
+      "pattern": "^(|arn:.*role/\\S+)$"
     },
     "PostAuthenticationLoginBanner": {
       "type": "string",
-      "maxLength": 512,
+      "maxLength": 4096,
       "minLength": 0,
       "pattern": "^[\\x09-\\x0D\\x20-\\x7E]*$"
     },
     "PreAuthenticationLoginBanner": {
       "type": "string",
-      "maxLength": 512,
+      "maxLength": 4096,
       "minLength": 0,
       "pattern": "^[\\x09-\\x0D\\x20-\\x7E]*$"
     },
@@ -295,6 +312,9 @@
       },
       "maxItems": 4,
       "minItems": 1
+    },
+    "S3StorageOptions": {
+      "$ref": "#/definitions/S3StorageOptions"
     },
     "SecurityPolicyName": {
       "type": "string",
@@ -314,7 +334,7 @@
         "type": "string",
         "maxLength": 1600,
         "minLength": 20,
-        "pattern": "^arn:"
+        "pattern": "^arn:\\S+$"
       },
       "maxItems": 1,
       "minItems": 0
@@ -331,7 +351,18 @@
       "$ref": "#/definitions/WorkflowDetails"
     }
   },
-  "additionalProperties": false,
+  "readOnlyProperties": [
+    "/properties/Arn",
+    "/properties/As2ServiceManagedEgressIpAddresses",
+    "/properties/ServerId"
+  ],
+  "writeOnlyProperties": [
+    "/properties/IdentityProviderType"
+  ],
+  "createOnlyProperties": [
+    "/properties/Domain",
+    "/properties/IdentityProviderType"
+  ],
   "primaryIdentifier": [
     "/properties/Arn"
   ],
@@ -339,19 +370,6 @@
     [
       "/properties/ServerId"
     ]
-  ],
-  "createOnlyProperties": [
-    "/properties/Domain",
-    "/properties/IdentityProviderType"
-  ],
-  "conditionalCreateOnlyProperties": [
-    "/properties/EndpointDetails",
-    "/properties/EndpointDetails/AddressAllocationIds"
-  ],
-  "readOnlyProperties": [
-    "/properties/Arn",
-    "/properties/ServerId",
-    "/properties/As2ServiceManagedEgressIpAddresses"
   ],
   "handlers": {
     "create": {
@@ -365,20 +383,20 @@
         "ec2:DescribeNetworkInterfaces",
         "ec2:DescribeVpcEndpoints",
         "iam:PassRole",
+        "logs:CreateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "logs:UpdateLogDelivery",
         "transfer:CreateServer",
         "transfer:DescribeServer",
         "transfer:StartServer",
         "transfer:StopServer",
-        "transfer:UpdateServer",
         "transfer:TagResource",
-        "logs:CreateLogDelivery",
-        "logs:GetLogDelivery",
-        "logs:UpdateLogDelivery",
-        "logs:DeleteLogDelivery",
-        "logs:ListLogDeliveries",
-        "logs:PutResourcePolicy",
-        "logs:DescribeResourcePolicies",
-        "logs:DescribeLogGroups"
+        "transfer:UpdateServer"
       ]
     },
     "read": {
@@ -391,28 +409,28 @@
       "permissions": [
         "apigateway:GET",
         "ec2:AssociateAddress",
-        "ec2:DisassociateAddress",
         "ec2:CreateVpcEndpoint",
         "ec2:DeleteVpcEndpoints",
         "ec2:DescribeAddresses",
         "ec2:DescribeNetworkInterfaces",
         "ec2:DescribeVpcEndpoints",
+        "ec2:DisassociateAddress",
         "ec2:ModifyVpcEndpoint",
         "iam:PassRole",
+        "logs:CreateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:DescribeLogGroups",
+        "logs:DescribeResourcePolicies",
+        "logs:GetLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "logs:UpdateLogDelivery",
         "transfer:DescribeServer",
         "transfer:StartServer",
         "transfer:StopServer",
-        "transfer:UpdateServer",
         "transfer:TagResource",
         "transfer:UnTagResource",
-        "logs:CreateLogDelivery",
-        "logs:GetLogDelivery",
-        "logs:UpdateLogDelivery",
-        "logs:DeleteLogDelivery",
-        "logs:ListLogDeliveries",
-        "logs:PutResourcePolicy",
-        "logs:DescribeResourcePolicies",
-        "logs:DescribeLogGroups"
+        "transfer:UpdateServer"
       ]
     },
     "delete": {
@@ -424,8 +442,8 @@
         "ec2:DescribeNetworkInterfaces",
         "ec2:DescribeVpcEndpoints",
         "ec2:DisassociateAddress",
-        "logs:GetLogDelivery",
         "logs:DeleteLogDelivery",
+        "logs:GetLogDelivery",
         "logs:ListLogDeliveries",
         "transfer:DeleteServer"
       ]
@@ -442,5 +460,11 @@
     "tagProperty": "/properties/Tags",
     "tagUpdatable": true,
     "taggable": true
-  }
+  },
+  "additionalProperties": false,
+  "conditionalCreateOnlyProperties": [
+    "/properties/EndpointDetails",
+    "/properties/EndpointDetails/AddressAllocationIds"
+  ],
+  "sourceUrl": "https://github.com/aws-cloudformation/aws-cloudformation-resource-providers-transfer"
 }

@@ -37,6 +37,7 @@ public final class Translator {
                 .map(mapping -> HomeDirectoryMapEntry.builder()
                         .entry(mapping.getEntry())
                         .target(mapping.getTarget())
+                        .type(mapping.getType())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -50,6 +51,7 @@ public final class Translator {
                 .map(mapping -> software.amazon.transfer.user.HomeDirectoryMapEntry.builder()
                         .entry(mapping.entry())
                         .target(mapping.target())
+                        .type(mapping.typeAsString())
                         .build())
                 .collect(Collectors.toList());
     }
