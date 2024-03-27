@@ -3,6 +3,7 @@ package software.amazon.transfer.user;
 import static org.mockito.Mockito.mock;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.DescribeUserResponse;
 import software.amazon.awssdk.services.transfer.model.DescribedUser;
 import software.amazon.awssdk.services.transfer.model.MapType;
+import software.amazon.awssdk.services.transfer.model.SshPublicKey;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
 import software.amazon.cloudformation.proxy.LoggerProxy;
@@ -188,6 +190,17 @@ public class AbstractTestBase {
     }
 
     protected DescribeUserResponse describeUserResponseFromModel(ResourceModel model) {
+        return describeUserResponseFromModel(model, Collections.emptyList());
+    }
+
+    protected DescribeUserResponse describeUserResponseFromModel(
+            ResourceModel model, Collection<SshPublicKey> extraPublicKeys) {
+        var publicKeys = translateToSdkSshPublicKeys(model.getSshPublicKeys());
+        if (publicKeys != null) {
+            publicKeys.addAll(extraPublicKeys);
+        } else {
+            publicKeys = extraPublicKeys;
+        }
         return DescribeUserResponse.builder()
                 .serverId(model.getServerId())
                 .user(DescribedUser.builder()
@@ -200,13 +213,13 @@ public class AbstractTestBase {
                         .homeDirectoryMappings(
                                 Translator.translateToSdkHomeDirectoryMappings(model.getHomeDirectoryMappings()))
                         .posixProfile(Translator.translateToSdkPosixProfile(model.getPosixProfile()))
-                        .sshPublicKeys(translateToSdkSshPublicKeys(model.getSshPublicKeys()))
+                        .sshPublicKeys(publicKeys)
                         .tags(Translator.translateToSdkTags(model.getTags()))
                         .build())
                 .build();
     }
 
-    private Collection<software.amazon.awssdk.services.transfer.model.SshPublicKey> translateToSdkSshPublicKeys(
+    protected Collection<software.amazon.awssdk.services.transfer.model.SshPublicKey> translateToSdkSshPublicKeys(
             List<String> sshPublicKeys) {
         if (sshPublicKeys == null || sshPublicKeys.isEmpty()) {
             return null;
@@ -215,6 +228,6 @@ public class AbstractTestBase {
                 .map(key -> software.amazon.awssdk.services.transfer.model.SshPublicKey.builder()
                         .sshPublicKeyBody(key)
                         .build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }

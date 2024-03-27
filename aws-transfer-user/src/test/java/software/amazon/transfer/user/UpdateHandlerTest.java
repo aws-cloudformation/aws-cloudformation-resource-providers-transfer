@@ -9,7 +9,9 @@ import static org.mockito.Mockito.verify;
 import static software.amazon.transfer.user.BaseHandlerStd.THROTTLE_CALLBACK_DELAY_SECONDS;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.SoftAssertions;
@@ -21,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import software.amazon.awssdk.services.transfer.model.DescribeUserRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeUserResponse;
+import software.amazon.awssdk.services.transfer.model.SshPublicKey;
 import software.amazon.awssdk.services.transfer.model.TagResourceRequest;
 import software.amazon.awssdk.services.transfer.model.TagResourceResponse;
 import software.amazon.awssdk.services.transfer.model.ThrottlingException;
@@ -59,12 +62,12 @@ public class UpdateHandlerTest extends AbstractTestBase {
         ResourceModel desired = simpleUserModel();
         desired.setSshPublicKeys(Arrays.asList(key1, key2, key3));
 
-        updateAndAssertSuccess(current, desired);
+        updateAndAssertSuccess(current, desired, extraPublicKeys());
 
         current.setSshPublicKeys(Arrays.asList(key1, key2, key3));
         desired.setSshPublicKeys(Collections.singletonList(key1));
 
-        updateAndAssertSuccess(current, desired);
+        updateAndAssertSuccess(current, desired, extraPublicKeys());
     }
 
     @Test
@@ -82,13 +85,13 @@ public class UpdateHandlerTest extends AbstractTestBase {
         desired.setTags(Arrays.asList(tag1, tag2, tag3));
 
         // adding three
-        updateAndAssertSuccess(current, desired);
+        updateAndAssertSuccess(current, desired, extraPublicKeys());
 
         current.setTags(Arrays.asList(tag1, tag2, tag3));
         desired.setTags(null);
 
         // removing three
-        updateAndAssertSuccess(current, desired);
+        updateAndAssertSuccess(current, desired, extraPublicKeys());
 
         current.setTags(Arrays.asList(tag1, tag3));
         desired.setTags(Arrays.asList(tag1, tag2, tag3));
@@ -104,6 +107,11 @@ public class UpdateHandlerTest extends AbstractTestBase {
     }
 
     private void updateAndAssertSuccess(ResourceModel current, ResourceModel desired) {
+        updateAndAssertSuccess(current, desired, Collections.emptyList());
+    }
+
+    private void updateAndAssertSuccess(
+            ResourceModel current, ResourceModel desired, Collection<SshPublicKey> extraPublicKeys) {
         final ResourceHandlerRequest<ResourceModel> request = requestBuilder()
                 .previousResourceState(current)
                 .desiredResourceState(desired)
@@ -111,7 +119,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         setupUserUpdateResponse();
 
-        DescribeUserResponse describeUserResponse = describeUserResponseFromModel(desired);
+        DescribeUserResponse describeUserResponse = describeUserResponseFromModel(desired, extraPublicKeys);
         doReturn(describeUserResponse).when(sdkClient).describeUser(any(DescribeUserRequest.class));
 
         callAndAssertInProgress(request);
@@ -218,6 +226,10 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         assertThat(response).isNotNull();
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
+    }
+
+    private Collection<SshPublicKey> extraPublicKeys() {
+        return translateToSdkSshPublicKeys(List.of("ssh-rsa foobar-1", "ssh-rsa foobar-2", "ssh-rsa foobar-3"));
     }
 
     private void setupUserUpdateResponse() {

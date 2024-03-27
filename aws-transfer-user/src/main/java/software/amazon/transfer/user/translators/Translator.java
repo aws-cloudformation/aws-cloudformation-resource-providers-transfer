@@ -1,15 +1,18 @@
 package software.amazon.transfer.user.translators;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
+import software.amazon.awssdk.annotations.NotNull;
 import software.amazon.awssdk.services.transfer.model.HomeDirectoryMapEntry;
 import software.amazon.awssdk.services.transfer.model.TagResourceRequest;
 import software.amazon.awssdk.services.transfer.model.UntagResourceRequest;
@@ -163,5 +166,20 @@ public final class Translator {
             model.setServerId(userArn.getServerId());
             model.setUserName(userArn.getUserName());
         }
+    }
+
+    private static final Pattern spaceSqueezer = Pattern.compile("\\s+");
+
+    // Blatantly copied from the API implementation to ensure we compare the
+    // normalized format of the SSH key body in the ReadHandler.
+    private static String canonicalize(String sshPublicKeyBody) {
+        return spaceSqueezer.matcher(sshPublicKeyBody.trim()).replaceAll(" ");
+    }
+
+    public static @NotNull List<String> normalizeSshKeys(List<String> sshPublicKeys) {
+        if (sshPublicKeys == null || sshPublicKeys.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return sshPublicKeys.stream().map(Translator::canonicalize).collect(Collectors.toList());
     }
 }
