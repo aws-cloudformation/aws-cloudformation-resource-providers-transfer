@@ -32,24 +32,22 @@ public class ReadHandler extends BaseHandlerStd {
 
         final String clientRequestToken = request.getClientRequestToken();
 
-        ensureServerIdAndUserNameInModel(request.getDesiredResourceState());
+        final ResourceModel desiredModel = request.getDesiredResourceState();
 
-        final String serverId = request.getDesiredResourceState().getServerId();
-        final List<String> expectedSshKeys =
-                normalizeSshKeys(request.getDesiredResourceState().getSshPublicKeys());
+        ensureServerIdAndUserNameInModel(desiredModel);
 
-        return proxy.initiate(
-                        "AWS-Transfer-User::Read", proxyClient, request.getDesiredResourceState(), callbackContext)
+        final String serverId = desiredModel.getServerId();
+
+        return proxy.initiate("AWS-Transfer-User::Read", proxyClient, desiredModel, callbackContext)
                 .translateToServiceRequest(this::translateToReadRequest)
                 .makeServiceCall(this::readUser)
                 .handleError((ignored, exception, client, model, context) ->
                         handleError(READ, exception, model, context, clientRequestToken))
-                .done(awsResponse -> ProgressEvent.defaultSuccessHandler(
-                        translateFromReadResponse(serverId, awsResponse, expectedSshKeys)));
+                .done(awsResponse ->
+                        ProgressEvent.defaultSuccessHandler(translateFromReadResponse(serverId, awsResponse)));
     }
 
-    private ResourceModel translateFromReadResponse(
-            final String serverId, final DescribeUserResponse awsResponse, List<String> expectedSshKeys) {
+    private ResourceModel translateFromReadResponse(final String serverId, final DescribeUserResponse awsResponse) {
         DescribedUser user = awsResponse.user();
 
         // Handle the use case where a user might have SSH keys managed completely out of CloudFormation,
@@ -57,24 +55,8 @@ public class ReadHandler extends BaseHandlerStd {
         // we make the result omit the extra keys. However, if the returned keys are missing expected CFN managed
         // keys we will allow this to return a list of keys that is incomplete and show the User as having a drift.
         List<String> responseSshKeys = normalizeSshKeys(translateFromSshPublicKeys(user.sshPublicKeys()));
-        if (!responseSshKeys.isEmpty()) {
-            if (expectedSshKeys.isEmpty()) {
-                logger.log(String.format(
-                        "User %s has keys, but the request model has no keys, assuming keys not managed by CloudFormation",
-                        user.userName()));
-                responseSshKeys = null;
-            } else {
-                responseSshKeys = responseSshKeys.stream()
-                        .filter(expectedSshKeys::contains)
-                        .collect(Collectors.toList());
-                if (responseSshKeys.isEmpty()) {
-                    logger.log(String.format(
-                            "User %s has no keys that match the request model, possible drift detected",
-                            user.userName()));
-                    responseSshKeys = null;
-                }
-            }
-        } else {
+        if (responseSshKeys.isEmpty()) {
+            logger.log(String.format("User %s has no keys", user.userName()));
             responseSshKeys = null;
         }
 

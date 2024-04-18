@@ -209,15 +209,14 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             List<String> keysToAdd,
             ProgressEvent<ResourceModel, CallbackContext> progress) {
 
-        String serverId = progress.getResourceModel().getServerId();
-        String userName = progress.getResourceModel().getUserName();
+        ResourceModel resourceModel = progress.getResourceModel();
+        CallbackContext ctx = progress.getCallbackContext();
+
+        String serverId = resourceModel.getServerId();
+        String userName = resourceModel.getUserName();
 
         for (String keyBody : keysToAdd) {
-            progress = proxy.initiate(
-                            "AWS-Transfer-User::importSshPublicKey",
-                            proxyClient,
-                            progress.getResourceModel(),
-                            progress.getCallbackContext())
+            progress = proxy.initiate("AWS-Transfer-User::importSshPublicKey", proxyClient, resourceModel, ctx)
                     .translateToServiceRequest(m -> translateToImportSshPublicKey(serverId, userName, keyBody))
                     .makeServiceCall(this::importSshPublicKey)
                     .handleError((ignored, exception, client, model, context) ->
@@ -255,8 +254,11 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
             return progress;
         }
 
-        String serverId = progress.getResourceModel().getServerId();
-        String userName = progress.getResourceModel().getUserName();
+        ResourceModel resourceModel = progress.getResourceModel();
+        CallbackContext ctx = progress.getCallbackContext();
+
+        String serverId = resourceModel.getServerId();
+        String userName = resourceModel.getUserName();
 
         DescribeUserRequest readRequest = translateToReadRequest(progress.getResourceModel());
         List<SshPublicKey> currentKeys =
@@ -268,11 +270,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
                 .collect(Collectors.toList());
 
         for (String sshKeyId : keyIdsToDelete) {
-            progress = proxy.initiate(
-                            "AWS-Transfer-User::deleteSshPublicKey",
-                            proxyClient,
-                            progress.getResourceModel(),
-                            progress.getCallbackContext())
+            progress = proxy.initiate("AWS-Transfer-User::deleteSshPublicKey", proxyClient, resourceModel, ctx)
                     .translateToServiceRequest(m -> translateToDeleteSshPublicKey(serverId, userName, sshKeyId))
                     .makeServiceCall(this::deleteSshPublicKey)
                     .handleError((ignored, exception, client, model, context) ->
@@ -396,7 +394,7 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
         try (TransferClient transferClient = client.client()) {
             DescribeUserResponse awsResponse =
                     client.injectCredentialsAndInvokeV2(awsRequest, transferClient::describeUser);
-            log("has successfully been read.", awsRequest.userName());
+            log("has been read successfully.", awsRequest.userName());
             return awsResponse;
         }
     }

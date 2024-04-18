@@ -5,6 +5,8 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static software.amazon.transfer.user.BaseHandlerStd.THROTTLE_CALLBACK_DELAY_SECONDS;
 
@@ -20,9 +22,12 @@ import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Stubber;
 
+import software.amazon.awssdk.services.transfer.model.DeleteSshPublicKeyRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeUserRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeUserResponse;
+import software.amazon.awssdk.services.transfer.model.ImportSshPublicKeyRequest;
 import software.amazon.awssdk.services.transfer.model.SshPublicKey;
 import software.amazon.awssdk.services.transfer.model.TagResourceRequest;
 import software.amazon.awssdk.services.transfer.model.TagResourceResponse;
@@ -62,12 +67,16 @@ public class UpdateHandlerTest extends AbstractTestBase {
         ResourceModel desired = simpleUserModel();
         desired.setSshPublicKeys(Arrays.asList(key1, key2, key3));
 
-        updateAndAssertSuccess(current, desired, extraPublicKeys());
+        // Add two new keys
+        updateAndAssertSuccess(current, desired);
+        verify(sdkClient, times(2)).importSshPublicKey(any(ImportSshPublicKeyRequest.class));
 
         current.setSshPublicKeys(Arrays.asList(key1, key2, key3));
         desired.setSshPublicKeys(Collections.singletonList(key1));
 
-        updateAndAssertSuccess(current, desired, extraPublicKeys());
+        // Remove two keys
+        updateAndAssertSuccess(current, desired, List.of(), true);
+        verify(sdkClient, times(2)).deleteSshPublicKey(any(DeleteSshPublicKeyRequest.class));
     }
 
     @Test
@@ -79,39 +88,52 @@ public class UpdateHandlerTest extends AbstractTestBase {
         ResourceModel current = simpleUserModel();
         ResourceModel desired = simpleUserModel();
 
-        // No changes
+        // No changes, no external managed keys
         updateAndAssertSuccess(current, desired);
+        assertNoKeysChanged();
 
         desired.setTags(Arrays.asList(tag1, tag2, tag3));
 
-        // adding three
-        updateAndAssertSuccess(current, desired, extraPublicKeys());
+        // adding three tags when having externally managed keys
+        updateAndAssertSuccess(current, desired, extraPublicKeys(), false);
+        assertNoKeysChanged();
 
         current.setTags(Arrays.asList(tag1, tag2, tag3));
         desired.setTags(null);
 
-        // removing three
-        updateAndAssertSuccess(current, desired, extraPublicKeys());
+        // removing three tags when having externally managed keys
+        updateAndAssertSuccess(current, desired, extraPublicKeys(), false);
+        assertNoKeysChanged();
 
         current.setTags(Arrays.asList(tag1, tag3));
         desired.setTags(Arrays.asList(tag1, tag2, tag3));
 
-        // adding one
+        // adding one tag without keys
         updateAndAssertSuccess(current, desired);
+        assertNoKeysChanged();
 
         current.setTags(Arrays.asList(tag1, tag2, tag3));
         desired.setTags(Arrays.asList(tag1, tag3));
 
-        // removing one
+        // removing one tag without keys
         updateAndAssertSuccess(current, desired);
+        assertNoKeysChanged();
+    }
+
+    private void assertNoKeysChanged() {
+        verify(sdkClient, never()).importSshPublicKey(any(ImportSshPublicKeyRequest.class));
+        verify(sdkClient, never()).deleteSshPublicKey(any(DeleteSshPublicKeyRequest.class));
     }
 
     private void updateAndAssertSuccess(ResourceModel current, ResourceModel desired) {
-        updateAndAssertSuccess(current, desired, Collections.emptyList());
+        updateAndAssertSuccess(current, desired, Collections.emptyList(), false);
     }
 
     private void updateAndAssertSuccess(
-            ResourceModel current, ResourceModel desired, Collection<SshPublicKey> extraPublicKeys) {
+            ResourceModel current,
+            ResourceModel desired,
+            Collection<SshPublicKey> extraPublicKeys,
+            boolean willDelete) {
         final ResourceHandlerRequest<ResourceModel> request = requestBuilder()
                 .previousResourceState(current)
                 .desiredResourceState(desired)
@@ -119,11 +141,23 @@ public class UpdateHandlerTest extends AbstractTestBase {
 
         setupUserUpdateResponse();
 
-        DescribeUserResponse describeUserResponse = describeUserResponseFromModel(desired, extraPublicKeys);
-        doReturn(describeUserResponse).when(sdkClient).describeUser(any(DescribeUserRequest.class));
+        // More complexity in delete keys case, we do an extra DescribeUser call to make sure
+        // we call DeleteSshPublicKey only if the key actually exists.
+        Stubber stubber;
+        if (willDelete) {
+            DescribeUserResponse initialUserState = describeUserResponseFromModel(current);
+            DescribeUserResponse describeUserResponse = describeUserResponseFromModel(desired, extraPublicKeys);
+            stubber = doReturn(initialUserState).doReturn(describeUserResponse);
+        } else {
+            DescribeUserResponse describeUserResponse = describeUserResponseFromModel(desired, extraPublicKeys);
+            stubber = doReturn(describeUserResponse);
+        }
+        stubber.when(sdkClient).describeUser(any(DescribeUserRequest.class));
 
+        Collection<String> extraKeys =
+                extraPublicKeys.stream().map(SshPublicKey::sshPublicKeyBody).toList();
         callAndAssertInProgress(request);
-        callAndAssertSuccess(request);
+        callAndAssertSuccess(request, extraKeys);
 
         verify(sdkClient, atLeastOnce()).updateUser(any(UpdateUserRequest.class));
         verify(sdkClient, atLeastOnce()).describeUser(any(DescribeUserRequest.class));
@@ -167,20 +201,53 @@ public class UpdateHandlerTest extends AbstractTestBase {
         callAndAssertInProgress(request);
         callAndAssertInProgress(request);
         callAndAssertInProgress(request);
-        callAndAssertSuccess(request);
+        callAndAssertSuccess(request, List.of());
 
         verify(sdkClient, atLeastOnce()).updateUser(any(UpdateUserRequest.class));
         verify(sdkClient, atLeastOnce()).describeUser(any(DescribeUserRequest.class));
     }
 
-    private void callAndAssertSuccess(ResourceHandlerRequest<ResourceModel> request) {
+    private void callAndAssertSuccess(ResourceHandlerRequest<ResourceModel> request, Collection<String> extraKeys) {
         ProgressEvent<ResourceModel, CallbackContext> response =
                 handler.handleRequest(proxy, request, new CallbackContext(), proxyClient, logger);
 
         assertThat(response).isNotNull();
+
         softly.assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         softly.assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
-        softly.assertThat(response.getResourceModel()).isEqualTo(request.getDesiredResourceState());
+
+        // In order to support the use case of external managed ssh keys we must validate fields
+        softly.assertThat(response.getResourceModel().getArn())
+                .isEqualTo(request.getDesiredResourceState().getArn());
+        softly.assertThat(response.getResourceModel().getServerId())
+                .isEqualTo(request.getDesiredResourceState().getServerId());
+        softly.assertThat(response.getResourceModel().getUserName())
+                .isEqualTo(request.getDesiredResourceState().getUserName());
+        softly.assertThat(response.getResourceModel().getHomeDirectory())
+                .isEqualTo(request.getDesiredResourceState().getHomeDirectory());
+        softly.assertThat(response.getResourceModel().getHomeDirectoryType())
+                .isEqualTo(request.getDesiredResourceState().getHomeDirectoryType());
+        softly.assertThat(response.getResourceModel().getHomeDirectoryMappings())
+                .isEqualTo(request.getDesiredResourceState().getHomeDirectoryMappings());
+        softly.assertThat(response.getResourceModel().getTags())
+                .isEqualTo(request.getDesiredResourceState().getTags());
+        softly.assertThat(response.getResourceModel().getRole())
+                .isEqualTo(request.getDesiredResourceState().getRole());
+        softly.assertThat(response.getResourceModel().getPolicy())
+                .isEqualTo(request.getDesiredResourceState().getPolicy());
+        softly.assertThat(response.getResourceModel().getPosixProfile())
+                .isEqualTo(request.getDesiredResourceState().getPosixProfile());
+
+        // This is where things get weird with CFN and externally managed keys. We expect the model
+        // to match the desired state normally but when there are external keys and NONE given for
+        // the desired state, we expect the model to match the external keys instead.
+        if (extraKeys.isEmpty()) {
+            softly.assertThat(response.getResourceModel().getSshPublicKeys())
+                    .isEqualTo(request.getDesiredResourceState().getSshPublicKeys());
+        } else {
+            softly.assertThat(response.getResourceModel().getSshPublicKeys()).isEqualTo(extraKeys);
+        }
+
         softly.assertThat(response.getResourceModels()).isNull();
         softly.assertThat(response.getMessage()).isNull();
         softly.assertThat(response.getErrorCode()).isNull();
