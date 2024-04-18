@@ -35,17 +35,26 @@ public class UpdateHandler extends BaseHandlerStd {
         Translator.ensureServerIdAndUserNameInModel(oldModel);
         Translator.ensureServerIdAndUserNameInModel(newModel);
 
+        final List<String> keysToAdd = new ArrayList<>();
         final List<String> keysToDelete = translateToSShPublicKeyBodies(oldModel);
         final List<String> requestedKeys = translateToSShPublicKeyBodies(newModel);
 
-        // Here we prune the list of current keys to eliminate
-        // existing keys by checking the body for matches.
-        // What is left should be deleted to complete the update.
-        // The truly new keys are added to the list.
-        final List<String> keysToAdd = new ArrayList<>();
-        for (String key : requestedKeys) {
-            if (!keysToDelete.remove(key)) {
-                keysToAdd.add(key);
+        // XFER-10648: Must ignore keys not managed by CFN when found in current
+        // model. Uluru will populate the PreviousResourceState using the result
+        // from a call to the ReadHandler. Such a call will make keys managed externally
+        // appear as part of the model. If the DesiredResourceState does not contain
+        // keys we must ignore the existing keys and do nothing about them.
+        if (newModel.getSshPublicKeys() == null) {
+            keysToDelete.clear();
+        } else {
+            // Here we prune the list of current keys to eliminate
+            // existing keys by checking the body for matches.
+            // What is left should be deleted to complete the update.
+            // The truly new keys are added to the list.
+            for (String key : requestedKeys) {
+                if (!keysToDelete.remove(key)) {
+                    keysToAdd.add(key);
+                }
             }
         }
 
