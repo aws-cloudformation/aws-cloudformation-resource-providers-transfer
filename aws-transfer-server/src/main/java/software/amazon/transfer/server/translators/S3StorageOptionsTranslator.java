@@ -7,10 +7,12 @@ public final class S3StorageOptionsTranslator {
 
     public static software.amazon.awssdk.services.transfer.model.S3StorageOptions toSdk(
             S3StorageOptions s3StorageOptions) {
-        var builder = software.amazon.awssdk.services.transfer.model.S3StorageOptions.builder();
-        if (s3StorageOptions != null) {
-            builder.directoryListingOptimization(s3StorageOptions.getDirectoryListingOptimization());
+        if (s3StorageOptions == null) {
+            return null;
         }
+
+        var builder = software.amazon.awssdk.services.transfer.model.S3StorageOptions.builder();
+        builder.directoryListingOptimization(s3StorageOptions.getDirectoryListingOptimization());
         return builder.build();
     }
 
