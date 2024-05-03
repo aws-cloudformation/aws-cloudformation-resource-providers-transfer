@@ -67,10 +67,6 @@ _Required_: No
 
 _Type_: String
 
-_Maximum Length_: <code>21</code>
-
-_Pattern_: <code>^vpc-[0-9a-f]{8,17}$</code>
-
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
 #### SecurityGroupIds
