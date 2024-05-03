@@ -249,9 +249,27 @@ public class UpdateHandler extends BaseHandlerStd {
                         return awsResponse;
                     }
                 })
+                .stabilize((awsRequest, awsResponse, client, model, context) ->
+                        waitForVpcEndpoint(awsRequest, awsResponse, client, model, context))
                 .handleError((ignored, exception, proxyClient1, model1, callbackContext1) ->
                         handleError(UPDATE, exception, model1, callbackContext1, clientRequestToken))
                 .progress();
+    }
+
+    private Boolean waitForVpcEndpoint(
+            ModifyVpcEndpointRequest request,
+            ModifyVpcEndpointResponse ignored1,
+            ProxyClient<Ec2Client> client,
+            ResourceModel model,
+            CallbackContext ignored2) {
+        String vpcEndpointId = request.vpcEndpointId();
+        if (!isVpcEndpointAvailable(vpcEndpointId, client)) {
+            log("VPC Endpoint is not available yet.", model.getServerId());
+            return false;
+        }
+
+        log("VPC endpoint stablized after security group update", model.getServerId());
+        return true;
     }
 
     private String getVpcEndpointId(ResourceModel model, ProxyClient<TransferClient> client) {
