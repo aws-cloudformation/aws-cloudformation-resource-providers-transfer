@@ -71,11 +71,6 @@
       ],
       "additionalProperties": false
     },
-    "SshPublicKey": {
-      "type": "string",
-      "maxLength": 2048,
-      "minLength": 0
-    },
     "Tag": {
       "type": "object",
       "properties": {
@@ -144,10 +139,12 @@
     "SshPublicKeys": {
       "type": "array",
       "items": {
-        "$ref": "#/definitions/SshPublicKey"
+        "type": "string",
+        "maxLength": 2048,
+        "minLength": 0,
+        "pattern": "^\\s*(ssh|ecdsa)-[a-z0-9-]+[ \\t]+(([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{1,3})?(={0,3})?)(\\s*|[ \\t]+[\\S \\t]*\\s*)$"
       },
-      "maxItems": 5,
-      "minItems": 0
+      "description": "This represents the SSH User Public Keys for CloudFormation resource"
     },
     "Tags": {
       "type": "array",

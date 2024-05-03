@@ -29,19 +29,13 @@
         "AddressAllocationIds": {
           "type": "array",
           "items": {
-            "type": "string",
-            "maxLength": 26,
-            "minLength": 0,
-            "pattern": "^eipalloc-([0-9a-f]{8,17})$"
+            "type": "string"
           }
         },
         "SubnetIds": {
           "type": "array",
           "items": {
-            "type": "string",
-            "maxLength": 24,
-            "minLength": 0,
-            "pattern": "^subnet-([0-9a-f]{8,17})$"
+            "type": "string"
           }
         },
         "VpcEndpointId": {
@@ -51,10 +45,7 @@
           "pattern": "^vpce-[0-9a-f]{17}$"
         },
         "VpcId": {
-          "type": "string",
-          "maxLength": 21,
-          "minLength": 0,
-          "pattern": "^vpc-[0-9a-f]{8,17}$"
+          "type": "string"
         },
         "SecurityGroupIds": {
           "type": "array",
