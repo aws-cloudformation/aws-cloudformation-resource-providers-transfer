@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateWorkflowRequest;
 import software.amazon.awssdk.services.transfer.model.CreateWorkflowResponse;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
@@ -27,29 +25,27 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.CfnThrottlingException;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 @ExtendWith(MockitoExtension.class)
 public class CreateHandlerTest extends AbstractTestBase {
-    private AmazonWebServicesClientProxy proxy;
-    private Logger logger;
-    private TransferClient client;
+
+    private MockableBaseHandler<CallbackContext> handler;
+
+    @Override
+    MockableBaseHandler<CallbackContext> getHandler() {
+        return handler;
+    }
 
     @BeforeEach
-    public void setup() {
-        proxy = mock(AmazonWebServicesClientProxy.class);
-        logger = mock(Logger.class);
-        client = mock(TransferClient.class);
+    public void setupTestData() {
+        handler = new CreateHandler();
     }
 
     @Test
     public void handleRequest_SimpleSuccess_Copy() {
-        CreateHandler handler = new CreateHandler(client);
-
         ResourceModel model = ResourceModel.builder()
                 .description(TEST_DESCRIPTION)
                 .onExceptionSteps(getModelCopyWorkflowSteps())
@@ -65,9 +61,9 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         CreateWorkflowResponse createWorkflowResponse =
                 CreateWorkflowResponse.builder().workflowId("id").build();
-        doReturn(createWorkflowResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doReturn(createWorkflowResponse).when(client).createWorkflow(any(CreateWorkflowRequest.class));
 
-        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
+        ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
 
         ResourceModel testModel = response.getResourceModel();
         assertThat(response).isNotNull();
@@ -83,15 +79,13 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(testModel).hasFieldOrPropertyWithValue("onExceptionSteps", getModelCopyWorkflowSteps());
 
         ArgumentCaptor<CreateWorkflowRequest> requestCaptor = ArgumentCaptor.forClass(CreateWorkflowRequest.class);
-        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        verify(client).createWorkflow(requestCaptor.capture());
         CreateWorkflowRequest actualRequest = requestCaptor.getValue();
         assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
     }
 
     @Test
     public void handleRequest_SimpleSuccess_Decrypt() {
-        CreateHandler handler = new CreateHandler(client);
-
         ResourceModel model = ResourceModel.builder()
                 .description(TEST_DESCRIPTION)
                 .onExceptionSteps(getModelDecryptWorkflowSteps())
@@ -107,9 +101,9 @@ public class CreateHandlerTest extends AbstractTestBase {
 
         CreateWorkflowResponse createWorkflowResponse =
                 CreateWorkflowResponse.builder().workflowId("id").build();
-        doReturn(createWorkflowResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doReturn(createWorkflowResponse).when(client).createWorkflow(any(CreateWorkflowRequest.class));
 
-        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
+        ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
 
         ResourceModel testModel = response.getResourceModel();
         assertThat(response).isNotNull();
@@ -125,18 +119,14 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(testModel).hasFieldOrPropertyWithValue("onExceptionSteps", getModelDecryptWorkflowSteps());
 
         ArgumentCaptor<CreateWorkflowRequest> requestCaptor = ArgumentCaptor.forClass(CreateWorkflowRequest.class);
-        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        verify(client).createWorkflow(requestCaptor.capture());
         CreateWorkflowRequest actualRequest = requestCaptor.getValue();
         assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
     }
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(InvalidRequestException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(CreateWorkflowRequest.class), any());
+        doThrow(InvalidRequestException.class).when(client).createWorkflow(any(CreateWorkflowRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -144,18 +134,12 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnInvalidRequestException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnInvalidRequestException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(InternalServiceErrorException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(CreateWorkflowRequest.class), any());
+        doThrow(InternalServiceErrorException.class).when(client).createWorkflow(any(CreateWorkflowRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -163,18 +147,12 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnServiceInternalErrorException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnServiceInternalErrorException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_ResourceExistsExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(ResourceExistsException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(CreateWorkflowRequest.class), any());
+        doThrow(ResourceExistsException.class).when(client).createWorkflow(any(CreateWorkflowRequest.class));
 
         ResourceModel model = ResourceModel.builder().workflowId("testId").build();
 
@@ -182,18 +160,12 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnAlreadyExistsException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnAlreadyExistsException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_ThrottlingExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(ThrottlingException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(CreateWorkflowRequest.class), any());
+        doThrow(ThrottlingException.class).when(client).createWorkflow(any(CreateWorkflowRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -201,18 +173,12 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnThrottlingException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnThrottlingException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(TransferException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(CreateWorkflowRequest.class), any());
+        doThrow(TransferException.class).when(client).createWorkflow(any(CreateWorkflowRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -220,8 +186,6 @@ public class CreateHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnGeneralServiceException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnGeneralServiceException.class, () -> callHandler(request));
     }
 }

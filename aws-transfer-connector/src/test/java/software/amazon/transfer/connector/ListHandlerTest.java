@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static software.amazon.transfer.connector.AbstractTestBase.*;
 
 import java.util.List;
@@ -13,10 +12,8 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
 import software.amazon.awssdk.services.transfer.model.ListConnectorsRequest;
@@ -26,35 +23,27 @@ import software.amazon.awssdk.services.transfer.model.TransferException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 @ExtendWith(MockitoExtension.class)
-public class ListHandlerTest {
+public class ListHandlerTest extends AbstractTestBase {
 
-    @Mock
-    private AmazonWebServicesClientProxy proxy;
+    private MockableBaseHandler<CallbackContext> handler;
 
-    @Mock
-    private Logger logger;
-
-    @Mock
-    private TransferClient client;
+    @Override
+    MockableBaseHandler<CallbackContext> getHandler() {
+        return handler;
+    }
 
     @BeforeEach
-    public void setup() {
-        proxy = mock(AmazonWebServicesClientProxy.class);
-        logger = mock(Logger.class);
-        client = mock(TransferClient.class);
+    public void setupTestData() {
+        handler = new ListHandler();
     }
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final ListHandler handler = new ListHandler(client);
-
         ListedConnector listedConnector = ListedConnector.builder()
                 .arn(TEST_ARN)
                 .connectorId(TEST_CONNECTOR_ID)
@@ -70,10 +59,9 @@ public class ListHandlerTest {
 
         ListConnectorsResponse listConnectorsResponse =
                 ListConnectorsResponse.builder().connectors(listedConnector).build();
-        doReturn(listConnectorsResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doReturn(listConnectorsResponse).when(client).listConnectors(any(ListConnectorsRequest.class));
 
-        final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
 
         List<ResourceModel> testModels = response.getResourceModels();
 
@@ -96,11 +84,7 @@ public class ListHandlerTest {
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        ListHandler handler = new ListHandler(client);
-
-        doThrow(InvalidRequestException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(ListConnectorsRequest.class), any());
+        doThrow(InvalidRequestException.class).when(client).listConnectors(any(ListConnectorsRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -108,18 +92,12 @@ public class ListHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnInvalidRequestException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnInvalidRequestException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        ListHandler handler = new ListHandler(client);
-
-        doThrow(InternalServiceErrorException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(ListConnectorsRequest.class), any());
+        doThrow(InternalServiceErrorException.class).when(client).listConnectors(any(ListConnectorsRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -127,18 +105,12 @@ public class ListHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnServiceInternalErrorException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnServiceInternalErrorException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        ListHandler handler = new ListHandler(client);
-
-        doThrow(TransferException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(ListConnectorsRequest.class), any());
+        doThrow(TransferException.class).when(client).listConnectors(any(ListConnectorsRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -146,8 +118,6 @@ public class ListHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnGeneralServiceException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnGeneralServiceException.class, () -> callHandler(request));
     }
 }

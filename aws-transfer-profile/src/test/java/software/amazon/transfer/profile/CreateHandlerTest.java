@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateProfileRequest;
 import software.amazon.awssdk.services.transfer.model.CreateProfileResponse;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
@@ -23,30 +22,27 @@ import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.ResourceNotFoundException;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 @ExtendWith(MockitoExtension.class)
-public class CreateHandlerTest {
+public class CreateHandlerTest extends AbstractTestBase {
 
-    private AmazonWebServicesClientProxy proxy;
-    private Logger logger;
-    private TransferClient client;
+    private MockableBaseHandler<CallbackContext> handler;
+
+    @Override
+    MockableBaseHandler<CallbackContext> getHandler() {
+        return handler;
+    }
 
     @BeforeEach
-    public void setup() {
-        proxy = mock(AmazonWebServicesClientProxy.class);
-        logger = mock(Logger.class);
-        client = mock(TransferClient.class);
+    public void setupTestData() {
+        handler = new CreateHandler();
     }
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final CreateHandler handler = new CreateHandler(client);
-
         final ResourceModel model = ResourceModel.builder()
                 .as2Id("testid")
                 .profileType("PARTNER")
@@ -62,10 +58,9 @@ public class CreateHandlerTest {
         CreateProfileResponse createProfileResponse =
                 CreateProfileResponse.builder().profileId("p-123456").build();
 
-        doReturn(createProfileResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doReturn(createProfileResponse).when(client).createProfile(any(CreateProfileRequest.class));
 
-        final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
 
         ResourceModel testModel = response.getResourceModel();
         assertThat(response).isNotNull();
@@ -81,18 +76,14 @@ public class CreateHandlerTest {
         assertThat(testModel).hasFieldOrPropertyWithValue("profileId", "p-123456");
 
         ArgumentCaptor<CreateProfileRequest> requestCaptor = ArgumentCaptor.forClass(CreateProfileRequest.class);
-        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        verify(client).createProfile(requestCaptor.capture());
         CreateProfileRequest actualRequest = requestCaptor.getValue();
         assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
     }
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(InvalidRequestException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(CreateProfileRequest.class), any());
+        doThrow(InvalidRequestException.class).when(client).createProfile(any(CreateProfileRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -100,18 +91,12 @@ public class CreateHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnInvalidRequestException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnInvalidRequestException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(InternalServiceErrorException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(CreateProfileRequest.class), any());
+        doThrow(InternalServiceErrorException.class).when(client).createProfile(any(CreateProfileRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -119,18 +104,12 @@ public class CreateHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnServiceInternalErrorException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnServiceInternalErrorException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(TransferException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(CreateProfileRequest.class), any());
+        doThrow(TransferException.class).when(client).createProfile(any(CreateProfileRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -138,18 +117,12 @@ public class CreateHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnGeneralServiceException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnGeneralServiceException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_ResourceNotFoundExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(ResourceNotFoundException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(CreateProfileRequest.class), any());
+        doThrow(ResourceNotFoundException.class).when(client).createProfile(any(CreateProfileRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -157,8 +130,6 @@ public class CreateHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnNotFoundException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnNotFoundException.class, () -> callHandler(request));
     }
 }
