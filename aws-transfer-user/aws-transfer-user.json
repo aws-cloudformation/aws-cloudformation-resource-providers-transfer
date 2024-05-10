@@ -56,6 +56,7 @@
         },
         "SecondaryGids": {
           "type": "array",
+          "insertionOrder": false,
           "items": {
             "type": "number",
             "maximum": 4294967295,
@@ -107,6 +108,7 @@
     },
     "HomeDirectoryMappings": {
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/HomeDirectoryMapEntry"
       },
@@ -138,6 +140,7 @@
     },
     "SshPublicKeys": {
       "type": "array",
+      "insertionOrder": true,
       "items": {
         "type": "string",
         "maxLength": 2048,
@@ -148,6 +151,7 @@
     },
     "Tags": {
       "type": "array",
+      "insertionOrder": false,
       "items": {
         "$ref": "#/definitions/Tag"
       },
