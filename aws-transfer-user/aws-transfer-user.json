@@ -140,7 +140,7 @@
     },
     "SshPublicKeys": {
       "type": "array",
-      "insertionOrder": true,
+      "insertionOrder": false,
       "items": {
         "type": "string",
         "maxLength": 2048,
