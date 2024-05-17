@@ -6,15 +6,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static software.amazon.transfer.agreement.AbstractTestBase.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.CreateAgreementRequest;
 import software.amazon.awssdk.services.transfer.model.CreateAgreementResponse;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
@@ -27,27 +25,27 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
 import software.amazon.cloudformation.exceptions.CfnThrottlingException;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 @ExtendWith(MockitoExtension.class)
-public class CreateHandlerTest {
-    @Mock
-    private AmazonWebServicesClientProxy proxy;
+public class CreateHandlerTest extends AbstractTestBase {
 
-    @Mock
-    private Logger logger;
+    private MockableBaseHandler<CallbackContext> handler;
 
-    @Mock
-    private TransferClient client;
+    @Override
+    MockableBaseHandler<CallbackContext> getHandler() {
+        return handler;
+    }
+
+    @BeforeEach
+    public void setupTestData() {
+        handler = new CreateHandler();
+    }
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final CreateHandler handler = new CreateHandler(client);
-
         final ResourceModel model = ResourceModel.builder()
                 .accessRole(TEST_ACCESS_ROLE)
                 .baseDirectory(TEST_BASE_DIRECTORY)
@@ -67,10 +65,9 @@ public class CreateHandlerTest {
 
         CreateAgreementResponse createAgreementResponse =
                 CreateAgreementResponse.builder().agreementId(TEST_AGREEMENT_ID).build();
-        doReturn(createAgreementResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doReturn(createAgreementResponse).when(client).createAgreement(any(CreateAgreementRequest.class));
 
-        final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
 
         ResourceModel testModel = response.getResourceModel();
         assertThat(response).isNotNull();
@@ -90,16 +87,14 @@ public class CreateHandlerTest {
         assertThat(testModel).hasFieldOrPropertyWithValue("status", TEST_STATUS);
 
         ArgumentCaptor<CreateAgreementRequest> requestCaptor = ArgumentCaptor.forClass(CreateAgreementRequest.class);
-        verify(proxy).injectCredentialsAndInvokeV2(requestCaptor.capture(), any());
+        verify(client).createAgreement(requestCaptor.capture());
         CreateAgreementRequest actualRequest = requestCaptor.getValue();
         assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
     }
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(InvalidRequestException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InvalidRequestException.class).when(client).createAgreement(any(CreateAgreementRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -107,16 +102,12 @@ public class CreateHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnInvalidRequestException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnInvalidRequestException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(InternalServiceErrorException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InternalServiceErrorException.class).when(client).createAgreement(any(CreateAgreementRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -124,16 +115,12 @@ public class CreateHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnServiceInternalErrorException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnServiceInternalErrorException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_ResourceExistsExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(ResourceExistsException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(ResourceExistsException.class).when(client).createAgreement(any(CreateAgreementRequest.class));
 
         ResourceModel model = ResourceModel.builder()
                 .agreementId(TEST_AGREEMENT_ID)
@@ -144,16 +131,12 @@ public class CreateHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnAlreadyExistsException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnAlreadyExistsException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_ThrottlingExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(ThrottlingException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(ThrottlingException.class).when(client).createAgreement(any(CreateAgreementRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -161,16 +144,12 @@ public class CreateHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnThrottlingException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnThrottlingException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        CreateHandler handler = new CreateHandler(client);
-
-        doThrow(TransferException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(TransferException.class).when(client).createAgreement(any(CreateAgreementRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -178,8 +157,6 @@ public class CreateHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnGeneralServiceException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnGeneralServiceException.class, () -> callHandler(request));
     }
 }

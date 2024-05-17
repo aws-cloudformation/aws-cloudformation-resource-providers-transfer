@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.DescribeProfileRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeProfileResponse;
 import software.amazon.awssdk.services.transfer.model.DescribedProfile;
@@ -23,30 +22,27 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 @ExtendWith(MockitoExtension.class)
-public class ReadHandlerTest {
+public class ReadHandlerTest extends AbstractTestBase {
 
-    private AmazonWebServicesClientProxy proxy;
-    private Logger logger;
-    private TransferClient client;
+    private MockableBaseHandler<CallbackContext> handler;
+
+    @Override
+    MockableBaseHandler<CallbackContext> getHandler() {
+        return handler;
+    }
 
     @BeforeEach
-    public void setup() {
-        proxy = mock(AmazonWebServicesClientProxy.class);
-        logger = mock(Logger.class);
-        client = mock(TransferClient.class);
+    public void setupTestData() {
+        handler = new ReadHandler();
     }
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final ReadHandler handler = new ReadHandler(client);
-
         final ResourceModel model = ResourceModel.builder().profileId("testId").build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -60,10 +56,9 @@ public class ReadHandlerTest {
                         .build())
                 .build();
 
-        doReturn(describeProfileResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doReturn(describeProfileResponse).when(client).describeProfile(any(DescribeProfileRequest.class));
 
-        final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
         ResourceModel testModel = response.getResourceModel();
 
         assertThat(response).isNotNull();
@@ -79,11 +74,7 @@ public class ReadHandlerTest {
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        ReadHandler handler = new ReadHandler(client);
-
-        doThrow(InvalidRequestException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(DescribeProfileRequest.class), any());
+        doThrow(InvalidRequestException.class).when(client).describeProfile(any(DescribeProfileRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -91,18 +82,12 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnInvalidRequestException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnInvalidRequestException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        ReadHandler handler = new ReadHandler(client);
-
-        doThrow(InternalServiceErrorException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(DescribeProfileRequest.class), any());
+        doThrow(InternalServiceErrorException.class).when(client).describeProfile(any(DescribeProfileRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -110,18 +95,12 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnServiceInternalErrorException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnServiceInternalErrorException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_ResourceNotFoundExceptionFailed() {
-        ReadHandler handler = new ReadHandler(client);
-
-        doThrow(ResourceNotFoundException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(DescribeProfileRequest.class), any());
+        doThrow(ResourceNotFoundException.class).when(client).describeProfile(any(DescribeProfileRequest.class));
 
         ResourceModel model = ResourceModel.builder().profileId("testId").build();
 
@@ -129,18 +108,12 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnNotFoundException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnNotFoundException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        ReadHandler handler = new ReadHandler(client);
-
-        doThrow(TransferException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(DescribeProfileRequest.class), any());
+        doThrow(TransferException.class).when(client).describeProfile(any(DescribeProfileRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -148,8 +121,6 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnGeneralServiceException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnGeneralServiceException.class, () -> callHandler(request));
     }
 }

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
 import software.amazon.awssdk.services.transfer.model.ListWorkflowsRequest;
@@ -24,29 +22,27 @@ import software.amazon.awssdk.services.transfer.model.TransferException;
 import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 @ExtendWith(MockitoExtension.class)
 public class ListHandlerTest extends AbstractTestBase {
-    private AmazonWebServicesClientProxy proxy;
-    private Logger logger;
-    private TransferClient client;
+
+    private MockableBaseHandler<CallbackContext> handler;
+
+    @Override
+    MockableBaseHandler<CallbackContext> getHandler() {
+        return handler;
+    }
 
     @BeforeEach
-    public void setup() {
-        proxy = mock(AmazonWebServicesClientProxy.class);
-        logger = mock(Logger.class);
-        client = mock(TransferClient.class);
+    public void setupTestData() {
+        handler = new ListHandler();
     }
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final ListHandler handler = new ListHandler(client);
-
         ListedWorkflow listedWorkflow = ListedWorkflow.builder()
                 .description(TEST_DESCRIPTION)
                 .arn("testarn")
@@ -61,9 +57,9 @@ public class ListHandlerTest extends AbstractTestBase {
 
         ListWorkflowsResponse listWorkflowsResponse =
                 ListWorkflowsResponse.builder().workflows(listedWorkflow).build();
-        doReturn(listWorkflowsResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doReturn(listWorkflowsResponse).when(client).listWorkflows(any(ListWorkflowsRequest.class));
 
-        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
+        ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
 
         List<ResourceModel> testModels = response.getResourceModels();
 
@@ -86,11 +82,7 @@ public class ListHandlerTest extends AbstractTestBase {
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        ListHandler handler = new ListHandler(client);
-
-        doThrow(InvalidRequestException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(ListWorkflowsRequest.class), any());
+        doThrow(InvalidRequestException.class).when(client).listWorkflows(any(ListWorkflowsRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -98,18 +90,12 @@ public class ListHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnInvalidRequestException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnInvalidRequestException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        ListHandler handler = new ListHandler(client);
-
-        doThrow(InternalServiceErrorException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(ListWorkflowsRequest.class), any());
+        doThrow(InternalServiceErrorException.class).when(client).listWorkflows(any(ListWorkflowsRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -117,18 +103,12 @@ public class ListHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnServiceInternalErrorException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnServiceInternalErrorException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        ListHandler handler = new ListHandler(client);
-
-        doThrow(TransferException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(ListWorkflowsRequest.class), any());
+        doThrow(TransferException.class).when(client).listWorkflows(any(ListWorkflowsRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -136,8 +116,6 @@ public class ListHandlerTest extends AbstractTestBase {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnGeneralServiceException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnGeneralServiceException.class, () -> callHandler(request));
     }
 }

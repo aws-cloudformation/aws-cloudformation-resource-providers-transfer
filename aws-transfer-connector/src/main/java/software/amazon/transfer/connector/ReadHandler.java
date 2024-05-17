@@ -18,6 +18,7 @@ import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import com.amazonaws.util.CollectionUtils;
@@ -25,30 +26,21 @@ import com.amazonaws.util.CollectionUtils;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class ReadHandler extends BaseHandler<CallbackContext> {
-    private TransferClient client;
-
-    public ReadHandler(TransferClient client) {
-        this.client = client;
-    }
-
+public class ReadHandler extends BaseHandlerStd {
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
             final ResourceHandlerRequest<ResourceModel> request,
             final CallbackContext callbackContext,
+            final ProxyClient<TransferClient> proxyClient,
             final Logger logger) {
-
-        if (this.client == null) {
-            this.client = ClientBuilder.getClient();
-        }
 
         final ResourceModel model = request.getDesiredResourceState();
         DescribeConnectorRequest describeConnectorRequest = DescribeConnectorRequest.builder()
                 .connectorId(model.getConnectorId())
                 .build();
 
-        try {
+        try (TransferClient client = proxyClient.client()) {
             DescribeConnectorResponse response =
                     proxy.injectCredentialsAndInvokeV2(describeConnectorRequest, client::describeConnector);
             logger.log(String.format(

@@ -7,12 +7,12 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static software.amazon.transfer.agreement.AbstractTestBase.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import software.amazon.awssdk.services.transfer.TransferClient;
+import software.amazon.awssdk.services.transfer.model.DescribeAgreementRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeAgreementResponse;
 import software.amazon.awssdk.services.transfer.model.DescribedAgreement;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
@@ -23,28 +23,27 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 @ExtendWith(MockitoExtension.class)
-public class ReadHandlerTest {
+public class ReadHandlerTest extends AbstractTestBase {
 
-    @Mock
-    private AmazonWebServicesClientProxy proxy;
+    private MockableBaseHandler<CallbackContext> handler;
 
-    @Mock
-    private Logger logger;
+    @Override
+    MockableBaseHandler<CallbackContext> getHandler() {
+        return handler;
+    }
 
-    @Mock
-    private TransferClient client;
+    @BeforeEach
+    public void setupTestData() {
+        handler = new ReadHandler();
+    }
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final ReadHandler handler = new ReadHandler(client);
-
         ResourceModel model =
                 ResourceModel.builder().agreementId(TEST_AGREEMENT_ID).build();
 
@@ -58,9 +57,9 @@ public class ReadHandlerTest {
                         .status(TEST_STATUS)
                         .build())
                 .build();
-        doReturn(describeAgreementResponse).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doReturn(describeAgreementResponse).when(client).describeAgreement(any(DescribeAgreementRequest.class));
 
-        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
+        ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
         ResourceModel testModel = response.getResourceModel();
 
         assertThat(response).isNotNull();
@@ -75,9 +74,7 @@ public class ReadHandlerTest {
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        ReadHandler handler = new ReadHandler(client);
-
-        doThrow(InvalidRequestException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InvalidRequestException.class).when(client).describeAgreement(any(DescribeAgreementRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -85,16 +82,14 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnInvalidRequestException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnInvalidRequestException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        ReadHandler handler = new ReadHandler(client);
-
-        doThrow(InternalServiceErrorException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InternalServiceErrorException.class)
+                .when(client)
+                .describeAgreement(any(DescribeAgreementRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -102,16 +97,12 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnServiceInternalErrorException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnServiceInternalErrorException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_ResourceNotFoundExceptionFailed() {
-        ReadHandler handler = new ReadHandler(client);
-
-        doThrow(ResourceNotFoundException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(ResourceNotFoundException.class).when(client).describeAgreement(any(DescribeAgreementRequest.class));
 
         ResourceModel model = ResourceModel.builder()
                 .agreementId(TEST_AGREEMENT_ID)
@@ -122,16 +113,12 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnNotFoundException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnNotFoundException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        ReadHandler handler = new ReadHandler(client);
-
-        doThrow(TransferException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(TransferException.class).when(client).describeAgreement(any(DescribeAgreementRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -139,8 +126,6 @@ public class ReadHandlerTest {
                 .desiredResourceState(model)
                 .build();
 
-        assertThrows(CfnGeneralServiceException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnGeneralServiceException.class, () -> callHandler(request));
     }
 }

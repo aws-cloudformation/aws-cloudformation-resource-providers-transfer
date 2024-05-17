@@ -19,6 +19,7 @@ import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import com.amazonaws.util.CollectionUtils;
@@ -26,23 +27,14 @@ import com.amazonaws.util.CollectionUtils;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class CreateHandler extends BaseHandler<CallbackContext> {
-    private TransferClient client;
-
-    public CreateHandler(TransferClient client) {
-        this.client = client;
-    }
-
+public class CreateHandler extends BaseHandlerStd {
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
             final ResourceHandlerRequest<ResourceModel> request,
             final CallbackContext callbackContext,
+            final ProxyClient<TransferClient> proxyClient,
             final Logger logger) {
-
-        if (this.client == null) {
-            this.client = ClientBuilder.getClient();
-        }
 
         final ResourceModel model = request.getDesiredResourceState();
 
@@ -67,7 +59,7 @@ public class CreateHandler extends BaseHandler<CallbackContext> {
                 .profileType(model.getProfileType())
                 .build();
 
-        try {
+        try (TransferClient client = proxyClient.client()) {
             CreateProfileResponse response =
                     proxy.injectCredentialsAndInvokeV2(createProfileRequest, client::createProfile);
             model.setProfileId(response.profileId());

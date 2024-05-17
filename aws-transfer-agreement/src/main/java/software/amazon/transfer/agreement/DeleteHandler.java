@@ -14,28 +14,20 @@ import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
+import software.amazon.cloudformation.proxy.ProxyClient;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class DeleteHandler extends BaseHandler<CallbackContext> {
-    private TransferClient client;
-
-    public DeleteHandler(TransferClient client) {
-        this.client = client;
-    }
-
+public class DeleteHandler extends BaseHandlerStd {
     @Override
     public ProgressEvent<ResourceModel, CallbackContext> handleRequest(
             final AmazonWebServicesClientProxy proxy,
             final ResourceHandlerRequest<ResourceModel> request,
             final CallbackContext callbackContext,
+            final ProxyClient<TransferClient> proxyClient,
             final Logger logger) {
-
-        if (this.client == null) {
-            this.client = ClientBuilder.getClient();
-        }
 
         final ResourceModel model = request.getDesiredResourceState();
 
@@ -44,7 +36,7 @@ public class DeleteHandler extends BaseHandler<CallbackContext> {
                 .serverId(model.getServerId())
                 .build();
 
-        try {
+        try (TransferClient client = proxyClient.client()) {
             proxy.injectCredentialsAndInvokeV2(deleteAgreementRequest, client::deleteAgreement);
             logger.log(
                     String.format("%s %s deleted successfully", ResourceModel.TYPE_NAME, model.getPrimaryIdentifier()));

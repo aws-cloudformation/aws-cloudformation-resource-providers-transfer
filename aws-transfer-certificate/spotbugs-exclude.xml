@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Class name="software.amazon.transfer.certificate.HandlerWrapperExecutable"/>
+    </Match>
+    <Match>
+        <Class name="software.amazon.transfer.certificate.HandlerWrapper"/>
+    </Match>
+    <Match>
+        <Class name="software.amazon.transfer.certificate.ResourceModel"/>
+    </Match>
+    <Match>
+        <Bug code="RCN,EI,EI2"/>
+    </Match>
+</FindBugsFilter>

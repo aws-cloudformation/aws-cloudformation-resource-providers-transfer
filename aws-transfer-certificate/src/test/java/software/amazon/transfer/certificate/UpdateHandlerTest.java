@@ -12,18 +12,16 @@ import static software.amazon.transfer.certificate.AbstractTestBase.*;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import software.amazon.awssdk.services.transfer.TransferClient;
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
 import software.amazon.awssdk.services.transfer.model.InvalidRequestException;
 import software.amazon.awssdk.services.transfer.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.transfer.model.TagResourceRequest;
 import software.amazon.awssdk.services.transfer.model.TransferException;
-import software.amazon.awssdk.services.transfer.model.TransferRequest;
 import software.amazon.awssdk.services.transfer.model.UntagResourceRequest;
 import software.amazon.awssdk.services.transfer.model.UpdateCertificateRequest;
 import software.amazon.awssdk.services.transfer.model.UpdateCertificateResponse;
@@ -31,28 +29,27 @@ import software.amazon.cloudformation.exceptions.CfnGeneralServiceException;
 import software.amazon.cloudformation.exceptions.CfnInvalidRequestException;
 import software.amazon.cloudformation.exceptions.CfnNotFoundException;
 import software.amazon.cloudformation.exceptions.CfnServiceInternalErrorException;
-import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
-import software.amazon.cloudformation.proxy.Logger;
 import software.amazon.cloudformation.proxy.OperationStatus;
 import software.amazon.cloudformation.proxy.ProgressEvent;
 import software.amazon.cloudformation.proxy.ResourceHandlerRequest;
 
 @ExtendWith(MockitoExtension.class)
-public class UpdateHandlerTest {
+public class UpdateHandlerTest extends AbstractTestBase {
 
-    @Mock
-    private AmazonWebServicesClientProxy proxy;
+    private MockableBaseHandler<CallbackContext> handler;
 
-    @Mock
-    private Logger logger;
+    @Override
+    MockableBaseHandler<CallbackContext> getHandler() {
+        return handler;
+    }
 
-    @Mock
-    private TransferClient client;
+    @BeforeEach
+    public void setupTestData() {
+        handler = new UpdateHandler();
+    }
 
     @Test
     public void handleRequest_SimpleSuccess() {
-        final UpdateHandler handler = new UpdateHandler(client);
-
         final ResourceModel model = ResourceModel.builder()
                 .certificateId(TEST_CERTIFICATE_ID)
                 .description(TEST_DESCRIPTION_2)
@@ -65,10 +62,9 @@ public class UpdateHandlerTest {
         UpdateCertificateResponse updateCertificateRequest = UpdateCertificateResponse.builder()
                 .certificateId(TEST_CERTIFICATE_ID)
                 .build();
-        doReturn(updateCertificateRequest).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doReturn(updateCertificateRequest).when(client).updateCertificate(any(UpdateCertificateRequest.class));
 
-        final ProgressEvent<ResourceModel, CallbackContext> response =
-                handler.handleRequest(proxy, request, null, logger);
+        final ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
 
         ResourceModel testModel = response.getResourceModel();
         assertThat(response).isNotNull();
@@ -80,12 +76,11 @@ public class UpdateHandlerTest {
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
         assertThat(testModel).hasFieldOrPropertyWithValue("description", TEST_DESCRIPTION_2);
-        verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(UpdateCertificateRequest.class), any());
+        verify(client, times(1)).updateCertificate(any(UpdateCertificateRequest.class));
     }
 
     @Test
     public void handleRequest_AddTagInvoked() {
-        UpdateHandler handler = new UpdateHandler(client);
         Set<Tag> desiredTags = TEST_TAG_MAP.entrySet().stream()
                 .map(tag ->
                         Tag.builder().key(tag.getKey()).value(tag.getValue()).build())
@@ -99,7 +94,7 @@ public class UpdateHandlerTest {
                 .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
+        ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -110,13 +105,12 @@ public class UpdateHandlerTest {
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
         assertThat(response.getResourceModel().getTags()).isEqualTo(desiredTags);
-        verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(TagResourceRequest.class), any());
-        verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(UpdateCertificateRequest.class), any());
+        verify(client, times(1)).tagResource(any(TagResourceRequest.class));
+        verify(client, times(1)).updateCertificate(any(UpdateCertificateRequest.class));
     }
 
     @Test
     public void handleRequest_RemoveTagInvoked() {
-        UpdateHandler handler = new UpdateHandler(client);
         Set<Tag> systemTags = SYSTEM_TAG_MAP.entrySet().stream()
                 .map(tag ->
                         Tag.builder().key(tag.getKey()).value(tag.getValue()).build())
@@ -130,7 +124,7 @@ public class UpdateHandlerTest {
                 .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        ProgressEvent<ResourceModel, CallbackContext> response = handler.handleRequest(proxy, request, null, logger);
+        ProgressEvent<ResourceModel, CallbackContext> response = callHandler(request);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
@@ -141,15 +135,13 @@ public class UpdateHandlerTest {
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
         assertThat(response.getResourceModel().getTags()).isEqualTo(systemTags);
-        verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(UntagResourceRequest.class), any());
-        verify(proxy, times(1)).injectCredentialsAndInvokeV2(any(UpdateCertificateRequest.class), any());
+        verify(client, times(1)).untagResource(any(UntagResourceRequest.class));
+        verify(client, times(1)).updateCertificate(any(UpdateCertificateRequest.class));
     }
 
     @Test
     public void handleRequest_InvalidRequestExceptionFailed() {
-        UpdateHandler handler = new UpdateHandler(client);
-
-        doThrow(InvalidRequestException.class).when(proxy).injectCredentialsAndInvokeV2(any(), any());
+        doThrow(InvalidRequestException.class).when(client).updateCertificate(any(UpdateCertificateRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -159,18 +151,14 @@ public class UpdateHandlerTest {
                 .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        assertThrows(CfnInvalidRequestException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnInvalidRequestException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_InternalServiceErrorExceptionFailed() {
-        UpdateHandler handler = new UpdateHandler(client);
-
         doThrow(InternalServiceErrorException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(TransferRequest.class), any());
+                .when(client)
+                .updateCertificate(any(UpdateCertificateRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -180,18 +168,12 @@ public class UpdateHandlerTest {
                 .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        assertThrows(CfnServiceInternalErrorException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnServiceInternalErrorException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_ResourceNotFoundExceptionFailed() {
-        UpdateHandler handler = new UpdateHandler(client);
-
-        doThrow(ResourceNotFoundException.class)
-                .when(proxy)
-                .injectCredentialsAndInvokeV2(any(TransferRequest.class), any());
+        doThrow(ResourceNotFoundException.class).when(client).updateCertificate(any(UpdateCertificateRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -201,16 +183,12 @@ public class UpdateHandlerTest {
                 .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        assertThrows(CfnNotFoundException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnNotFoundException.class, () -> callHandler(request));
     }
 
     @Test
     public void handleRequest_TransferExceptionFailed() {
-        UpdateHandler handler = new UpdateHandler(client);
-
-        doThrow(TransferException.class).when(proxy).injectCredentialsAndInvokeV2(any(TransferRequest.class), any());
+        doThrow(TransferException.class).when(client).updateCertificate(any(UpdateCertificateRequest.class));
 
         ResourceModel model = ResourceModel.builder().build();
 
@@ -220,8 +198,6 @@ public class UpdateHandlerTest {
                 .systemTags(SYSTEM_TAG_MAP)
                 .build();
 
-        assertThrows(CfnGeneralServiceException.class, () -> {
-            handler.handleRequest(proxy, request, null, logger);
-        });
+        assertThrows(CfnGeneralServiceException.class, () -> callHandler(request));
     }
 }

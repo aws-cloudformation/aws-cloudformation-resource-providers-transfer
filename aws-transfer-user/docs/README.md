@@ -126,6 +126,8 @@ _Update requires_: [Replacement](https://docs.aws.amazon.com/AWSCloudFormation/l
 
 #### SshPublicKeys
 
+This represents the SSH User Public Keys for CloudFormation resource
+
 _Required_: No
 
 _Type_: List of String
