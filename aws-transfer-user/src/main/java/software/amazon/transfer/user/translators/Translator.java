@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -122,7 +121,10 @@ public final class Translator {
     }
 
     public static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
-        return Optional.ofNullable(collection).map(Collection::stream).orElseGet(Stream::empty);
+        if (collection == null) {
+            return Stream.empty();
+        }
+        return collection.stream();
     }
 
     /**

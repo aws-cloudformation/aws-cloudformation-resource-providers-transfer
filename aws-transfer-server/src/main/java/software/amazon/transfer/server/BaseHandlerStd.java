@@ -310,6 +310,9 @@ public abstract class BaseHandlerStd extends BaseHandler<CallbackContext> {
     }
 
     protected boolean privateIpsAvailable(List<String> allocationIds, ProxyClient<Ec2Client> ec2Client) {
+        if (allocationIds.isEmpty()) {
+            return true; // no IPs to check against, so assume available
+        }
         DescribeAddressesRequest request =
                 DescribeAddressesRequest.builder().allocationIds(allocationIds).build();
         try (Ec2Client client = ec2Client.client()) {

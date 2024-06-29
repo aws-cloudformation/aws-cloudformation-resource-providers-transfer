@@ -28,7 +28,7 @@ import software.amazon.transfer.server.translators.ServerArn;
 import software.amazon.transfer.server.translators.WorkflowDetailsTranslator;
 
 import com.amazonaws.regions.Region;
-import com.amazonaws.regions.Regions;
+import com.amazonaws.regions.RegionUtils;
 
 public class CreateHandler extends BaseHandlerStd {
 
@@ -45,7 +45,7 @@ public class CreateHandler extends BaseHandlerStd {
         final String clientRequestToken = request.getClientRequestToken();
         ResourceModel newModel = request.getDesiredResourceState();
 
-        prepareDesiredResourceModel(request, newModel);
+        prepareDesiredResourceModel(request, newModel, true);
 
         return ProgressEvent.progress(newModel, callbackContext)
                 .then(progress -> proxy.initiate(
@@ -106,7 +106,7 @@ public class CreateHandler extends BaseHandlerStd {
             CallbackContext ignored2) {
 
         String serverId = awsResponse.serverId();
-        Region region = Region.getRegion(Regions.fromName(request.getRegion()));
+        Region region = RegionUtils.getRegion(request.getRegion());
         ServerArn serverArn = new ServerArn(region, request.getAwsAccountId(), serverId);
         model.setArn(serverArn.getArn());
         model.setServerId(serverId);
