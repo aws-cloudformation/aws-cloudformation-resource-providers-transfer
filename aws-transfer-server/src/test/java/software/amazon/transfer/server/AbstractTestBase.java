@@ -183,7 +183,7 @@ public class AbstractTestBase {
     protected static ResourceModel setupSimpleServerModel(String endpointType) {
         EndpointDetails endpointDetails = null;
         if (EndpointType.VPC.name().equals(endpointType)) {
-            endpointDetails = getEndpointDetails(Collections.emptyList());
+            endpointDetails = getEndpointDetails(null, null, null);
         }
         return ResourceModel.builder()
                 .as2ServiceManagedEgressIpAddresses(Collections.emptyList())
@@ -254,11 +254,18 @@ public class AbstractTestBase {
     }
 
     protected static EndpointDetails getEndpointDetails(List<String> addressAllocationIds) {
+        List<String> subnetIds = Arrays.asList("sub1", "sub2");
+        List<String> securityGroupIds = Arrays.asList("sec1", "sec2");
+        return getEndpointDetails(addressAllocationIds, subnetIds, securityGroupIds);
+    }
+
+    private static EndpointDetails getEndpointDetails(
+            List<String> addressAllocationIds, List<String> subnetIds, List<String> securityGroupIds) {
         return EndpointDetails.builder()
                 .vpcId("vpc")
                 .vpcEndpointId("vpcEndpointId")
-                .subnetIds(Arrays.asList("sub1", "sub2"))
-                .securityGroupIds(Arrays.asList("sec1", "sec2"))
+                .subnetIds(subnetIds)
+                .securityGroupIds(securityGroupIds)
                 .addressAllocationIds(addressAllocationIds)
                 .build();
     }
