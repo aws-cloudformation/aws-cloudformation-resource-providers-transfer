@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static software.amazon.transfer.server.translators.ResourceModelAdapter.DEFAULT_ENDPOINT_TYPE;
+import static software.amazon.transfer.server.translators.Translator.nullIfEmptyList;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -173,7 +174,7 @@ public class UpdateHandlerTest extends AbstractTestBase {
     private static void setupEndpointDetails(List<String> sg, ResourceModel model) {
         setServerId(model, "testServerId");
         if (model.getEndpointDetails() != null) {
-            model.getEndpointDetails().setSecurityGroupIds(sg);
+            model.getEndpointDetails().setSecurityGroupIds(nullIfEmptyList(sg));
         }
     }
 
