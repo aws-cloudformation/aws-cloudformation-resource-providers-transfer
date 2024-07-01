@@ -1,8 +1,8 @@
 package software.amazon.transfer.server.translators;
 
+import static software.amazon.transfer.server.translators.Translator.nullIfEmptyList;
+
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 
 import software.amazon.transfer.server.EndpointDetails;
 
@@ -16,11 +16,9 @@ public final class EndpointDetailsTranslator {
             return null;
         }
         return EndpointDetails.builder()
-                .addressAllocationIds(Optional.ofNullable(endpointDetails.addressAllocationIds())
-                        .orElse(Collections.emptyList()))
-                .subnetIds(Optional.ofNullable(endpointDetails.subnetIds()).orElse(Collections.emptyList()))
-                .securityGroupIds(
-                        Optional.ofNullable(endpointDetails.securityGroupIds()).orElse(Collections.emptyList()))
+                .addressAllocationIds(nullIfEmptyList(endpointDetails.addressAllocationIds()))
+                .subnetIds(nullIfEmptyList(endpointDetails.subnetIds()))
+                .securityGroupIds(nullIfEmptyList(endpointDetails.securityGroupIds()))
                 .vpcId(endpointDetails.vpcId())
                 .vpcEndpointId(endpointDetails.vpcEndpointId())
                 .build();
