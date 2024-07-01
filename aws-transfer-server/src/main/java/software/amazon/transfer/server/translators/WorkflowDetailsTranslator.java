@@ -1,6 +1,7 @@
 package software.amazon.transfer.server.translators;
 
-import java.util.Collections;
+import static software.amazon.transfer.server.translators.Translator.streamOfOrEmpty;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,30 +13,40 @@ public final class WorkflowDetailsTranslator {
 
     public static software.amazon.awssdk.services.transfer.model.WorkflowDetails toSdk(
             WorkflowDetails workflowDetails, boolean forUpdate) {
-        software.amazon.awssdk.services.transfer.model.WorkflowDetails.Builder builder =
-                software.amazon.awssdk.services.transfer.model.WorkflowDetails.builder();
-
-        if (workflowDetails != null) {
-            builder.onUpload(toSdk(workflowDetails.getOnUpload()))
-                    .onPartialUpload(toSdk(workflowDetails.getOnPartialUpload()));
-        } else if (forUpdate) {
-            // As the server may already have workflows details, we need to make sure
-            // we remove the old onUpload or onPartialUpload workflows if they are not
-            // set in the update.
-
-            builder.onUpload(Collections.emptyList()).onPartialUpload(Collections.emptyList());
+        // As the server may already have workflows details, we need to make sure
+        // we remove the old onUpload or onPartialUpload workflows if they are not
+        // set in the update. The unit test proves this is done correctly.
+        var builder = software.amazon.awssdk.services.transfer.model.WorkflowDetails.builder();
+        List<software.amazon.awssdk.services.transfer.model.WorkflowDetail> onUpload;
+        List<software.amazon.awssdk.services.transfer.model.WorkflowDetail> onPartialUpload;
+        if (workflowDetails == null) {
+            onUpload = List.of();
+            onPartialUpload = List.of();
         } else {
-            return null;
+            onUpload = toSdk(workflowDetails.getOnUpload());
+            onPartialUpload = toSdk(workflowDetails.getOnPartialUpload());
         }
-        return builder.build();
+
+        if (!forUpdate) {
+            if (!onUpload.isEmpty()) {
+                if (onPartialUpload.isEmpty()) {
+                    onPartialUpload = null;
+                }
+            } else {
+                if (onPartialUpload.isEmpty()) {
+                    // Both null then Create needs to return null
+                    return null;
+                }
+                onUpload = null;
+            }
+        }
+
+        return builder.onUpload(onUpload).onPartialUpload(onPartialUpload).build();
     }
 
     private static List<software.amazon.awssdk.services.transfer.model.WorkflowDetail> toSdk(
             List<WorkflowDetail> details) {
-        if (details == null) {
-            return null;
-        }
-        return details.stream()
+        return streamOfOrEmpty(details)
                 .map(detail -> software.amazon.awssdk.services.transfer.model.WorkflowDetail.builder()
                         .workflowId(detail.getWorkflowId())
                         .executionRole(detail.getExecutionRole())

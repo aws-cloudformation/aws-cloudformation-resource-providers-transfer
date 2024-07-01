@@ -22,5 +22,7 @@
         "protocolVersion": "2.0.0"
     },
     "logProcessorEnabled": "true",
-    "executableEntrypoint": "software.amazon.transfer.agreement.HandlerWrapperExecutable"
+    "executableEntrypoint": "software.amazon.transfer.agreement.HandlerWrapperExecutable",
+    "contractSettings": {},
+    "canarySettings": {}
 }

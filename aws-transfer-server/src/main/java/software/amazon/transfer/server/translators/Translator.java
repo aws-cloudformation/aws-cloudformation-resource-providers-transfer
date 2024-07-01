@@ -3,7 +3,6 @@ package software.amazon.transfer.server.translators;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -89,7 +88,31 @@ public final class Translator {
     }
 
     public static <T> Stream<T> streamOfOrEmpty(final Collection<T> collection) {
-        return Optional.ofNullable(collection).map(Collection::stream).orElseGet(Stream::empty);
+        if (collection == null) {
+            return Stream.empty();
+        }
+        return collection.stream();
+    }
+
+    public static String emptyStringIfNull(String nullableString) {
+        if (nullableString == null) {
+            return "";
+        }
+        return nullableString;
+    }
+
+    public static <T> List<T> nullIfEmptyList(final List<T> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        return list;
+    }
+
+    public static <T> List<T> emptyListIfNull(final List<T> list) {
+        if (list == null) {
+            return List.of();
+        }
+        return list;
     }
 
     /**

@@ -31,14 +31,13 @@ public final class ResourceModelAdapter {
     public static final String DEFAULT_SECURITY_POLICY = "TransferSecurityPolicy-2018-11";
 
     public static void prepareDesiredResourceModel(
-            ResourceHandlerRequest<ResourceModel> request, ResourceModel resourceModel) {
-        setDefaults(resourceModel);
+            ResourceHandlerRequest<ResourceModel> request, ResourceModel resourceModel, boolean create) {
+        setDefaults(resourceModel, create);
         setDesiredTags(request, resourceModel);
     }
 
     public static void preparePreviousResourceModel(
             ResourceHandlerRequest<ResourceModel> request, ResourceModel resourceModel) {
-        setDefaults(resourceModel);
         setPreviousTags(request, resourceModel);
     }
 
@@ -57,7 +56,7 @@ public final class ResourceModelAdapter {
         previousResourceModel.setTags(Translator.translateTagMapToTagList(tagsMap));
     }
 
-    private static void setDefaults(ResourceModel resourceModel) {
+    private static void setDefaults(ResourceModel resourceModel, boolean create) {
         if (resourceModel.getEndpointType() == null) {
             resourceModel.setEndpointType(DEFAULT_ENDPOINT_TYPE);
         }
@@ -67,8 +66,11 @@ public final class ResourceModelAdapter {
         if (resourceModel.getProtocols() == null) {
             resourceModel.setProtocols(DEFAULT_PROTOCOLS);
         }
-        if (resourceModel.getSecurityPolicyName() == null) {
-            resourceModel.setSecurityPolicyName(DEFAULT_SECURITY_POLICY);
+        // Handle update differently because of https://i.amazon.com/XFER-10446
+        if (create) {
+            if (resourceModel.getSecurityPolicyName() == null) {
+                resourceModel.setSecurityPolicyName(DEFAULT_SECURITY_POLICY);
+            }
         }
     }
 }
