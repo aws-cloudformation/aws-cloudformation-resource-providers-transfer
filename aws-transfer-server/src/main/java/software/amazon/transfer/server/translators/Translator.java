@@ -28,9 +28,6 @@ public final class Translator {
     }
 
     public static List<software.amazon.awssdk.services.transfer.model.Tag> translateToSdkTags(List<Tag> tags) {
-        if (tags == null) {
-            return null;
-        }
         return streamOfOrEmpty(tags)
                 .map(tag -> software.amazon.awssdk.services.transfer.model.Tag.builder()
                         .key(tag.getKey())
