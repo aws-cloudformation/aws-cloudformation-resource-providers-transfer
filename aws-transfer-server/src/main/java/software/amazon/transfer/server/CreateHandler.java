@@ -81,7 +81,7 @@ public class CreateHandler extends BaseHandlerStd {
                 .protocols(translateToSdkProtocols(model.getProtocols()))
                 .protocolDetails(ProtocolDetailsTranslator.toSdk(model.getProtocolDetails()))
                 .securityPolicyName(model.getSecurityPolicyName())
-                .tags(translateToSdkTags(model.getTags()))
+                .tags(CollectionUtils.isNullOrEmpty(model.getTags()) ? null : translateToSdkTags(model.getTags()))
                 .workflowDetails(WorkflowDetailsTranslator.toSdk(model.getWorkflowDetails(), false))
                 .structuredLogDestinations(model.getStructuredLogDestinations())
                 .s3StorageOptions(S3StorageOptionsTranslator.toSdk(model.getS3StorageOptions()))
