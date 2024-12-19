@@ -18,7 +18,9 @@
       "LocalProfileId": "p-02dbd12fb18b4e94b",
       "PartnerProfileId": "p-209b4c7113c94feaa",
       "ServerId": "s-c4fa7897de0a4c01b",
-      "Status": "ACTIVE"
+      "Status": "ACTIVE",
+      "PreserveFilename": "ENABLED",
+      "EnforceMessageSigning": "ENABLED"
     },
     "desiredResourceTags": {
       "violets": "blue"

@@ -57,6 +57,9 @@ public class UpdateHandler extends BaseHandlerStd {
                 .partnerProfileId(model.getPartnerProfileId())
                 .serverId(model.getServerId())
                 .status(model.getStatus())
+                .preserveFilename(model.getPreserveFilename())
+                .enforceMessageSigning(model.getEnforceMessageSigning())
+                .customDirectories(Converter.CustomDirectoriesConverter.toSdk(model.getCustomDirectories()))
                 .build();
 
         Map<String, String> allDesiredTagsMap = new HashMap<>();

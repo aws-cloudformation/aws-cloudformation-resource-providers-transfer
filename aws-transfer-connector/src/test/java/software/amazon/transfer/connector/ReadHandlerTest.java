@@ -51,6 +51,8 @@ public class ReadHandlerTest extends AbstractTestBase {
                 .accessRole(TEST_ACCESS_ROLE)
                 .connectorId(TEST_CONNECTOR_ID)
                 .loggingRole(TEST_LOGGING_ROLE)
+                .as2Config(getAs2Config())
+                .sftpConfig(getSftpConfig())
                 .serviceManagedEgressIpAddresses(addresses)
                 .build();
 
@@ -63,6 +65,8 @@ public class ReadHandlerTest extends AbstractTestBase {
                         .accessRole(TEST_ACCESS_ROLE)
                         .connectorId(TEST_CONNECTOR_ID)
                         .loggingRole(TEST_LOGGING_ROLE)
+                        .as2Config(Converter.As2ConfigConverter.toSdk(getAs2Config()))
+                        .sftpConfig(Converter.SftpConfigConverter.toSdk(getSftpConfig()))
                         .serviceManagedEgressIpAddresses(addresses)
                         .build())
                 .build();

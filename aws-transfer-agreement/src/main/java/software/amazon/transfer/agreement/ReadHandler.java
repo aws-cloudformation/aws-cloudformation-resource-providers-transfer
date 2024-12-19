@@ -57,6 +57,11 @@ public class ReadHandler extends BaseHandlerStd {
                     .partnerProfileId(describedAgreement.partnerProfileId())
                     .serverId(describedAgreement.serverId())
                     .status(describedAgreement.status().name())
+                    .preserveFilename(describedAgreement.preserveFilename().name())
+                    .enforceMessageSigning(
+                            describedAgreement.enforceMessageSigning().name())
+                    .customDirectories(
+                            Converter.CustomDirectoriesConverter.fromSdk(describedAgreement.customDirectories()))
                     .tags(
                             (CollectionUtils.isNullOrEmpty(describedAgreement.tags()))
                                     ? null

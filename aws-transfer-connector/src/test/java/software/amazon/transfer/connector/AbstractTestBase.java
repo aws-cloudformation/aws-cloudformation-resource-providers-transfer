@@ -44,6 +44,7 @@ public abstract class AbstractTestBase {
     public static final String TEST_MDN_SIGNING_ALGORITHM = "SHA256";
     public static final String TEST_MDN_RESPONSE = "SYNC";
     public static final String TEST_BASIC_AUTH_SECRET = "basic-auth-secret";
+    public static final String TEST_PRESERVE_CONTENT_TYPE = "ENABLED";
     public static final String TEST_USER_SECRET_ID = "arn:aws:secretsmanager:us-east-1:123456789:secret:testest";
     public static final String TEST_SECURITY_POLICY_NAME = "TransferSFTPConnectorSecurityPolicy-2023-07";
     public static final Map<String, String> RESOURCE_TAG_MAP = Collections.singletonMap("key", "value");
@@ -75,6 +76,7 @@ public abstract class AbstractTestBase {
                 .mdnSigningAlgorithm(TEST_MDN_SIGNING_ALGORITHM)
                 .mdnResponse(TEST_MDN_RESPONSE)
                 .basicAuthSecretId(TEST_BASIC_AUTH_SECRET)
+                .preserveContentType(TEST_PRESERVE_CONTENT_TYPE)
                 .build();
     }
 

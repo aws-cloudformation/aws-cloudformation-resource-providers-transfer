@@ -58,6 +58,9 @@ public class CreateHandler extends BaseHandlerStd {
                 .baseDirectory(model.getBaseDirectory())
                 .accessRole(model.getAccessRole())
                 .status(model.getStatus())
+                .preserveFilename(model.getPreserveFilename())
+                .enforceMessageSigning(model.getEnforceMessageSigning())
+                .customDirectories(Converter.CustomDirectoriesConverter.toSdk(model.getCustomDirectories()))
                 .tags(
                         (CollectionUtils.isNullOrEmpty(model.getTags()))
                                 ? null
@@ -77,7 +80,9 @@ public class CreateHandler extends BaseHandlerStd {
             throw new CfnServiceInternalErrorException("createAgreement", e);
         } catch (ResourceExistsException e) {
             throw new CfnAlreadyExistsException(
-                    ResourceModel.TYPE_NAME, model.getPrimaryIdentifier().toString());
+                    ResourceModel.TYPE_NAME,
+                    model.getServerId() + "," + model.getLocalProfileId() + "," + model.getPartnerProfileId(),
+                    e);
         } catch (ThrottlingException e) {
             throw new CfnThrottlingException("createAgreement", e);
         } catch (TransferException e) {

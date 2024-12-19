@@ -17,7 +17,8 @@
         "EncryptionAlgorithm": "AES128_CBC",
         "SigningAlgorithm": "SHA256",
         "MdnSigningAlgorithm": "SHA256",
-        "MdnResponse": "SYNC"
+        "MdnResponse": "SYNC",
+        "PreserveContentType": "ENABLED"
       },
       "Url": "http://www.google.com/"
     },

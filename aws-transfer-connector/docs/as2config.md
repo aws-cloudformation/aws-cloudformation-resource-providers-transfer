@@ -18,7 +18,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     "<a href="#signingalgorithm" title="SigningAlgorithm">SigningAlgorithm</a>" : <i>String</i>,
     "<a href="#mdnsigningalgorithm" title="MdnSigningAlgorithm">MdnSigningAlgorithm</a>" : <i>String</i>,
     "<a href="#mdnresponse" title="MdnResponse">MdnResponse</a>" : <i>String</i>,
-    "<a href="#basicauthsecretid" title="BasicAuthSecretId">BasicAuthSecretId</a>" : <i>String</i>
+    "<a href="#basicauthsecretid" title="BasicAuthSecretId">BasicAuthSecretId</a>" : <i>String</i>,
+    "<a href="#preservecontenttype" title="PreserveContentType">PreserveContentType</a>" : <i>String</i>
 }
 </pre>
 
@@ -34,6 +35,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <a href="#mdnsigningalgorithm" title="MdnSigningAlgorithm">MdnSigningAlgorithm</a>: <i>String</i>
 <a href="#mdnresponse" title="MdnResponse">MdnResponse</a>: <i>String</i>
 <a href="#basicauthsecretid" title="BasicAuthSecretId">BasicAuthSecretId</a>: <i>String</i>
+<a href="#preservecontenttype" title="PreserveContentType">PreserveContentType</a>: <i>String</i>
 </pre>
 
 ## Properties
@@ -158,3 +160,14 @@ _Maximum Length_: <code>2048</code>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
+#### PreserveContentType
+
+Specifies whether to use the AWS S3 object content-type as the content-type for the AS2 message.
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>ENABLED</code> | <code>DISABLED</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)

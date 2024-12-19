@@ -60,6 +60,7 @@ public class Converter {
                     .mdnSigningAlgorithm(as2Config.getMdnSigningAlgorithm())
                     .mdnResponse(as2Config.getMdnResponse())
                     .basicAuthSecretId(as2Config.getBasicAuthSecretId())
+                    .preserveContentType(as2Config.getPreserveContentType())
                     .build();
         }
 
@@ -79,6 +80,7 @@ public class Converter {
             modelAs2Config.setMdnSigningAlgorithm(as2ConnectorConfig.mdnSigningAlgorithmAsString());
             modelAs2Config.setMdnResponse(as2ConnectorConfig.mdnResponseAsString());
             modelAs2Config.setBasicAuthSecretId(as2ConnectorConfig.basicAuthSecretId());
+            modelAs2Config.setPreserveContentType(as2ConnectorConfig.preserveContentTypeAsString());
 
             return modelAs2Config;
         }

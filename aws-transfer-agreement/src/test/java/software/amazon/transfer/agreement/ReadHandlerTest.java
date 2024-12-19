@@ -7,11 +7,17 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static software.amazon.transfer.agreement.AbstractTestBase.*;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import software.amazon.awssdk.services.transfer.model.CustomDirectoriesType;
 import software.amazon.awssdk.services.transfer.model.DescribeAgreementRequest;
 import software.amazon.awssdk.services.transfer.model.DescribeAgreementResponse;
 import software.amazon.awssdk.services.transfer.model.DescribedAgreement;
@@ -42,10 +48,13 @@ public class ReadHandlerTest extends AbstractTestBase {
         handler = new ReadHandler();
     }
 
-    @Test
-    public void handleRequest_SimpleSuccess() {
-        ResourceModel model =
-                ResourceModel.builder().agreementId(TEST_AGREEMENT_ID).build();
+    @ParameterizedTest
+    @MethodSource("provideDirectoryOptions")
+    public void handleRequest_SimpleSuccess(String baseDirectory, CustomDirectoriesType customDirectoriesType) {
+        ResourceModel model = ResourceModel.builder()
+                .serverId(TEST_SERVER_ID)
+                .agreementId(TEST_AGREEMENT_ID)
+                .build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
                 .desiredResourceState(model)
@@ -53,8 +62,12 @@ public class ReadHandlerTest extends AbstractTestBase {
 
         DescribeAgreementResponse describeAgreementResponse = DescribeAgreementResponse.builder()
                 .agreement(DescribedAgreement.builder()
+                        .baseDirectory(baseDirectory)
                         .description(TEST_DESCRIPTION)
                         .status(TEST_STATUS)
+                        .enforceMessageSigning(TEST_ENFORCE_MESSAGE_SIGNING)
+                        .preserveFilename(TEST_PRESERVE_FILENAME)
+                        .customDirectories(customDirectoriesType)
                         .build())
                 .build();
         doReturn(describeAgreementResponse).when(client).describeAgreement(any(DescribeAgreementRequest.class));
@@ -66,10 +79,21 @@ public class ReadHandlerTest extends AbstractTestBase {
         assertThat(response.getStatus()).isEqualTo(OperationStatus.SUCCESS);
         assertThat(response.getCallbackContext()).isNull();
         assertThat(response.getCallbackDelaySeconds()).isEqualTo(0);
+        assertThat(testModel).hasFieldOrPropertyWithValue("baseDirectory", baseDirectory);
         assertThat(testModel).hasFieldOrPropertyWithValue("description", TEST_DESCRIPTION);
+        assertThat(testModel).hasFieldOrPropertyWithValue("status", TEST_STATUS);
+        assertThat(testModel).hasFieldOrPropertyWithValue("enforceMessageSigning", TEST_ENFORCE_MESSAGE_SIGNING);
+        assertThat(testModel).hasFieldOrPropertyWithValue("preserveFilename", TEST_PRESERVE_FILENAME);
+        assertThat(testModel)
+                .hasFieldOrPropertyWithValue(
+                        "customDirectories", Converter.CustomDirectoriesConverter.fromSdk(customDirectoriesType));
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
+    }
+
+    private static Stream<Arguments> provideDirectoryOptions() {
+        return Stream.of(Arguments.of(TEST_BASE_DIRECTORY, null), Arguments.of(null, getCustomDirectories()));
     }
 
     @Test

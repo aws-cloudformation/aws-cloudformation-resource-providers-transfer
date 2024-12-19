@@ -11,10 +11,14 @@ import static software.amazon.transfer.agreement.AbstractTestBase.*;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import software.amazon.awssdk.services.transfer.model.InternalServiceErrorException;
@@ -48,11 +52,15 @@ public class UpdateHandlerTest extends AbstractTestBase {
         handler = new UpdateHandler();
     }
 
-    @Test
-    public void handleRequest_SimpleSuccess() {
+    @ParameterizedTest
+    @MethodSource("provideDirectoryOptions")
+    public void handleRequest_SimpleSuccess(String baseDirectory, CustomDirectories customDirectories) {
         ResourceModel model = ResourceModel.builder()
+                .serverId(TEST_SERVER_ID)
                 .agreementId(TEST_AGREEMENT_ID)
+                .baseDirectory(baseDirectory)
                 .description(TEST_DESCRIPTION_2)
+                .customDirectories(customDirectories)
                 .build();
 
         ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -74,8 +82,16 @@ public class UpdateHandlerTest extends AbstractTestBase {
         assertThat(response.getResourceModels()).isNull();
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
+        assertThat(testModel).hasFieldOrPropertyWithValue("baseDirectory", baseDirectory);
         assertThat(testModel).hasFieldOrPropertyWithValue("description", TEST_DESCRIPTION_2);
+        assertThat(testModel).hasFieldOrPropertyWithValue("customDirectories", customDirectories);
         verify(client, times(1)).updateAgreement(any(UpdateAgreementRequest.class));
+    }
+
+    private static Stream<Arguments> provideDirectoryOptions() {
+        return Stream.of(
+                Arguments.of(TEST_BASE_DIRECTORY_2, null),
+                Arguments.of(null, Converter.CustomDirectoriesConverter.fromSdk(getCustomDirectories())));
     }
 
     @Test

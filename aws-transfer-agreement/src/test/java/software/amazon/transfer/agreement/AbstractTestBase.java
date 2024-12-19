@@ -21,6 +21,7 @@ import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.services.transfer.TransferClient;
+import software.amazon.awssdk.services.transfer.model.CustomDirectoriesType;
 import software.amazon.cloudformation.proxy.AmazonWebServicesClientProxy;
 import software.amazon.cloudformation.proxy.Credentials;
 import software.amazon.cloudformation.proxy.LoggerProxy;
@@ -35,11 +36,19 @@ public abstract class AbstractTestBase {
     public static final String TEST_DESCRIPTION_2 = "another unit test";
     public static final String TEST_ACCESS_ROLE = "access-role";
     public static final String TEST_BASE_DIRECTORY = "/";
+    public static final String TEST_BASE_DIRECTORY_2 = "/base/";
     public static final String TEST_LOCAL_PROFILE = "local-profile";
     public static final String TEST_PARTNER_PROFILE = "partner-profile";
     public static final String TEST_SERVER_ID = "test-server-id";
     public static final String TEST_STATUS = "ACTIVE";
     public static final String TEST_AGREEMENT_ID = "id";
+    public static final String TEST_PRESERVE_FILENAME = "ENABLED";
+    public static final String TEST_ENFORCE_MESSAGE_SIGNING = "ENABLED";
+    public static final String TEST_CUSTOM_FAILED_DIRECTORY = "/failed/";
+    public static final String TEST_CUSTOM_MDN_DIRECTORY = "/mdn/";
+    public static final String TEST_CUSTOM_PAYLOAD_DIRECTORY = "/payload/";
+    public static final String TEST_CUSTOM_STATUS_DIRECTORY = "/status/";
+    public static final String TEST_CUSTOM_TEMPORARY_DIRECTORY = "/temporary/";
     public static final Map<String, String> RESOURCE_TAG_MAP = Collections.singletonMap("key", "value");
     public static final Map<String, String> SYSTEM_TAG_MAP =
             Collections.singletonMap("aws:cloudformation:stack-name", "StackName");
@@ -57,6 +66,16 @@ public abstract class AbstractTestBase {
                     .key("aws:cloudformation:stack-name")
                     .value("StackName")
                     .build();
+
+    public static CustomDirectoriesType getCustomDirectories() {
+        return CustomDirectoriesType.builder()
+                .failedFilesDirectory(TEST_CUSTOM_FAILED_DIRECTORY)
+                .payloadFilesDirectory(TEST_CUSTOM_PAYLOAD_DIRECTORY)
+                .mdnFilesDirectory(TEST_CUSTOM_MDN_DIRECTORY)
+                .statusFilesDirectory(TEST_CUSTOM_STATUS_DIRECTORY)
+                .temporaryFilesDirectory(TEST_CUSTOM_TEMPORARY_DIRECTORY)
+                .build();
+    }
 
     abstract MockableBaseHandler<CallbackContext> getHandler();
 

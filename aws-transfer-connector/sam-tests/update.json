@@ -21,7 +21,8 @@
         "EncryptionAlgorithm": "AES256_CBC",
         "SigningAlgorithm": "NONE",
         "MdnSigningAlgorithm": "DEFAULT",
-        "MdnResponse": "NONE"
+        "MdnResponse": "NONE",
+        "PreserveContentType": "ENABLED"
       },
       "Arn": "arn:aws:transfer:us-east-1:${PERSONAL_AWS}:connector/c-b19e4d54098e42bcb",
       "Url": "http://www.google.com/"

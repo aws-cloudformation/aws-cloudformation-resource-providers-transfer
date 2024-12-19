@@ -7,9 +7,14 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -44,17 +49,21 @@ public class CreateHandlerTest extends AbstractTestBase {
         handler = new CreateHandler();
     }
 
-    @Test
-    public void handleRequest_SimpleSuccess() {
+    @ParameterizedTest
+    @MethodSource("provideDirectoryOptions")
+    public void handleRequest_SimpleSuccess(String baseDirectory, CustomDirectories customDirectories) {
         final ResourceModel model = ResourceModel.builder()
                 .accessRole(TEST_ACCESS_ROLE)
-                .baseDirectory(TEST_BASE_DIRECTORY)
+                .baseDirectory(baseDirectory)
                 .description(TEST_DESCRIPTION)
                 .localProfileId(TEST_LOCAL_PROFILE)
                 .partnerProfileId(TEST_PARTNER_PROFILE)
                 .serverId(TEST_SERVER_ID)
                 .status(TEST_STATUS)
                 .tags(MODEL_TAGS)
+                .preserveFilename(TEST_PRESERVE_FILENAME)
+                .enforceMessageSigning(TEST_ENFORCE_MESSAGE_SIGNING)
+                .customDirectories(customDirectories)
                 .build();
 
         final ResourceHandlerRequest<ResourceModel> request = ResourceHandlerRequest.<ResourceModel>builder()
@@ -79,17 +88,26 @@ public class CreateHandlerTest extends AbstractTestBase {
         assertThat(response.getMessage()).isNull();
         assertThat(response.getErrorCode()).isNull();
         assertThat(testModel).hasFieldOrPropertyWithValue("accessRole", TEST_ACCESS_ROLE);
-        assertThat(testModel).hasFieldOrPropertyWithValue("baseDirectory", TEST_BASE_DIRECTORY);
+        assertThat(testModel).hasFieldOrPropertyWithValue("baseDirectory", baseDirectory);
         assertThat(testModel).hasFieldOrPropertyWithValue("description", TEST_DESCRIPTION);
         assertThat(testModel).hasFieldOrPropertyWithValue("localProfileId", TEST_LOCAL_PROFILE);
         assertThat(testModel).hasFieldOrPropertyWithValue("partnerProfileId", TEST_PARTNER_PROFILE);
         assertThat(testModel).hasFieldOrPropertyWithValue("serverId", TEST_SERVER_ID);
         assertThat(testModel).hasFieldOrPropertyWithValue("status", TEST_STATUS);
+        assertThat(testModel).hasFieldOrPropertyWithValue("preserveFilename", TEST_PRESERVE_FILENAME);
+        assertThat(testModel).hasFieldOrPropertyWithValue("enforceMessageSigning", TEST_ENFORCE_MESSAGE_SIGNING);
+        assertThat(testModel).hasFieldOrPropertyWithValue("customDirectories", customDirectories);
 
         ArgumentCaptor<CreateAgreementRequest> requestCaptor = ArgumentCaptor.forClass(CreateAgreementRequest.class);
         verify(client).createAgreement(requestCaptor.capture());
         CreateAgreementRequest actualRequest = requestCaptor.getValue();
         assertThat(actualRequest.tags()).containsExactlyInAnyOrder(SDK_MODEL_TAG, SDK_SYSTEM_TAG);
+    }
+
+    private static Stream<Arguments> provideDirectoryOptions() {
+        return Stream.of(
+                Arguments.of(TEST_BASE_DIRECTORY, null),
+                Arguments.of(null, Converter.CustomDirectoriesConverter.fromSdk(getCustomDirectories())));
     }
 
     @Test

@@ -20,6 +20,9 @@ To declare this entity in your AWS CloudFormation template, use the following sy
         "<a href="#accessrole" title="AccessRole">AccessRole</a>" : <i>String</i>,
         "<a href="#status" title="Status">Status</a>" : <i>String</i>,
         "<a href="#tags" title="Tags">Tags</a>" : <i>[ <a href="tag.md">Tag</a>, ... ]</i>,
+        "<a href="#preservefilename" title="PreserveFilename">PreserveFilename</a>" : <i>String</i>,
+        "<a href="#enforcemessagesigning" title="EnforceMessageSigning">EnforceMessageSigning</a>" : <i>String</i>,
+        "<a href="#customdirectories" title="CustomDirectories">CustomDirectories</a>" : <i><a href="customdirectories.md">CustomDirectories</a></i>
     }
 }
 </pre>
@@ -38,6 +41,9 @@ Properties:
     <a href="#status" title="Status">Status</a>: <i>String</i>
     <a href="#tags" title="Tags">Tags</a>: <i>
       - <a href="tag.md">Tag</a></i>
+    <a href="#preservefilename" title="PreserveFilename">PreserveFilename</a>: <i>String</i>
+    <a href="#enforcemessagesigning" title="EnforceMessageSigning">EnforceMessageSigning</a>: <i>String</i>
+    <a href="#customdirectories" title="CustomDirectories">CustomDirectories</a>: <i><a href="customdirectories.md">CustomDirectories</a></i>
 </pre>
 
 ## Properties
@@ -110,7 +116,7 @@ _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormati
 
 Specifies the base directory for the agreement.
 
-_Required_: Yes
+_Required_: No
 
 _Type_: String
 
@@ -155,6 +161,40 @@ Key-value pairs that can be used to group and search for agreements. Tags are me
 _Required_: No
 
 _Type_: List of <a href="tag.md">Tag</a>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### PreserveFilename
+
+Specifies whether to preserve the filename received for this agreement.
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>ENABLED</code> | <code>DISABLED</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### EnforceMessageSigning
+
+Specifies whether to enforce an AS2 message is signed for this agreement.
+
+_Required_: No
+
+_Type_: String
+
+_Allowed Values_: <code>ENABLED</code> | <code>DISABLED</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### CustomDirectories
+
+Specifies a separate directory for each type of file to store for an AS2 message.
+
+_Required_: No
+
+_Type_: <a href="customdirectories.md">CustomDirectories</a>
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 
