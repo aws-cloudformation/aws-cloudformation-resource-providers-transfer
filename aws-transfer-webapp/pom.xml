@@ -5,22 +5,11 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>software.amazon.transfer</groupId>
-    <artifactId>aws-transfer-cloudformation</artifactId>
-    <name>aws-transfer-cloudformation</name>
+    <groupId>software.amazon.transfer.webapp</groupId>
+    <artifactId>aws-transfer-webapp-handler</artifactId>
+    <name>aws-transfer-webapp-handler</name>
     <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>aws-transfer-agreement</module>
-        <module>aws-transfer-certificate</module>
-        <module>aws-transfer-connector</module>
-        <module>aws-transfer-profile</module>
-        <module>aws-transfer-server</module>
-        <module>aws-transfer-user</module>
-        <module>aws-transfer-webapp</module>
-        <module>aws-transfer-workflow</module>
-    </modules>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -28,115 +17,83 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <cfn.generate.args/>
-	<!-- Keep all module versions here -->
-	<awssdk.version>2.26.12</awssdk.version>
-	<log4j.version>2.23.1</log4j.version>
-	<lombok.version>1.18.34</lombok.version>
-	<assertj.version>3.26.0</assertj.version>
-	<junit.version>5.10.3</junit.version>
-	<mockito.version>5.12.0</mockito.version>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>software.amazon.awssdk</groupId>
-                <artifactId>bom</artifactId>
-		<version>${awssdk.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/software.amazon.cloudformation/aws-cloudformation-rpdk-java-plugin -->
-            <dependency>
-                <groupId>software.amazon.cloudformation</groupId>
-                <artifactId>aws-cloudformation-rpdk-java-plugin</artifactId>
-                <version>[2.0.0,3.0.0)</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/transfer -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>transfer</artifactId>
+            <version>2.29.30</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/software.amazon.awssdk/ec2 -->
+        <!-- https://mvnrepository.com/artifact/software.amazon.cloudformation/aws-cloudformation-rpdk-java-plugin -->
         <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>ec2</artifactId>
+            <groupId>software.amazon.cloudformation</groupId>
+            <artifactId>aws-cloudformation-rpdk-java-plugin</artifactId>
+            <version>[2.0.0,3.0.0)</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-	    <version>${lombok.version}</version>
+            <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-	    <version>${log4j.version}</version>
+            <version>2.22.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-	    <version>${log4j.version}</version>
+            <version>2.22.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-slf4j-impl</artifactId>
-	    <version>${log4j.version}</version>
+            <version>2.22.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.assertj/assertj-core -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-	    <version>${assertj.version}</version>
+            <version>3.24.2</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-	    <version>${junit.version}</version>
+            <version>5.10.1</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-	    <version>${mockito.version}</version>
+            <version>5.8.0</version>
             <scope>test</scope>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-	    <version>${mockito.version}</version>
+            <version>5.8.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-	<pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.3.0</version>
-	        </plugin>
-	    </plugins>
-	</pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>3.11.0</version>
                 <configuration>
                     <compilerArgs>
                         <arg>-Xlint:all,-options,-processing</arg>
@@ -147,7 +104,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.5.1</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <filters>
@@ -170,8 +127,27 @@
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <id>generate</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>cfn</executable>
+                            <commandlineArgs>generate ${cfn.generate.args}</commandlineArgs>
+                            <workingDirectory>${project.basedir}</workingDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>add-source</id>
@@ -193,9 +169,8 @@
                 <version>3.3.1</version>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.2.3</version>
                 <configuration>
                     <systemPropertyVariables>
                         <uluru.unit.tests>true</uluru.unit.tests>
@@ -205,18 +180,17 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>0.8.11</version>
                 <configuration>
                     <excludes>
                         <exclude>**/BaseConfiguration*</exclude>
                         <exclude>**/BaseHandler*</exclude>
-			<exclude>**/CallbackContext*</exclude>
                         <exclude>**/Configuration*</exclude>
-			<exclude>**/Converter*</exclude>
                         <exclude>**/HandlerWrapper*</exclude>
                         <exclude>**/ResourceModel*</exclude>
                         <exclude>**/ClientBuilder*</exclude>
-                        <exclude>**/*ClientBuilder*</exclude>
+                        <exclude>**/CallBackContext*</exclude>
+                        <exclude>**/Converter*</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -284,5 +258,19 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>${project.basedir}</directory>
+                <includes>
+                    <include>aws-transfer-webapp.json</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/target/loaded-target-schemas</directory>
+                <includes>
+                    <include>**/*.json</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 </project>
